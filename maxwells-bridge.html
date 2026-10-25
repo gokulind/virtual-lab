@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maxwell’s Bridge | KGR Virtual Lab</title>
+<style>
+:root{--navy:#12304a;--blue:#1769aa;--teal:#078b83;--bg:#f3f7fb;--ink:#182534;--muted:#5c6b7a;--line:#dce5ee}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:25px 20px}.wrap{max-width:1100px;margin:auto}header a{color:white}.back{display:inline-block;margin-bottom:8px}h1{margin:4px 0}main{max-width:1100px;margin:24px auto;padding:0 18px}.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 5px 18px #16324b0b}.panel h2{margin-top:0;font-size:1.2rem}.diagram{width:100%;height:auto;display:block;background:#fbfdff;border:1px solid var(--line);border-radius:12px}
+label{display:block;font-weight:bold;font-size:.92rem;margin:14px 0 5px}input{width:100%;font:inherit;padding:10px;border:1px solid #cbd7e2;border-radius:8px}small,.muted{color:var(--muted)}.result{background:#eaf7f5;border:1px solid #bde5df;border-radius:12px;padding:15px;margin-top:16px}.result strong{font-size:1.05rem}.btn{border:0;background:var(--blue);color:white;padding:11px 15px;border-radius:9px;font:inherit;font-weight:bold;cursor:pointer;margin-top:14px}.formula{background:#f4f7fa;padding:12px;border-radius:9px;overflow-wrap:anywhere}.warning{font-size:.88rem;color:#664d12;background:#fff8e7;border:1px solid #f1dfad;padding:12px;border-radius:10px;margin-top:14px}footer{text-align:center;color:var(--muted);padding:24px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div class="wrap"><a class="back" href="index.html">← Back to Virtual Lab</a><div class="muted" style="color:#d6eaff">KGR · Electrical & Electronics Engineering</div><h1>Maxwell’s Bridge</h1><div>Interactive balance-condition learning module</div></div></header>
+<main class="wrap">
+<div class="layout">
+<section class="panel">
+<h2>1. Bridge concept</h2>
+<p>Maxwell’s inductance-capacitance bridge can be used to determine an unknown coil’s inductance and resistance by comparison with a standard capacitor and resistors.</p>
+<svg class="diagram" viewBox="0 0 620 390" role="img" aria-label="Conceptual Maxwell bridge diagram">
+<rect x="1" y="1" width="618" height="388" rx="12" fill="#fbfdff" stroke="#dce5ee"/>
+<g stroke="#1769aa" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M310 65 L145 165 L310 265 L475 165 Z"/>
+<path d="M145 165 L310 165 L475 165"/>
+<path d="M310 65 L310 20 M310 265 L310 325"/>
+<path d="M290 20 L330 20 M290 325 L330 325"/>
+</g>
+<g fill="#12304a" font-family="Arial" font-size="16" font-weight="bold">
+<text x="322" y="55">Zx = Rx + jωLx</text><text x="75" y="150">R2</text><text x="332" y="292">R3</text><text x="430" y="150">R4 ∥ C4</text>
+<text x="320" y="14" font-size="13">AC supply</text><text x="320" y="348" font-size="13">Return</text>
+<text x="318" y="151" font-size="13">Detector</text>
+</g>
+<g stroke="#078b83" stroke-width="3" fill="none"><circle cx="310" cy="165" r="10"/><path d="M300 165h20"/></g>
+<text x="18" y="370" fill="#5c6b7a" font-family="Arial" font-size="12">Conceptual teaching diagram only — exact arm arrangement may vary by textbook.</text>
+</svg>
+<p class="muted">This page demonstrates the ideal balance equations; it is not a real circuit instrument or hardware controller.</p>
+</section>
+<section class="panel">
+<h2>2. Enter known values</h2>
+<p>For the common Maxwell bridge balance form used in this teaching calculator:</p>
+<div class="formula"><strong>Lx = R2 × R3 × C4</strong><br><strong>Rx = (R2 × R3) / R4</strong></div>
+<label for="r2">R₂ (Ω)</label><input id="r2" type="number" min="0.000001" step="any" value="1000">
+<label for="r3">R₃ (Ω)</label><input id="r3" type="number" min="0.000001" step="any" value="1000">
+<label for="r4">R₄ (Ω)</label><input id="r4" type="number" min="0.000001" step="any" value="1000">
+<label for="c4">C₄ (µF)</label><input id="c4" type="number" min="0.000001" step="any" value="0.1">
+<button class="btn" id="calculate">Calculate balance values</button>
+<div class="result" aria-live="polite"><div>Unknown coil resistance, Rₓ</div><strong id="rx">1000 Ω</strong><hr><div>Unknown coil inductance, Lₓ</div><strong id="lx">0.1 H</strong></div>
+<div class="warning"><strong>Check your course convention:</strong> Bridge-arm labels and balance equations can differ between diagrams and textbooks. Verify these equations against your laboratory manual before using the page for assessment.</div>
+</section>
+</div>
+<section class="panel" style="margin-top:18px">
+<h2>3. Learning checkpoints</h2>
+<ol><li>Set the known resistor and capacitor values.</li><li>Calculate the unknown coil resistance and inductance using the displayed balance equations.</li><li>Change one component at a time and observe how the calculated unknown values change.</li><li>Record the values and compare them with the theoretical result in your lab record.</li></ol>
+<h3>Try it</h3><p>Set R₂ = 1000 Ω, R₃ = 1000 Ω, R₄ = 1000 Ω and C₄ = 0.1 µF. Then change C₄ to 0.2 µF. What happens to the calculated inductance?</p>
+</section>
+</main><footer>KGR Virtual Laboratory · Maxwell’s Bridge prototype</footer>
+<script>
+const ids=['r2','r3','r4','c4'];const get=id=>Number(document.getElementById(id).value);
+function fmt(n,unit){if(!Number.isFinite(n))return '—';return n.toLocaleString(undefined,{maximumSignificantDigits:6})+' '+unit}
+function calc(){const [r2,r3,r4,cuf]=ids.map(get);if([r2,r3,r4,cuf].some(v=>!Number.isFinite(v)||v<=0)){document.getElementById('rx').textContent='Enter positive values';document.getElementById('lx').textContent='Enter positive values';return;}const rx=(r2*r3)/r4;const lx=r2*r3*(cuf*1e-6);document.getElementById('rx').textContent=fmt(rx,'Ω');document.getElementById('lx').textContent=fmt(lx,'H');}
+document.getElementById('calculate').addEventListener('click',calc);ids.forEach(id=>document.getElementById(id).addEventListener('input',calc));calc();
+</script>
+</body></html>

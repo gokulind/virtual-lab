@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wheatstone Bridge Virtual Laboratory</title>
+<style>
+.wb-app{
+  
+  
+  
+  --bg:#e8eef2;--surface:#ffffff;--surface2:#f1f5f8;--ink:#12212e;--muted:#58708a;--line:#d3dfe8;
+  --accent:#0d6e92;--accent-ink:#ffffff;--good:#10773a;--goodbg:#e4f5ea;--bad:#b3261e;--badbg:#fdeceb;
+  --warn:#86540a;--warnbg:#fff4d9;--idle:#4a5d70;--idlebg:#e9eff4;
+  --wire:#2b4157;--flow:#e08a00;--needle:#d92d20;--gaugebg:#d8eef7;--dial:#fbfdff;--shadow:0 5px 22px rgba(18,33,46,.09);
+}
+.wb-app[data-theme="dark"]{
+  --bg:#0a131a;--surface:#121f2a;--surface2:#192a38;--ink:#e5eef5;--muted:#8da6bb;--line:#26394a;
+  --accent:#4fb4d8;--accent-ink:#04141c;--good:#52d68f;--goodbg:#0f2f20;--bad:#ff8c82;--badbg:#391613;
+  --warn:#f4c35e;--warnbg:#33290f;--idle:#9db3c6;--idlebg:#1a2a38;
+  --wire:#9db8cf;--flow:#ffb937;--needle:#ff6a5e;--gaugebg:#17384b;--dial:#0e1923;--shadow:0 5px 22px rgba(0,0,0,.45);
+}
+.wb-app *{box-sizing:border-box}
+.wb-app{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+.wb-app button,.wb-app select,.wb-app input{font:inherit;color:inherit}
+.wb-app :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wb-app .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.wb-app .top{background:linear-gradient(120deg,#082f4a,#0d6e92);color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wb-app .brand{display:flex;gap:12px;align-items:center;min-width:0}
+.wb-app .logo{flex:none;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.wb-app .logo svg{width:24px;height:24px}
+.wb-app .top h1{margin:0;font-size:18px;line-height:1.2}
+.wb-app .top p{margin:0;font-size:12px;opacity:.85}
+.wb-app .icon{flex:none;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:6px 11px;cursor:pointer}
+.wb-app .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:1680px;margin:10px auto 0;padding:0 14px}
+.wb-app .mode{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left;font-weight:700;line-height:1.3}
+.wb-app .mode small{display:none}
+.wb-app .mode[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.wb-app main{width:100%;max-width:1680px;margin:10px auto 24px;padding:0 14px}
+.wb-app .layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:12px;align-items:start}
+.wb-app .stack{display:grid;gap:12px;min-width:0}
+.wb-app .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.wb-app aside.card{position:sticky;top:8px;max-height:calc(100dvh - 16px);overflow:auto}
+.wb-app h2{margin:0 0 2px;font-size:17px}
+.wb-app h3{margin:14px 0 6px;font-size:15px}
+.wb-app .muted{color:var(--muted);font-size:13px}
+.wb-app .sec{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.wb-app .sec:first-of-type{border-top:0;margin-top:6px;padding-top:0}
+.wb-app .sec h3{margin:0 0 6px;font-size:13.5px;color:var(--muted);font-weight:700}
+.wb-app .ctl{margin:7px 0}
+.wb-app .ctlh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.wb-app .inp{display:inline-flex;align-items:center;gap:4px}
+.wb-app .inp em{font-style:normal;color:var(--muted);font-weight:600;font-size:13px}
+.wb-app input[type=number],.wb-app select{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:4px 7px;font-weight:700}
+.wb-app input[type=number]{width:84px;text-align:right}
+.wb-app select{max-width:100%}
+.wb-app input[type=range]{width:100%;accent-color:var(--accent);margin:3px 0 0}
+.wb-app .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.wb-app .btn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+.wb-app .btn:hover{border-color:var(--accent)}
+.wb-app .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1}
+.wb-app .btn[disabled]{opacity:.5;cursor:not-allowed}
+.wb-app .seg{display:flex;gap:6px;flex-wrap:wrap}
+.wb-app .seg .btn{flex:1;padding:7px 6px;text-align:center}
+.wb-app .seg .btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.wb-app .check{display:flex;gap:8px;align-items:center;font-weight:600;font-size:14px;margin:8px 0 2px}
+.wb-app .keybtn{width:100%;display:flex;align-items:center;justify-content:space-between}
+.wb-app .led{width:12px;height:12px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 3px var(--surface2)}
+.wb-app .led.on{background:var(--good)}
+.wb-app .hidden{display:none !important}
+.wb-app .stage{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(210px,1fr);gap:12px;margin-top:8px}
+.wb-app .panel{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:6px;min-width:0}
+.wb-app .panel svg{display:block;width:100%;height:auto}
+.wb-app .formula{font-size:13.5px;background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:7px 10px;margin:8px 0 0}
+.wb-app .wire{stroke:var(--wire);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.wb-app .flow{stroke:var(--flow);stroke-width:4.6;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:.1 15;animation:dash 1.2s linear infinite;opacity:0;transition:opacity .25s}
+@keyframes dash{to{stroke-dashoffset:-15.1}}
+@media (prefers-reduced-motion:reduce){.wb-app .flow{animation:none;stroke-dasharray:3 10}}
+.wb-app .res{fill:var(--surface);stroke:var(--wire);stroke-width:3}
+.wb-app .res.gauge{fill:var(--gaugebg);stroke:var(--accent)}
+.wb-app .lbl{font-weight:800;fill:var(--ink);font-size:16px}
+.wb-app .val{fill:var(--muted);font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.wb-app .nv{fill:var(--accent);font-size:12.5px;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+.wb-app .tag{font-size:11px;fill:var(--accent);font-weight:700}
+.wb-app .node{fill:var(--accent)}
+.wb-app .gcirc{fill:var(--surface);stroke:var(--accent);stroke-width:4;transition:stroke .2s}
+.wb-app .gcirc.ok{stroke:var(--good)}
+.wb-app .plate{stroke:var(--wire);stroke-linecap:round}
+.wb-app .small{font-size:11.5px;fill:var(--muted)}
+.wb-app .keyhit{cursor:pointer;fill:transparent}
+.wb-app .face{fill:var(--dial);stroke:var(--line);stroke-width:2}
+.wb-app .arc{fill:none;stroke:var(--wire);stroke-width:2}
+.wb-app .tmin{stroke:var(--wire);stroke-width:1.2}
+.wb-app .tmaj{stroke:var(--wire);stroke-width:2.2}
+.wb-app .dl{font-size:9.5px;fill:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.wb-app .needle{stroke:var(--needle);stroke-width:2.8;stroke-linecap:round}
+.wb-app .hub{fill:var(--wire)}
+.wb-app .ovl{fill:var(--line)}
+.wb-app .ovl.on{fill:var(--bad)}
+.wb-app .dig{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 6px 0;flex-wrap:wrap}
+.wb-app .dig b{font-size:18px}
+.wb-app .dmm{background:var(--dial);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.wb-app .dmm .big{font-size:30px;font-weight:700;margin:4px 0;color:var(--accent)}
+.wb-app .reads{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.wb-app .read{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:8px 10px;min-width:0}
+.wb-app .read small{display:block;color:var(--muted);font-size:12px}
+.wb-app .read b{display:block;font-size:15.5px;margin-top:1px;overflow-wrap:anywhere}
+.wb-app .read i{display:block;font-style:normal;font-size:11.5px;color:var(--muted)}
+.wb-app .status{margin-top:10px;padding:9px 12px;border-radius:11px;font-weight:600}
+.wb-app .status.ok{background:var(--goodbg);color:var(--good)}
+.wb-app .status.bad{background:var(--badbg);color:var(--bad)}
+.wb-app .status.warn{background:var(--warnbg);color:var(--warn)}
+.wb-app .status.idle{background:var(--idlebg);color:var(--idle)}
+.wb-app .status span{display:block;font-weight:500;font-size:13px;margin-top:2px;opacity:.95}
+.wb-app table{width:100%;border-collapse:collapse;font-size:13.5px}
+.wb-app th,.wb-app td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.wb-app th:first-child,.wb-app td:first-child,.wb-app th.l,.wb-app td.l{text-align:left}
+.wb-app th{color:var(--muted);font-weight:700;font-size:12.5px;background:var(--surface2)}
+.wb-app tr.hot td{color:var(--bad);font-weight:700}
+.wb-app .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.wb-app .warnline{margin-top:8px;font-size:13px;color:var(--warn);background:var(--warnbg);border-radius:8px;padding:7px 10px}
+.wb-app .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-4px -4px 12px;overflow-x:auto;flex:none}
+.wb-app .tab{border:0;background:none;padding:8px 12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.wb-app .tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.wb-app .chartbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.wb-app .chartbar label{font-size:13px;font-weight:700;color:var(--muted)}
+.wb-app #chart{width:100%;height:auto;background:var(--surface2);border:1px solid var(--line);border-radius:12px;touch-action:pan-y}
+.wb-app .ax{stroke:var(--muted);stroke-width:1.4}
+.wb-app .gl{stroke:var(--line);stroke-width:1}
+.wb-app .zero{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 4}
+.wb-app .tk{font-size:11px;fill:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.wb-app .axt{font-size:12px;fill:var(--ink);font-weight:700}
+.wb-app .cv{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round}
+.wb-app .cv2{fill:none;stroke:var(--flow);stroke-width:2.4;stroke-dasharray:7 5}
+.wb-app .cmsg{fill:var(--muted);font-size:14px}
+.wb-app .mk{fill:var(--needle);stroke:var(--surface);stroke-width:2}
+.wb-app .nl{fill:var(--good);stroke:var(--surface);stroke-width:2}
+.wb-app .mkt{font-size:12px;fill:var(--ink);font-weight:700}
+.wb-app .cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.wb-app .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:8px}
+.wb-app .legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:5px}
+.wb-app .legend i.d{border-top:3px dashed var(--flow)}
+.wb-app .eq{background:var(--surface2);border-left:4px solid var(--accent);border-radius:6px;padding:8px 12px;margin:8px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;overflow-x:auto;white-space:nowrap}
+.wb-app .doc p,.wb-app .doc li{max-width:78ch}
+.wb-app .doc ul,.wb-app .doc ol{padding-left:22px}
+.wb-app .proc{display:none}
+.wb-app .proc.on{display:block}
+.wb-app .qz{border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:var(--surface2)}
+.wb-app .qo{display:grid;gap:6px;margin-top:8px}
+.wb-app .opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:7px 11px;cursor:pointer}
+.wb-app .opt:hover:not([disabled]){border-color:var(--accent)}
+.wb-app .opt.right{background:var(--goodbg);border-color:var(--good);color:var(--good);font-weight:700}
+.wb-app .opt.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.wb-app .qe{font-size:13px;color:var(--muted);margin-top:8px}
+.wb-app .score{font-weight:800;font-size:16px}
+.wb-app .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:9;max-width:90vw}
+.wb-app .toast.show{opacity:1;transform:translate(-50%,0)}
+.wb-app .dec{display:flex;gap:5px;justify-content:center;align-items:flex-end;margin:4px 0 8px}
+.wb-app .dc{display:flex;flex-direction:column;align-items:center;gap:3px}
+.wb-app .dc small{color:var(--muted);font-weight:700;font-size:11.5px}
+.wb-app .dc button{width:40px;height:24px;border:1px solid var(--line);background:var(--surface2);border-radius:7px;cursor:pointer;font-size:12px;padding:0}
+.wb-app .dc button:hover{border-color:var(--accent)}
+.wb-app .dg{width:40px;text-align:center;font-size:24px;font-weight:700;background:var(--dial);border:1px solid var(--line);border-radius:8px;padding:2px 0}
+.wb-app .dp{font-size:26px;font-weight:800;padding-bottom:28px;color:var(--muted)}
+.wb-app textarea{width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px;font:12.5px ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+
+.wb{display:block;width:100%}
+.wb-app{text-align:left;text-transform:none;letter-spacing:normal;font-style:normal}
+.wb-app h1,.wb-app h2,.wb-app h3{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif !important;text-transform:none !important;letter-spacing:normal !important;font-style:normal !important}
+.wb-app h1{font-size:18px !important;font-weight:700 !important;line-height:1.2 !important;margin:0 !important;color:#fff !important;padding:0 !important}
+.wb-app h2{font-size:17px !important;font-weight:700 !important;line-height:1.3 !important;margin:0 0 2px !important;padding:0 !important;color:var(--ink) !important}
+.wb-app h3{font-size:15px !important;font-weight:700 !important;line-height:1.3 !important;padding:0 !important;color:var(--ink) !important}
+.wb-app .sec h3{font-size:13.5px !important;color:var(--muted) !important;margin:0 0 6px !important}
+.wb-app .doc h3{margin:14px 0 6px !important}
+.wb-app .doc h3:first-child{margin-top:0 !important}
+.wb-app p,.wb-app li,.wb-app td,.wb-app th,.wb-app label,.wb-app small{font-family:inherit;letter-spacing:normal;text-transform:none}
+.wb-app button,.wb-app select,.wb-app input,.wb-app textarea{font-family:inherit;letter-spacing:normal;text-transform:none;margin:0}
+.wb-app .mono,.wb-app .eq{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace !important}
+.wb-app .eq{white-space:normal;overflow:visible;overflow-wrap:anywhere;font-size:12.5px}
+.wb-app .tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:2px;overflow:visible;margin:-4px -4px 12px}
+.wb-app .tab{padding:8px 4px;text-align:center}
+.wb-app .lbl{font-size:18px}
+.wb-app .val,.wb-app .nv{font-size:14.5px}
+.wb-app .tag{font-size:12.5px}
+.wb-app .tp{scrollbar-width:thin}
+
+/* size modes set by script from the width actually available */
+.wb-app[data-w="md"] .stage,.wb-app[data-w="lg"] .stage{grid-template-columns:minmax(0,1.5fr) minmax(190px,1fr)}
+.wb-app:not([data-w="lg"]) .tp{max-height:400px;overflow:auto}
+.wb-app[data-w="sm"] .layout{grid-template-columns:1fr}
+.wb-app[data-w="sm"] aside.card{position:static;max-height:none}
+.wb-app[data-w="sm"] .stage{grid-template-columns:1fr}
+.wb-app[data-w="sm"] .modes{grid-template-columns:1fr}
+.wb-app[data-w="sm"] .top p{display:none}
+.wb-app[data-w="sm"] .top h1{font-size:16px !important}
+.wb-app[data-w="lg"]{height:clamp(640px,calc(100vh - 24px),900px);display:flex;flex-direction:column}
+.wb-app[data-w="lg"] .top,.wb-app[data-w="lg"] .modes{flex:none}
+.wb-app[data-w="lg"] main{flex:1;min-height:0;margin:10px auto 12px}
+.wb-app[data-w="lg"] .layout{height:100%;grid-template-columns:280px minmax(0,1fr);align-items:stretch}
+.wb-app[data-w="lg"] aside.card{position:static;max-height:none;height:100%;overflow:auto}
+.wb-app[data-w="lg"] .stack{grid-template-columns:minmax(0,1fr) 440px;height:100%;min-height:0;align-items:stretch}
+.wb-app[data-w="lg"] .stack>.card{min-height:0;overflow:auto}
+.wb-app[data-w="lg"] .tabcard{display:flex;flex-direction:column;overflow:hidden}
+.wb-app[data-w="lg"] .tabcard .tp{flex:1;min-height:0;max-height:none;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wb"><div class="wb-app" id="wbApp" data-w="md">
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M14 3 L25 14 L14 25 L3 14 Z"/><path d="M3 14 H25" stroke-dasharray="2 3"/></svg>
+    </div>
+    <div>
+      <h1>Wheatstone Bridge Virtual Laboratory</h1>
+      <p>DC bridge measurements · Measurements &amp; Instrumentation</p>
+    </div>
+  </div>
+  <button class="icon" id="themeBtn" aria-label="Switch light or dark theme" title="Switch light or dark theme">◐ Theme</button>
+</header>
+
+<nav class="modes" role="tablist" aria-label="Experiment">
+  <button class="mode" role="tab" data-mode="explore" aria-selected="true" title="Change every arm, watch the null">Explore the bridge<small>Change every arm, watch the null</small></button>
+  <button class="mode" role="tab" data-mode="measure" aria-selected="false" title="Balance with a decade box">Measure an unknown resistor<small>Balance with a decade box</small></button>
+  <button class="mode" role="tab" data-mode="strain" aria-selected="false" title="Quarter, half and full bridge">Strain-gauge bridge<small>Quarter, half and full bridge</small></button>
+</nav>
+
+<main>
+<div class="layout">
+
+  <aside class="card" aria-label="Controls">
+    <h2>Bench controls</h2>
+    <div class="muted">Settings apply to the circuit immediately.</div>
+
+    <div class="sec">
+      <h3>Supply</h3>
+      <div class="ctl"><div class="ctlh">Supply voltage Vs<span class="inp"><input type="number" id="vsN" min="1" max="24" step="0.1" value="10"><em>V</em></span></div>
+        <input type="range" id="vs" min="1" max="24" step="0.1" value="10" aria-label="Supply voltage"></div>
+      <button class="btn keybtn" id="keyBtn"><span>Battery key K</span><span><span id="keyTxt">Closed</span> <span class="led on" id="keyLed"></span></span></button>
+    </div>
+
+    <div class="sec">
+      <h3 id="armHead">Bridge arms</h3>
+      <div id="armCtl"></div>
+    </div>
+
+    <div class="sec" id="galvCtl">
+      <h3>Galvanometer</h3>
+      <div class="ctl"><div class="ctlh">Coil resistance Rg<span class="inp"><input type="number" id="rgN" min="10" max="1000" step="1" value="100"><em>Ω</em></span></div>
+        <input type="range" id="rg" min="10" max="1000" step="1" value="100" aria-label="Galvanometer resistance"></div>
+      <div class="ctl"><div class="ctlh"><label for="rangeSel">Full-scale range</label>
+        <select id="rangeSel"><option value="0.01">±10 mA</option><option value="0.001" selected>±1 mA</option><option value="0.0001">±100 µA</option><option value="0.00001">±10 µA</option></select></div>
+        <div class="muted">Use a high range while far from balance; lower it for the final null.</div></div>
+    </div>
+    <div class="sec hidden" id="detNote"><h3>Detector</h3><div class="muted">A high-impedance amplifier (10 MΩ) reads the bridge output, so the bridge is practically unloaded.</div></div>
+
+    <div class="sec"><button class="btn" id="resetBtn" style="width:100%">↺ Reset this experiment</button></div>
+  </aside>
+
+  <section class="stack">
+
+    <div class="card">
+      <h2 id="modeTitle"></h2>
+      <div class="muted" id="modeDesc"></div>
+      <div class="stage">
+        <div class="panel"><svg id="diagram" viewBox="24 8 516 466" role="img" aria-label="Wheatstone bridge circuit diagram"></svg></div>
+        <div>
+          <div class="panel" id="dialWrap">
+            <svg id="dial" viewBox="0 0 300 190" role="img" aria-label="Galvanometer dial"></svg>
+            <div class="dig"><div><small class="muted">Ig (B→C)</small><br><b class="mono" id="dI">0.00 µA</b></div><div style="text-align:right"><small class="muted">Deflection</small><br><b class="mono" id="dDiv">0.0 div</b></div></div>
+          </div>
+          <div class="dmm hidden" id="dmm">
+            <div class="muted">Bridge output Vo (B–C)</div>
+            <div class="big mono" id="dmmV">0.000 mV</div>
+            <div class="muted mono" id="dmmS">0.000 mV/V</div>
+          </div>
+          <div class="formula mono" id="formulaBox"></div>
+        </div>
+      </div>
+      <div class="status ok" id="status" role="status"></div>
+    </div>
+
+    <div class="card tabcard">
+      <div class="tabs" role="tablist" aria-label="Lab sections">
+        <button class="tab" role="tab" data-tab="live" aria-selected="true">Live</button>
+        <button class="tab" role="tab" data-tab="chart" aria-selected="false">Graph</button>
+        <button class="tab" role="tab" data-tab="obs" aria-selected="false">Readings</button>
+        <button class="tab" role="tab" data-tab="theory" aria-selected="false">Theory</button>
+        <button class="tab" role="tab" data-tab="proc" aria-selected="false">Procedure</button>
+        <button class="tab" role="tab" data-tab="viva" aria-selected="false">Quiz</button>
+      </div>
+
+      <div id="tab-live" class="tp">
+        <div class="reads" id="reads"></div>
+        <h3>Branch analysis</h3>
+        <div class="scroll"><table id="branch"></table></div>
+        <div id="warns"></div>
+      </div>
+
+      <div id="tab-chart" class="tp hidden">
+        <div class="chartbar" id="chartBar">
+          <label>Vary <select id="swSel"><option value="0">R₁</option><option value="1">R₂</option><option value="2">R₃</option><option value="3" selected>R₄</option></select></label>
+          <label>Plot <select id="yqSel"><option value="vo">Bridge voltage Vo (mV)</option><option value="ig">Galvanometer current Ig (mA)</option></select></label>
+        </div>
+        <svg id="chart" viewBox="0 0 520 320" role="img" aria-label="Bridge characteristic curve"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div id="tab-obs" class="tp hidden">
+        <div class="btns" style="margin:0 0 10px">
+          <button class="btn primary" id="recBtn" style="flex:none">＋ Record reading</button>
+          <button class="btn" id="csvBtn">Copy as CSV</button>
+          <button class="btn" id="clrBtn">Clear table</button>
+        </div>
+        <div class="scroll"><table id="trials"></table></div>
+        <div class="formula" id="trialSum">No readings yet. Set up the bridge and press Record reading.</div>
+        <div id="csvBox" class="hidden"><div class="muted">Select all and copy (Ctrl/⌘ + C):</div><textarea id="csvText" readonly></textarea></div>
+      </div>
+
+      <div id="tab-theory" class="tp hidden doc">
+        <h3 style="margin-top:0">Principle</h3>
+        <p>A Wheatstone bridge has four resistors in a diamond. A DC source drives the diagonal A–D; a null detector (galvanometer) sits across the other diagonal B–C. When the potentials at B and C are equal, no current flows through the detector, and the unknown resistance follows from the other three.</p>
+        <h3>Bridge equations (this lab's labelling)</h3>
+        <p>R₁ = A–B, R₂ = B–D, R₃ = A–C, R₄ = C–D, with the source positive at A and D at 0 V.</p>
+        <div class="eq">V_B = Vs · R₂ / (R₁ + R₂)     V_C = Vs · R₄ / (R₃ + R₄)</div>
+        <div class="eq">Vo = V_B − V_C = Vs (R₂R₃ − R₁R₄) / [(R₁+R₂)(R₃+R₄)]</div>
+        <div class="eq">Balance: Vo = 0 ⇒ R₁R₄ = R₂R₃ ⇒ R₁/R₂ = R₃/R₄ ⇒ Rx = R₃ · R₂/R₁</div>
+        <div class="eq">Ig = Vs (R₂R₃ − R₁R₄) / [Rg(R₁+R₂)(R₃+R₄) + R₁R₂(R₃+R₄) + R₃R₄(R₁+R₂)]</div>
+        <p>The balance point does not depend on Vs or Rg. Those only change how large the deflection is, which is why the null method is accurate: the result depends on resistor ratios, not on meter calibration.</p>
+        <h3>Sensitivity</h3>
+        <p>Near balance with four equal arms R, a small change ΔR in one arm gives ΔVo ≈ Vs · (ΔR/R) / 4. Sensitivity grows with Vs, but so does self-heating (P = V²/R), which drifts the resistance. Keep arm resistances of similar size and match Rg to the bridge resistance for best current sensitivity.</p>
+        <h3>Deflection bridge: strain gauges</h3>
+        <p>A strain gauge changes resistance by ΔR/R = GF · ε. Used as an unbalanced bridge, the output is proportional to strain.</p>
+        <div class="eq">Quarter bridge: Vo/Vs = x / [2(2 + x)] ≈ GF·ε / 4     (x = GF·ε)</div>
+        <div class="eq">Half bridge (adjacent arms, opposite strain): Vo/Vs = x / 2   (exactly linear)</div>
+        <div class="eq">Full bridge (all four active): Vo/Vs = x   (exactly linear)</div>
+        <h3>Limitations and errors</h3>
+        <ul><li>Lead and contact resistance matter for low resistances (below about 1 Ω). A Kelvin double bridge is used there.</li>
+        <li>Very high resistances give tiny currents and a weak null. Use a more sensitive detector.</li>
+        <li>Thermoelectric EMFs and resistor self-heating shift the null.</li>
+        <li>Resolution is limited by the smallest step of the decade box and by the detector's minimum visible deflection.</li></ul>
+        <h3>Applications</h3>
+        <p>Strain gauges and load cells, RTD and thermistor thermometry, pressure transducers, and precision resistance comparison in calibration labs.</p>
+      </div>
+
+      <div id="tab-proc" class="tp hidden doc">
+        <div class="proc on" id="proc-explore">
+          <h3 style="margin-top:0">Explore the bridge</h3>
+          <ol>
+            <li>Close battery key K. Note V<sub>B</sub> and V<sub>C</sub> in the Live tab.</li>
+            <li>Set R₁ = R₂ = R₃ = R₄. Confirm the needle sits at zero.</li>
+            <li>Increase R₄ by a few ohms. Note the direction and size of the deflection, and the sign of Ig.</li>
+            <li>Press Auto-balance and check that R₁/R₂ equals R₃/R₄.</li>
+            <li>Change Vs. The balance point stays put but the deflection scales with Vs.</li>
+            <li>Change Rg. The null is unchanged; only the current for a given imbalance changes.</li>
+            <li>Open the Graph tab and find where the curve crosses zero for each arm.</li>
+            <li>Record several readings in the Readings tab.</li>
+          </ol>
+        </div>
+        <div class="proc" id="proc-measure">
+          <h3 style="margin-top:0">Measure an unknown resistor</h3>
+          <ol>
+            <li>Choose a ratio (R₂/R₁). Start with ×1.</li>
+            <li>Select the ±10 mA range for coarse balancing and close key K.</li>
+            <li>Set the decade box from the thousands dial down to the tenths dial. For each dial, pick the digit that brings the needle closest to zero.</li>
+            <li>Lower the range to ±100 µA, then ±10 µA, and trim the last digits until the needle is at zero.</li>
+            <li>Press Record reading. The lab computes Rx = R₃ · R₂/R₁.</li>
+            <li>Change the ratio and repeat. Record at least three readings.</li>
+            <li>Press Reveal Rx to compare your mean value with the true resistor and see the percentage error.</li>
+          </ol>
+        </div>
+        <div class="proc" id="proc-strain">
+          <h3 style="margin-top:0">Strain-gauge bridge</h3>
+          <ol>
+            <li>Choose the gauge resistance and gauge factor. A metal foil gauge has GF ≈ 2.</li>
+            <li>With strain at 0 µε the bridge is balanced, so Vo = 0.</li>
+            <li>Apply strain in steps (for example 0, 500, 1000, 2000 µε) in quarter-bridge mode and record Vo.</li>
+            <li>Switch to half bridge, then full bridge. Compare mV/V against the quarter bridge for the same strain.</li>
+            <li>Raise GF to 120 (semiconductor gauge) and use a large strain. In the Graph tab see how the quarter bridge bends away from the ideal line while half and full stay straight.</li>
+          </ol>
+        </div>
+        <h3>Precautions</h3>
+        <ul><li>Start on a high galvanometer range. Never power the bridge with the detector on its most sensitive range while far from balance.</li>
+        <li>Keep resistor power below its rating. The branch table flags any element above 0.5 W.</li>
+        <li>Open the key between readings to avoid heating.</li></ul>
+      </div>
+
+      <div id="tab-viva" class="tp hidden">
+        <div class="score" id="score"></div>
+        <div id="quiz"></div>
+        <div class="btns"><button class="btn" id="quizReset">Restart quiz</button></div>
+      </div>
+    </div>
+
+  </section>
+</div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+</div></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var clamp=function(v,a,b){return Math.min(b,Math.max(a,v))};
+
+/* ---------- state ---------- */
+var S={mode:'explore',vs:10,R:[100,100,100,100],rg:100,range:1e-3,key:true,
+  ratio:1,dec:[0,0,0,0,0],rx:100,revealed:false,hint:true,
+  r0:350,gf:2,eps:0,cfg:'quarter',trials:[],tab:'live',sweep:3,yq:'vo'};
+var RATIOS=[{p:1000,q:100,t:'×0.1'},{p:100,q:100,t:'×1'},{p:100,q:1000,t:'×10'}];
+var SUBN=['R₁','R₂','R₃','R₄'];
+
+function newRx(){S.rx=Math.round(Math.pow(10,1.3+Math.random()*1.65));S.revealed=false}
+function decVal(){var d=S.dec;return d[0]*1000+d[1]*100+d[2]*10+d[3]+d[4]/10}
+function setDec(v){var t=Math.round(clamp(v,0,9999.9)*10);
+  S.dec=[Math.floor(t/10000),Math.floor(t/1000)%10,Math.floor(t/100)%10,Math.floor(t/10)%10,t%10]}
+
+function arms(){
+  if(S.mode==='explore')return S.R.slice();
+  if(S.mode==='measure'){var r=RATIOS[S.ratio];return [r.p,r.q,decVal(),S.rx]}
+  var x=clamp(S.gf*S.eps*1e-6,-0.95,0.95),r0=S.r0,a=[r0,r0,r0,r0];
+  a[2]=r0*(1+x);
+  if(S.cfg!=='quarter')a[3]=r0*(1-x);
+  if(S.cfg==='full'){a[1]=r0*(1+x);a[0]=r0*(1-x)}
+  return a;
+}
+function rgNow(){return S.mode==='strain'?1e7:S.rg}
+
+/* ---------- circuit solver (nodal analysis) ---------- */
+function solve(R,vs,rg){
+  var g=R.map(function(r){return 1/Math.max(r,1e-3)}),gg=1/Math.max(rg,1e-3);
+  var a=g[0]+g[1]+gg,d=g[2]+g[3]+gg,det=a*d-gg*gg,b1=vs*g[0],b2=vs*g[2];
+  var vb=(b1*d+gg*b2)/det,vc=(a*b2+gg*b1)/det;
+  var i1=(vs-vb)*g[0],i2=vb*g[1],i3=(vs-vc)*g[2],i4=vc*g[3],ig=(vb-vc)*gg;
+  return {vs:vs,vb:vb,vc:vc,vbc:vb-vc,i:[i1,i2,i3,i4],ig:ig,it:i1+i3,
+    v:[vs-vb,vb,vs-vc,vc],R:R};
+}
+
+/* ---------- formatting ---------- */
+function fmtI(a){var x=Math.abs(a);if(x<1e-9)return '0.00 µA';if(x>=1)return a.toFixed(3)+' A';if(x>=1e-3)return (a*1e3).toFixed(3)+' mA';return (a*1e6).toFixed(2)+' µA'}
+function fmtV(v){var x=Math.abs(v);if(x===0)return '0 V';if(x>=1)return v.toFixed(3)+' V';return (v*1e3).toFixed(2)+' mV'}
+function fmtR(r){return (Math.round(r*100)/100).toLocaleString('en-US',{maximumFractionDigits:2})+' Ω'}
+function fmtP(p){return p>=1?p.toFixed(2)+' W':(p*1e3).toFixed(2)+' mW'}
+function sgn(v,d){return (v>0?'+':'')+v.toFixed(d)}
+
+/* ---------- diagram ---------- */
+var P={A:[320,60],B:[150,230],C:[490,230],D:[320,400]};
+var EDGES=[['A','B'],['B','D'],['A','C'],['C','D']];
+function buildDiagram(){
+  var s='';
+  s+='<path class="wire" d="M60 214 V28 H320 V60"/><path class="wire" d="M60 228 V432 H160"/><path class="wire" d="M230 432 H320 V400"/>';
+  s+='<path id="flS1" class="flow" d="M60 214 V28 H320 V60"/><path id="flS2" class="flow" d="M320 400 V432 H60 V228"/>';
+  s+='<line class="plate" x1="40" y1="214" x2="80" y2="214" stroke-width="3.5"/><line class="plate" x1="50" y1="228" x2="70" y2="228" stroke-width="7"/>';
+  s+='<text class="small" x="88" y="212">+</text><text class="small" x="88" y="242">−</text>';
+  s+='<circle class="node" cx="160" cy="432" r="5"/><circle class="node" cx="230" cy="432" r="5"/>';
+  s+='<line id="keyBlade" class="wire" x1="160" y1="432" x2="230" y2="432"/>';
+  s+='<rect id="keyHit" class="keyhit" x="145" y="392" width="100" height="56"><title>Click to open or close key K</title></rect>';
+  s+='<text class="lbl" x="195" y="462" text-anchor="middle">K</text>';
+  s+='<text id="vsTxt" class="nv" x="62" y="462">Vs</text>';
+  for(var i=0;i<4;i++){
+    var a=P[EDGES[i][0]],b=P[EDGES[i][1]],mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+    var ang=Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI;
+    var nx=mx-320,ny=my-230,L=Math.hypot(nx,ny),ox=mx+nx/L*52,oy=my+ny/L*46;
+    s+='<line class="wire" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>';
+    s+='<line id="fl'+(i+1)+'" class="flow" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>';
+    s+='<g transform="translate('+mx+' '+my+') rotate('+ang+')"><rect id="rect'+(i+1)+'" class="res" x="-40" y="-13" width="80" height="26" rx="5"/></g>';
+    s+='<text id="lab'+(i+1)+'" class="lbl" x="'+ox+'" y="'+oy+'" text-anchor="middle"></text>';
+    s+='<text id="val'+(i+1)+'" class="val" x="'+ox+'" y="'+(oy+16)+'" text-anchor="middle"></text>';
+    s+='<text id="tag'+(i+1)+'" class="tag" x="'+ox+'" y="'+(oy+31)+'" text-anchor="middle"></text>';
+  }
+  s+='<path class="wire" d="M150 230 H490"/><path id="flG" class="flow" d="M150 230 H490"/>';
+  s+='<circle id="gC" class="gcirc" cx="320" cy="230" r="36"/><text id="gLab" class="lbl" x="320" y="238" text-anchor="middle" style="font-size:24px">G</text>';
+  s+='<text id="gTxt" class="val" x="320" y="286" text-anchor="middle"></text>';
+  ['A','B','C','D'].forEach(function(k){s+='<circle class="node" cx="'+P[k][0]+'" cy="'+P[k][1]+'" r="7"/>'});
+  s+='<text x="334" y="56"><tspan class="lbl">A</tspan><tspan id="nA" class="nv" dx="8"></tspan></text>';
+  s+='<text x="150" y="254" text-anchor="middle"><tspan class="lbl">B</tspan><tspan id="nB" class="nv" dx="8"></tspan></text>';
+  s+='<text x="490" y="254" text-anchor="middle"><tspan class="lbl">C</tspan><tspan id="nC" class="nv" dx="8"></tspan></text>';
+  s+='<text x="334" y="416"><tspan class="lbl">D</tspan><tspan id="nD" class="nv" dx="8"></tspan></text>';
+  $('diagram').innerHTML=s;
+  $('keyHit').addEventListener('click',toggleKey);
+}
+var GAUGE_TAGS={quarter:{2:'▲ gauge (+ε)'},half:{2:'▲ gauge (+ε)',3:'▼ gauge (−ε)'},
+  full:{0:'▼ gauge (−ε)',1:'▲ gauge (+ε)',2:'▲ gauge (+ε)',3:'▼ gauge (−ε)'}};
+function setFlow(id,i,on){
+  var el=$(id),a=Math.abs(i);
+  if(!on||a<5e-7){el.style.opacity=0;return}
+  el.style.opacity=1;
+  el.style.animationDuration=clamp(1.3-0.32*Math.log10(a/0.01),0.35,3.5)+'s';
+  el.style.animationDirection=i>=0?'normal':'reverse';
+}
+function updDiagram(R,sol,bal){
+  var names=S.mode==='measure'?['R₁ (P)','R₂ (Q)','R₃ (decade)','R₄ = Rx']:SUBN;
+  var hide=S.mode==='measure'&&!S.revealed;
+  for(var i=0;i<4;i++){
+    $('lab'+(i+1)).textContent=names[i];
+    $('val'+(i+1)).textContent=(hide&&i===3)?'? Ω':fmtR(R[i]);
+    var tg=S.mode==='strain'&&GAUGE_TAGS[S.cfg][i];
+    $('tag'+(i+1)).textContent=tg||'';
+    $('rect'+(i+1)).setAttribute('class','res'+(tg?' gauge':''));
+    setFlow('fl'+(i+1),sol.i[i],S.key);
+  }
+  setFlow('flG',sol.ig,S.key&&!bal);
+  setFlow('flS1',sol.it,S.key);setFlow('flS2',sol.it,S.key);
+  $('nA').textContent=fmtV(sol.vs);$('nB').textContent=fmtV(sol.vb);$('nC').textContent=fmtV(sol.vc);$('nD').textContent='0 V';
+  var bl=$('keyBlade');
+  if(S.key){bl.setAttribute('x2',230);bl.setAttribute('y2',432)}else{bl.setAttribute('x2',224);bl.setAttribute('y2',404)}
+  $('gC').setAttribute('class','gcirc'+((bal&&S.key)?' ok':''));
+  $('gLab').textContent=S.mode==='strain'?'V':'G';
+  $('gTxt').textContent=S.mode==='strain'?('Vo = '+fmtV(sol.vbc)):(S.key?('Ig = '+fmtI(sol.ig)):'');
+  $('vsTxt').textContent='Vs = '+S.vs.toFixed(1)+' V'+(S.key?'':' (key open)');
+}
+
+/* ---------- galvanometer dial ---------- */
+var needle={ang:0,vel:0,tgt:0,raf:0};
+function buildDial(){
+  var cx=150,cy=170,r=120;
+  function pt(d,rad){var t=d*Math.PI/180;return [cx+rad*Math.sin(t),cy-rad*Math.cos(t)]}
+  var p0=pt(-50,r),p1=pt(50,r),s='<rect class="face" x="6" y="6" width="288" height="178" rx="14"/>';
+  s+='<path class="arc" d="M'+p0[0]+' '+p0[1]+' A'+r+' '+r+' 0 0 1 '+p1[0]+' '+p1[1]+'"/>';
+  for(var d=-50;d<=50;d+=5){
+    var maj=d%10===0,a=pt(d,r),b=pt(d,r-(maj?14:8));
+    s+='<line class="'+(maj?'tmaj':'tmin')+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>';
+    if(maj){var t=pt(d,r-26);s+='<text class="dl" x="'+t[0]+'" y="'+(t[1]+3)+'" text-anchor="middle">'+(d>0?'+'+d:d)+'</text>'}
+  }
+  s+='<text class="small" x="20" y="176">GALVANOMETER</text><text id="dRange" class="small" x="280" y="176" text-anchor="end"></text>';
+  s+='<circle id="ovl" class="ovl" cx="270" cy="26" r="6"/><text class="small" x="258" y="30" text-anchor="end">OVERLOAD</text>';
+  s+='<g id="needleG"><line class="needle" x1="150" y1="170" x2="150" y2="58"/></g><circle class="hub" cx="150" cy="170" r="9"/>';
+  $('dial').innerHTML=s;
+}
+function stepNeedle(){
+  var dt=1/60,k=85,c=10,acc=k*(needle.tgt-needle.ang)-c*needle.vel;
+  needle.vel+=acc*dt;needle.ang+=needle.vel*dt;
+  $('needleG').setAttribute('transform','rotate('+needle.ang.toFixed(3)+' 150 170)');
+  if(Math.abs(needle.vel)>0.01||Math.abs(needle.tgt-needle.ang)>0.01){needle.raf=requestAnimationFrame(stepNeedle)}
+  else{needle.raf=0;needle.ang=needle.tgt;$('needleG').setAttribute('transform','rotate('+needle.tgt+' 150 170)')}
+}
+function setNeedle(deg){
+  needle.tgt=deg;
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){needle.ang=deg;$('needleG').setAttribute('transform','rotate('+deg+' 150 170)');return}
+  if(!needle.raf)needle.raf=requestAnimationFrame(stepNeedle);
+}
+function updDial(sol){
+  var div=S.key?sol.ig/S.range*50:0,over=Math.abs(div)>50;
+  setNeedle(clamp(div,-54,54));
+  $('ovl').setAttribute('class','ovl'+(over?' on':''));
+  var per=S.range/50;
+  $('dRange').textContent='FS ±'+fmtI(S.range).replace('.00','')+' · 1 div = '+fmtI(per).replace(/\.0+ /,' ');
+  $('dI').textContent=S.key?fmtI(sol.ig):'—';
+  $('dDiv').textContent=S.key?(over?(div>0?'> +50 div':'< −50 div'):sgn(div,1)+' div'):'—';
+  return div;
+}
+
+/* ---------- status, readouts, branch table ---------- */
+function updStatus(R,sol,bal,div){
+  var el=$('status'),cls,h;
+  if(S.mode==='strain'){
+    var mv=sol.vbc*1e3;
+    if(!S.key){cls='idle';h='<b>Battery key open</b> — close K to energise the bridge.'}
+    else if(Math.abs(S.eps)<0.5){cls='ok';h='<b>Balanced</b> — no strain, so Vo = 0.<span>Apply strain with the slider to unbalance the bridge.</span>'}
+    else{cls='warn';h='<b>'+(S.eps>0?'Tension':'Compression')+'</b> — Vo = '+sgn(mv,3)+' mV ('+sgn(mv/S.vs,3)+' mV/V).<span>Output is proportional to strain; the bridge acts as a transducer.</span>'}
+  }else if(!S.key){cls='idle';h='<b>Battery key open</b> — no current flows. Close key K to energise the bridge.'}
+  else if(bal){cls='ok';h='<b>Balanced</b> — galvanometer reads zero.<span>R₁/R₂ = R₃/R₄ means B and C are at the same potential.</span>'}
+  else if(Math.abs(div)>50){cls='warn';h='<b>Off-scale</b> — the galvanometer is overloaded.<span>Select a higher range, or move the adjustable arm toward balance.'+hintTxt(div)+'</span>'}
+  else{cls='bad';h='<b>Unbalanced</b> — needle deflects '+(div>0?'right (+)':'left (−)')+' by '+Math.abs(div).toFixed(1)+' div.<span>'+(S.mode==='measure'?hintTxt(div).replace(/^ /,''):'Adjust an arm and watch the needle return toward zero.')+'</span>'}
+  el.className='status '+cls;el.innerHTML=h;
+}
+function hintTxt(div){
+  if(S.mode!=='measure'||!S.hint)return '';
+  return ' Hint: R₃ is too '+(div>0?'high — decrease it.':'low — increase it.');
+}
+function card(l,v,sub){return '<div class="read"><small>'+l+'</small><b class="mono">'+v+'</b>'+(sub?'<i>'+sub+'</i>':'')+'</div>'}
+function updReads(R,sol,bal){
+  var h='';
+  if(S.mode==='strain'){
+    var x=S.gf*S.eps*1e-6,k={quarter:.25,half:.5,full:1}[S.cfg],ideal=S.vs*x*k*1e3,act=sol.vbc*1e3;
+    var nl=Math.abs(ideal)>1e-9?(act-ideal)/ideal*100:0;
+    h+=card('Output Vo',sgn(act,3)+' mV','open-circuit, B–C');
+    h+=card('Sensitivity',(S.vs>0?sgn(act/S.vs,3):'0')+' mV/V','Vo per volt of supply');
+    h+=card('ΔR/R of gauge',sgn(x*100,3)+' %','GF × strain');
+    h+=card('Ideal linear Vo',sgn(ideal,3)+' mV','Vs·GF·ε × '+(S.cfg==='quarter'?'¼':S.cfg==='half'?'½':'1'));
+    h+=card('Non-linearity',sgn(nl,2)+' %','actual vs ideal');
+    h+=card('Strain',S.eps+' µε','1 µε = 10⁻⁶');
+    h+=card('Source current',fmtI(sol.it),'drawn from Vs');
+    h+=card('Gauge power',fmtP(Math.max.apply(null,sol.i.map(function(c,i){return c*c*R[i]}))),'hottest arm');
+  }else{
+    var hide=S.mode==='measure'&&!S.revealed,r12=R[0]/R[1],r34=R[2]/R[3];
+    h+=card('V_B (node B)',fmtV(sol.vb),'= Vs·R₂/(R₁+R₂) unloaded');
+    h+=card('V_C (node C)',hide?'—':fmtV(sol.vc),hide?'hidden until reveal':'= Vs·R₄/(R₃+R₄) unloaded');
+    h+=card('V_B − V_C',fmtV(sol.vbc),'across galvanometer');
+    h+=card('Galvanometer Ig',S.key?fmtI(sol.ig):'—','B → C positive');
+    h+=card('R₁ / R₂',r12.toFixed(4));
+    h+=card('R₃ / R₄',hide?'—':r34.toFixed(4),hide?'hidden until reveal':'');
+    var err=hide?null:(r12-r34)/r12*100;
+    h+=card('Balance error',hide?'—':sgn(err,3)+' %','(R₁/R₂ − R₃/R₄)/(R₁/R₂)');
+    var idx=S.mode==='measure'?2:3,R2=R.slice();R2[idx]*=1.01;
+    var d=solve(R2,sol.vs,S.rg).vbc-sol.vbc;
+    h+=card('Sensitivity',(d*1e3>=0?'+':'')+(d*1e3).toFixed(2)+' mV','for +1 % change in '+SUBN[idx]);
+  }
+  $('reads').innerHTML=h;
+}
+function updBranch(R,sol){
+  var hide=S.mode==='measure'&&!S.revealed;
+  var names=['R₁ (A–B)','R₂ (B–D)','R₃ (A–C)','R₄ (C–D)'],rows='',warns=[];
+  rows+='<tr><th class="l">Element</th><th>R</th><th>Voltage</th><th>Current</th><th>Power</th></tr>';
+  for(var i=0;i<4;i++){
+    var p=sol.v[i]*sol.i[i],hot=p>0.5;
+    if(hot)warns.push(SUBN[i]+' dissipates '+fmtP(p));
+    if(hide&&i===3){rows+='<tr><td>'+names[i]+'</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>';continue}
+    rows+='<tr'+(hot?' class="hot"':'')+'><td>'+names[i]+'</td><td>'+fmtR(R[i])+'</td><td>'+fmtV(sol.v[i])+'</td><td>'+fmtI(sol.i[i])+'</td><td>'+fmtP(p)+'</td></tr>';
+  }
+  var rg=rgNow();
+  rows+='<tr><td>'+(S.mode==='strain'?'Detector':'Galvanometer')+'</td><td>'+(S.mode==='strain'?'10 MΩ':fmtR(rg))+'</td><td>'+fmtV(sol.vbc)+'</td><td>'+fmtI(sol.ig)+'</td><td>'+fmtP(Math.abs(sol.vbc*sol.ig))+'</td></tr>';
+  $('branch').innerHTML=rows;
+  $('warns').innerHTML=warns.length?'<div class="warnline">⚠ '+warns.join('; ')+' (above a 0.5 W resistor rating). Lower Vs or raise the resistance.</div>':'';
+}
+
+/* ---------- main update ---------- */
+function update(){
+  var R=arms(),rg=rgNow(),sol=solve(R,S.key?S.vs:0,rg);
+  var bal=S.mode==='strain'?(Math.abs(S.eps)<0.5):(S.key&&Math.abs(sol.ig)<S.range/100);
+  updDiagram(R,sol,bal);
+  var div=0;
+  if(S.mode==='strain'){
+    $('dmmV').textContent=(sol.vbc*1e3).toFixed(3)+' mV';
+    $('dmmS').textContent=(S.vs>0?sgn(sol.vbc*1e3/S.vs,3):'0.000')+' mV/V';
+  }else div=updDial(sol);
+  updStatus(R,sol,bal,div);updReads(R,sol,bal);updBranch(R,sol);updFormula(R);
+  if(S.mode==='measure')updMeasureUI();
+  if(S.mode==='strain')updStrainUI();
+  if(S.tab==='chart')renderChart();
+}
+function updFormula(R){
+  var el=$('formulaBox');
+  if(S.mode==='explore')el.innerHTML='Balance: R₁/R₂ = R₃/R₄<br>R₁R₄ = R₂R₃';
+  else if(S.mode==='measure'){var est=R[2]*R[1]/R[0];el.innerHTML='Rx = R₃ × (R₂/R₁)<br>= '+fmtR(R[2])+' × '+(R[1]/R[0])+' = <b>'+fmtR(est)+'</b>'}
+  else el.innerHTML='Gauge: ΔR/R = GF·ε<br>'+({quarter:'Quarter: Vo ≈ Vs·GF·ε/4',half:'Half: Vo = Vs·GF·ε/2',full:'Full: Vo = Vs·GF·ε'})[S.cfg];
+}
+
+/* ---------- controls per mode ---------- */
+function pair(id,label,val,min,max,step,unit){
+  return '<div class="ctl"><div class="ctlh">'+label+'<span class="inp"><input type="number" id="'+id+'N" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"><em>'+unit+'</em></span></div>'+
+  '<input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'" aria-label="'+label+'"></div>';
+}
+function bindPair(id,min,max,set){
+  var s=$(id),n=$(id+'N');
+  s.addEventListener('input',function(){n.value=s.value;set(+s.value)});
+  n.addEventListener('input',function(){if(n.value===''||isNaN(+n.value))return;var v=clamp(+n.value,min,max);s.value=v;set(v)});
+  n.addEventListener('change',function(){n.value=clamp(+n.value||min,min,max)});
+}
+function setPair(id,v){$(id).value=v;$(id+'N').value=v}
+
+var SCEN={equal:[100,100,100,100],ratio2:[200,100,300,150],off:[100,100,100,120],unb:[220,100,150,330]};
+function renderArms(){
+  var el=$('armCtl'),h='';
+  if(S.mode==='explore'){
+    $('armHead').textContent='Bridge arms';
+    for(var i=0;i<4;i++)h+=pair('r'+i,SUBN[i]+' ('+EDGES[i][0]+'–'+EDGES[i][1]+')',S.R[i],1,1000,1,'Ω');
+    h+='<div class="ctl"><div class="ctlh"><label for="scen">Preset</label><select id="scen"><option value="">Custom</option><option value="equal">Equal arms (balanced)</option><option value="ratio2">Ratio 2:1 (balanced)</option><option value="off">R₄ 20 % high</option><option value="unb">Strongly unbalanced</option></select></div></div>';
+    h+='<div class="btns"><button class="btn primary" data-act="auto">Auto-balance</button></div>';
+  }else if(S.mode==='measure'){
+    $('armHead').textContent='Decade box and ratio arms';
+    h+='<div class="ctl"><div class="ctlh">Ratio R₂ / R₁</div><div class="seg" style="margin-top:6px">'+RATIOS.map(function(r,i){return '<button class="btn'+(i===S.ratio?' on':'')+'" data-act="ratio" data-i="'+i+'">'+r.t+'<br><small class="muted" style="color:inherit;opacity:.8">'+r.p+' : '+r.q+' Ω</small></button>'}).join('')+'</div></div>';
+    h+='<div class="ctl"><div class="ctlh">R₃ decade box</div><div class="dec" id="dec">';
+    var lab=['×1000','×100','×10','×1','×0.1'];
+    for(var k=0;k<5;k++){
+      if(k===4)h+='<div class="dp">.</div>';
+      h+='<div class="dc" data-d="'+k+'"><small>'+lab[k]+'</small><button data-act="dec" data-d="'+k+'" data-dir="1" aria-label="Increase '+lab[k]+' dial">▲</button><div class="dg mono" id="dg'+k+'">0</div><button data-act="dec" data-d="'+k+'" data-dir="-1" aria-label="Decrease '+lab[k]+' dial">▼</button></div>';
+    }
+    h+='</div><div class="ctlh"><label for="r3tot">R₃ total</label><span class="inp"><input type="number" id="r3tot" min="0" max="9999.9" step="0.1" value="0"><em>Ω</em></span></div><div class="muted" style="margin-top:4px">Click ▲ ▼ or scroll the mouse wheel over a dial.</div></div>';
+    h+='<label class="check"><input type="checkbox" id="hintChk"'+(S.hint?' checked':'')+'> Show direction hint</label>';
+    h+='<div class="btns"><button class="btn primary" data-act="rec">Record reading</button><button class="btn" data-act="newrx">New unknown</button></div>';
+    h+='<div class="btns"><button class="btn" data-act="reveal" id="revBtn" style="flex:1">Reveal Rx</button></div>';
+    h+='<div class="formula" id="measOut" style="display:none"></div>';
+  }else{
+    $('armHead').textContent='Strain gauge';
+    h+='<div class="ctl"><div class="ctlh"><label for="r0sel">Gauge resistance R₀</label><select id="r0sel"><option value="120">120 Ω</option><option value="350" selected>350 Ω</option><option value="1000">1000 Ω</option></select></div></div>';
+    h+='<div class="ctl"><div class="ctlh">Bridge type</div><div class="seg" style="margin-top:6px">'+['quarter','half','full'].map(function(c){return '<button class="btn'+(c===S.cfg?' on':'')+'" data-act="cfg" data-c="'+c+'">'+c[0].toUpperCase()+c.slice(1)+'</button>'}).join('')+'</div></div>';
+    h+='<div class="ctl"><div class="ctlh"><label for="gfsel">Gauge material</label><select id="gfsel"><option value="2">Metal foil (GF ≈ 2)</option><option value="4.8">Pt–Ir alloy (GF ≈ 4.8)</option><option value="120">Silicon (GF ≈ 120)</option><option value="">Custom</option></select></div></div>';
+    h+=pair('gf','Gauge factor GF',S.gf,1,200,0.1,'');
+    h+=pair('eps','Strain ε',S.eps,-5000,5000,10,'µε');
+    h+='<div class="btns"><button class="btn" data-act="tare" style="flex:1">Zero strain</button></div>';
+  }
+  el.innerHTML=h;
+  if(S.mode==='explore'){
+    for(var j=0;j<4;j++)(function(j){bindPair('r'+j,1,1000,function(v){S.R[j]=v;$('scen').value='';update()})})(j);
+    $('scen').addEventListener('change',function(e){var a=SCEN[e.target.value];if(!a)return;S.R=a.slice();for(var q=0;q<4;q++)setPair('r'+q,S.R[q]);update()});
+  }else if(S.mode==='measure'){
+    $('r3tot').addEventListener('input',function(e){if(e.target.value==='')return;setDec(+e.target.value);update()});
+    $('hintChk').addEventListener('change',function(e){S.hint=e.target.checked;update()});
+  }else{
+    $('r0sel').value=String(S.r0);
+    $('r0sel').addEventListener('change',function(e){S.r0=+e.target.value;update()});
+    var known={'2':1,'4.8':1,'120':1};$('gfsel').value=known[String(S.gf)]?String(S.gf):'';
+    $('gfsel').addEventListener('change',function(e){if(e.target.value===''){return}S.gf=+e.target.value;setPair('gf',S.gf);update()});
+    bindPair('gf',1,200,function(v){S.gf=v;var k={'2':1,'4.8':1,'120':1};$('gfsel').value=k[String(v)]?String(v):'';update()});
+    bindPair('eps',-5000,5000,function(v){S.eps=v;update()});
+  }
+}
+function updMeasureUI(){
+  var d=S.dec;for(var k=0;k<5;k++){var e=$('dg'+k);if(e)e.textContent=d[k]}
+  var t=$('r3tot');if(t&&document.activeElement!==t)t.value=decVal().toFixed(1);
+  var b=$('revBtn');if(b)b.disabled=S.revealed;
+  var o=$('measOut');
+  if(o){
+    if(S.revealed){
+      var m=measMean(),err=m!==null?(m-S.rx)/S.rx*100:null;
+      o.style.display='block';
+      o.innerHTML='<b>True Rx = '+fmtR(S.rx)+'</b><br>'+(m===null?'Record a balanced reading to compute your error.':'Your mean = '+fmtR(m)+'<br>Error = <b>'+sgn(err,3)+' %</b>');
+    }else o.style.display='none';
+  }
+}
+function updStrainUI(){}
+
+/* ---------- observations ---------- */
+function measMean(){
+  var xs=S.trials.filter(function(t){return t.mode==='measure'}).map(function(t){return t.rxc});
+  if(!xs.length)return null;
+  return xs.reduce(function(a,b){return a+b},0)/xs.length;
+}
+function record(){
+  if(!S.key){toast('Close battery key K before recording.');return}
+  var R=arms(),sol=solve(R,S.vs,rgNow()),t={mode:S.mode,R:R,ig:sol.ig,vo:sol.vbc,hid:S.mode==='measure'&&!S.revealed};
+  if(S.mode==='measure'){t.rxc=R[2]*R[1]/R[0];t.res='Rx = '+fmtR(t.rxc);t.rxid=S.rx}
+  else if(S.mode==='explore')t.res='R₁/R₂ = '+(R[0]/R[1]).toFixed(3)+', R₃/R₄ = '+(R[2]/R[3]).toFixed(3);
+  else t.res=S.cfg+', ε = '+S.eps+' µε, Vo = '+(sol.vbc*1e3).toFixed(3)+' mV';
+  S.trials.push(t);renderTrials();toast('Reading '+S.trials.length+' recorded');
+}
+function renderTrials(){
+  var h='<tr><th>#</th><th class="l">Mode</th><th>R₁ (Ω)</th><th>R₂ (Ω)</th><th>R₃ (Ω)</th><th>R₄ (Ω)</th><th>Ig</th><th class="l">Result</th></tr>';
+  if(!S.trials.length)h+='<tr><td colspan="8" class="l muted">No readings yet.</td></tr>';
+  S.trials.forEach(function(t,i){
+    var r4=(t.mode==='measure'&&!S.revealed)?'?':(+t.R[3].toFixed(2));
+    h+='<tr><td>'+(i+1)+'</td><td class="l">'+t.mode+'</td><td>'+(+t.R[0].toFixed(2))+'</td><td>'+(+t.R[1].toFixed(2))+'</td><td>'+(+t.R[2].toFixed(2))+'</td><td>'+r4+'</td><td>'+fmtI(t.ig)+'</td><td class="l">'+t.res+'</td></tr>';
+  });
+  $('trials').innerHTML=h;
+  var m=measMean(),box=$('trialSum');
+  if(m===null)box.innerHTML='Record readings in the measurement experiment to see the mean and error here.';
+  else{
+    var n=S.trials.filter(function(t){return t.mode==='measure'}).length,s='Measured Rx: mean of '+n+' reading'+(n>1?'s':'')+' = <b>'+fmtR(m)+'</b>';
+    if(S.revealed)s+='<br>True Rx = '+fmtR(S.rx)+' · error = '+sgn((m-S.rx)/S.rx*100,3)+' %';
+    else s+='<br>Press Reveal Rx in the measurement experiment to compare with the true value.';
+    box.innerHTML=s;
+  }
+}
+function toCSV(){
+  var rows=[['n','mode','R1_ohm','R2_ohm','R3_ohm','R4_ohm','Ig_A','Vo_V','result']];
+  S.trials.forEach(function(t,i){rows.push([i+1,t.mode,t.R[0],t.R[1],t.R[2],(t.mode==='measure'&&!S.revealed)?'hidden':t.R[3],t.ig,t.vo,'"'+t.res+'"'])});
+  return rows.map(function(r){return r.join(',')}).join('\n');
+}
+function copyCSV(){
+  if(!S.trials.length){toast('Nothing to copy yet.');return}
+  var txt=toCSV(),box=$('csvBox'),ta=$('csvText');
+  ta.value=txt;
+  function manual(){box.classList.remove('hidden');ta.focus();ta.select()}
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast('CSV copied to clipboard');box.classList.add('hidden')},manual)}
+    else manual();
+  }catch(e){manual()}
+}
+
+/* ---------- chart ---------- */
+var CH=null;
+function ticks(min,max,n){
+  var span=max-min,raw=span/n,mag=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/mag;
+  var step=(f<1.5?1:f<3?2:f<7?5:10)*mag,t=[];
+  for(var v=Math.ceil(min/step-1e-9)*step;v<=max+1e-9;v+=step)t.push(+v.toFixed(10));
+  return t;
+}
+function tk(v){return String(+v.toPrecision(4))}
+function chartSpec(){
+  var vs=S.vs,i,xs=[],ys=[],sp;
+  if(S.mode==='strain'){
+    var k={quarter:.25,half:.5,full:1}[S.cfg],ex=[],id=[];
+    var save=S.eps;
+    for(i=-5000;i<=5000;i+=100){xs.push(i);S.eps=i;var s2=solve(arms(),vs,1e7);ex.push(s2.vbc*1e3);id.push(vs*S.gf*i*1e-6*k*1e3)}
+    S.eps=save;
+    var cur=solve(arms(),vs,1e7).vbc*1e3;
+    return {xs:xs,series:[{ys:ex,cls:'cv'},{ys:id,cls:'cv2'}],xl:'Strain ε (µε)',yl:'Output Vo (mV)',mk:{x:S.eps,y:cur,t:'now'},legend:'<span><i></i>Actual bridge output</span><span><i class="d"></i>Ideal linear response</span>'};
+  }
+  if(S.mode==='measure'&&!S.revealed)return {locked:true};
+  var base=arms(),idx=S.mode==='measure'?2:S.sweep,xmin,xmax,nul;
+  var bal=[base[1]*base[2]/base[3],base[0]*base[3]/base[2],base[0]*base[3]/base[1],base[2]*base[1]/base[0]];
+  if(S.mode==='measure'){xmin=0;xmax=Math.max(10,bal[2]*2)}else{xmin=1;xmax=1000}
+  for(i=0;i<=160;i++){
+    var x=xmin+(xmax-xmin)*i/160,R=base.slice();R[idx]=x;
+    var s=solve(R,vs,S.rg);xs.push(x);ys.push(S.yq==='vo'?s.vbc*1e3:s.ig*1e3);
+  }
+  var c=solve(base,vs,S.rg);
+  nul=bal[idx];
+  return {xs:xs,series:[{ys:ys,cls:'cv'}],xl:SUBN[idx]+' (Ω)',yl:S.yq==='vo'?'Bridge voltage Vo (mV)':'Galvanometer current Ig (mA)',
+    mk:{x:base[idx],y:S.yq==='vo'?c.vbc*1e3:c.ig*1e3,t:'now'},nul:(nul>=xmin&&nul<=xmax)?{x:nul,t:'Null at '+SUBN[idx]+' = '+fmtR(nul)}:null,
+    legend:'<span><i></i>Other arms held at their present values</span>'};
+}
+function renderChart(){
+  var sp=chartSpec(),svg=$('chart');
+  $('chartBar').classList.toggle('hidden',S.mode==='strain');
+  $('swSel').disabled=S.mode==='measure';
+  if(S.mode==='measure')$('swSel').value='2';
+  if(sp.locked){svg.innerHTML='<text class="cmsg" x="260" y="160" text-anchor="middle">The graph is locked until you press Reveal Rx.</text>';$('legend').innerHTML='';CH=null;return}
+  var W=520,H=320,ml=58,mr=18,mt=16,mb=46,pw=W-ml-mr,ph=H-mt-mb;
+  var xmin=sp.xs[0],xmax=sp.xs[sp.xs.length-1],ymin=0,ymax=0;
+  sp.series.forEach(function(s){s.ys.forEach(function(y){if(y<ymin)ymin=y;if(y>ymax)ymax=y})});
+  if(ymax-ymin<1e-9){ymax=1;ymin=-1}
+  var pad=(ymax-ymin)*.08;ymin-=pad;ymax+=pad;
+  var sx=function(x){return ml+(x-xmin)/(xmax-xmin)*pw},sy=function(y){return mt+(1-(y-ymin)/(ymax-ymin))*ph};
+  var h='',t,i;
+  ticks(xmin,xmax,6).forEach(function(v){h+='<line class="gl" x1="'+sx(v)+'" y1="'+mt+'" x2="'+sx(v)+'" y2="'+(mt+ph)+'"/><text class="tk" x="'+sx(v)+'" y="'+(mt+ph+16)+'" text-anchor="middle">'+tk(v)+'</text>'});
+  ticks(ymin,ymax,5).forEach(function(v){h+='<line class="gl" x1="'+ml+'" y1="'+sy(v)+'" x2="'+(ml+pw)+'" y2="'+sy(v)+'"/><text class="tk" x="'+(ml-7)+'" y="'+(sy(v)+4)+'" text-anchor="end">'+tk(v)+'</text>'});
+  h+='<line class="zero" x1="'+ml+'" y1="'+sy(0)+'" x2="'+(ml+pw)+'" y2="'+sy(0)+'"/>';
+  h+='<line class="ax" x1="'+ml+'" y1="'+mt+'" x2="'+ml+'" y2="'+(mt+ph)+'"/><line class="ax" x1="'+ml+'" y1="'+(mt+ph)+'" x2="'+(ml+pw)+'" y2="'+(mt+ph)+'"/>';
+  h+='<text class="axt" x="'+(ml+pw/2)+'" y="'+(H-8)+'" text-anchor="middle">'+sp.xl+'</text>';
+  h+='<text class="axt" transform="translate(14 '+(mt+ph/2)+') rotate(-90)" text-anchor="middle">'+sp.yl+'</text>';
+  for(var si=sp.series.length-1;si>=0;si--){
+    var s=sp.series[si],d='';
+    for(i=0;i<sp.xs.length;i++)d+=(i?'L':'M')+sx(sp.xs[i]).toFixed(1)+' '+sy(s.ys[i]).toFixed(1);
+    h+='<path class="'+s.cls+'" d="'+d+'"/>';
+  }
+  if(sp.nul){h+='<circle class="nl" cx="'+sx(sp.nul.x)+'" cy="'+sy(0)+'" r="6"/><text class="mkt" x="'+clamp(sx(sp.nul.x),ml+70,ml+pw-70)+'" y="'+(sy(0)-12)+'" text-anchor="middle">'+sp.nul.t+'</text>'}
+  var mx=clamp(sx(sp.mk.x),ml,ml+pw),my=clamp(sy(sp.mk.y),mt,mt+ph);
+  h+='<circle class="mk" cx="'+mx+'" cy="'+my+'" r="6"/>';
+  h+='<g id="xh" class="hidden"><line id="xhl" class="cross" y1="'+mt+'" y2="'+(mt+ph)+'"/><text id="xht" class="mkt"></text></g>';
+  svg.innerHTML=h;
+  $('legend').innerHTML=sp.legend+'<span><svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle"><circle cx="7" cy="7" r="5.5" fill="var(--needle)"/></svg> Present setting</span>'+(sp.nul?'<span><svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle"><circle cx="7" cy="7" r="5.5" fill="var(--good)"/></svg> Null (balance) point</span>':'');
+  CH={sp:sp,sx:sx,ml:ml,pw:pw,W:W,xmin:xmin,xmax:xmax,mt:mt};
+}
+function chartHover(e){
+  if(!CH)return;
+  var svg=$('chart'),r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*CH.W/r.width;
+  if(x<CH.ml||x>CH.ml+CH.pw){$('xh').classList.add('hidden');return}
+  var dx=CH.xmin+(x-CH.ml)/CH.pw*(CH.xmax-CH.xmin),xs=CH.sp.xs,n=0,best=1e18;
+  for(var i=0;i<xs.length;i++){var dd=Math.abs(xs[i]-dx);if(dd<best){best=dd;n=i}}
+  var px=CH.sx(xs[n]),y=CH.sp.series[0].ys[n];
+  $('xh').classList.remove('hidden');
+  var l=$('xhl');l.setAttribute('x1',px);l.setAttribute('x2',px);
+  var t=$('xht');t.textContent=tk(xs[n])+' → '+tk(y);
+  t.setAttribute('x',clamp(px+8,CH.ml+4,CH.ml+CH.pw-110));t.setAttribute('y',CH.mt+14);
+}
+
+/* ---------- quiz ---------- */
+var QZ=[
+ {q:'What is the balance condition of the bridge in this lab (R₁ = A–B, R₂ = B–D, R₃ = A–C, R₄ = C–D)?',o:['R₁/R₂ = R₃/R₄','R₁/R₂ = R₄/R₃','R₁ + R₂ = R₃ + R₄','R₁R₂ = R₃R₄'],a:0,e:'Equal potentials at B and C require R₂/(R₁+R₂) = R₄/(R₃+R₄), which reduces to R₁R₄ = R₂R₃.'},
+ {q:'At balance, what is the current through the galvanometer?',o:['Maximum','Zero','Equal to the supply current','Equal to Vs/Rg'],a:1,e:'Points B and C are at the same potential, so no current flows between them.'},
+ {q:'Why is the bridge called a null-measurement method?',o:['It needs no power supply','The reading is taken when the detector shows zero, so meter calibration does not affect the result','It measures only zero resistance','It uses a zero-resistance galvanometer'],a:1,e:'The result depends on resistor ratios, not on the detector scale or on the supply voltage.'},
+ {q:'Which change does NOT move the balance point?',o:['Changing R₃','Changing R₄','Changing the supply voltage Vs','Changing R₁'],a:2,e:'Vs scales both V_B and V_C equally, so the null stays where it is. It only changes the size of the deflection.'},
+ {q:'A bridge has R₁ = 100 Ω, R₂ = 1000 Ω and balances at R₃ = 472 Ω. What is R₄ (= Rx)?',o:['47.2 Ω','472 Ω','4720 Ω','4.72 kΩ ÷ 10'],a:2,e:'Rx = R₃ · R₂/R₁ = 472 × 1000/100 = 4720 Ω.'},
+ {q:'For best sensitivity of a bridge at balance, the four arms should be',o:['As different as possible','Of similar resistance','Zero ohms','Infinite'],a:1,e:'Sensitivity ΔVo ≈ Vs·(ΔR/R)/4 is greatest when the arms are of similar size and the detector is matched.'},
+ {q:'What is the approximate output of a quarter-bridge strain gauge circuit?',o:['Vs·GF·ε','Vs·GF·ε / 2','Vs·GF·ε / 4','Vs·GF·ε / 8'],a:2,e:'With one active arm and small ΔR/R, Vo/Vs ≈ GF·ε/4.'},
+ {q:'Two gauges in adjacent arms, one in tension and one in compression, form a',o:['Quarter bridge, output ¼ of full','Half bridge, output twice the quarter bridge and exactly linear','Full bridge','Kelvin bridge'],a:1,e:'The half bridge gives Vo = Vs·GF·ε/2, which is double the quarter bridge and has no first-order non-linearity.'},
+ {q:'Which is a limitation of the simple Wheatstone bridge?',o:['It cannot use DC','Lead and contact resistance spoil measurements below about 1 Ω','It only works with a 10 V supply','It needs a variable galvanometer'],a:1,e:'For very low resistances, a Kelvin double bridge is used to remove lead and contact resistance.'}
+];
+var qa=[];
+function renderQuiz(){
+  qa=[];
+  $('quiz').innerHTML=QZ.map(function(q,i){return '<div class="qz"><div><b>'+(i+1)+'.</b> '+q.q+'</div><div class="qo">'+q.o.map(function(o,j){return '<button class="opt" data-q="'+i+'" data-o="'+j+'">'+o+'</button>'}).join('')+'</div><div class="qe" id="qe'+i+'"></div></div>'}).join('');
+  quizScore();
+}
+function quizScore(){
+  var right=qa.filter(function(x){return x===true}).length,done=qa.filter(function(x){return x!==undefined}).length;
+  $('score').textContent='Score: '+right+' / '+QZ.length+(done===QZ.length?(right===QZ.length?'  Perfect.':'  Quiz complete.'):'');
+}
+
+/* ---------- misc ---------- */
+var tt=0;
+function toast(m){var e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('show')},2200)}
+function toggleKey(){S.key=!S.key;$('keyTxt').textContent=S.key?'Closed':'Open';$('keyLed').className='led'+(S.key?' on':'');update()}
+
+var MODES={
+  explore:{t:'Explore the bridge',d:'Change any arm, the supply and the galvanometer. Watch the node potentials, branch currents and the needle respond, then find the null.'},
+  measure:{t:'Measure an unknown resistor',d:'Balance the bridge with the R₃ decade box until the galvanometer reads zero. Then Rx = R₃ × R₂/R₁. Reveal the true value to check your error.'},
+  strain:{t:'Strain-gauge bridge',d:'A deflection bridge turns a tiny resistance change into a voltage. Compare quarter, half and full bridge configurations.'}
+};
+function setMode(m){
+  S.mode=m;
+  document.querySelectorAll('.mode').forEach(function(b){b.setAttribute('aria-selected',b.dataset.mode===m)});
+  $('modeTitle').textContent=MODES[m].t;$('modeDesc').textContent=MODES[m].d;
+  var st=m==='strain';
+  $('dialWrap').classList.toggle('hidden',st);$('dmm').classList.toggle('hidden',!st);
+  $('galvCtl').classList.toggle('hidden',st);$('detNote').classList.toggle('hidden',!st);
+  document.querySelectorAll('.proc').forEach(function(p){p.classList.toggle('on',p.id==='proc-'+m)});
+  if(m==='measure'&&!S.rx)newRx();
+  renderArms();update();
+}
+function resetExp(){
+  S.vs=10;setPair('vs',10);S.key=true;$('keyTxt').textContent='Closed';$('keyLed').className='led on';
+  S.rg=100;setPair('rg',100);S.range=1e-3;$('rangeSel').value='0.001';
+  if(S.mode==='explore')S.R=[100,100,100,100];
+  if(S.mode==='measure'){S.dec=[0,0,0,0,0];S.ratio=1;newRx();S.trials=S.trials.filter(function(t){return t.mode!=='measure'});renderTrials()}
+  if(S.mode==='strain'){S.eps=0;S.gf=2;S.cfg='quarter';S.r0=350}
+  renderArms();update();toast('Experiment reset');
+}
+function autoBalance(){
+  var R=S.R,r4=R[2]*R[1]/R[0];
+  if(r4>=1&&r4<=1000)R[3]=Math.round(r4*100)/100;
+  else{var r3=R[3]*R[0]/R[1];if(r3>=1&&r3<=1000)R[2]=Math.round(r3*100)/100;else S.R=[100,100,100,100]}
+  for(var i=0;i<4;i++)setPair('r'+i,S.R[i]);
+  update();
+}
+
+function init(){
+  buildDiagram();buildDial();renderQuiz();newRx();
+  bindPair('vs',1,24,function(v){S.vs=v;update()});
+  bindPair('rg',10,1000,function(v){S.rg=v;update()});
+  $('rangeSel').addEventListener('change',function(e){S.range=+e.target.value;update()});
+  $('keyBtn').addEventListener('click',toggleKey);
+  $('resetBtn').addEventListener('click',resetExp);
+  $('recBtn').addEventListener('click',record);
+  $('csvBtn').addEventListener('click',copyCSV);
+  $('clrBtn').addEventListener('click',function(){S.trials=[];renderTrials();$('csvBox').classList.add('hidden')});
+  $('swSel').addEventListener('change',function(e){S.sweep=+e.target.value;renderChart()});
+  $('yqSel').addEventListener('change',function(e){S.yq=e.target.value;renderChart()});
+  $('chart').addEventListener('pointermove',chartHover);
+  $('chart').addEventListener('pointerleave',function(){var x=$('xh');if(x)x.classList.add('hidden')});
+  $('quizReset').addEventListener('click',renderQuiz);
+  document.querySelectorAll('.mode').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.mode)})});
+  document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){
+    S.tab=b.dataset.tab;
+    document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+    ['live','chart','obs','theory','proc','viva'].forEach(function(k){$('tab-'+k).classList.toggle('hidden',k!==S.tab)});
+    if(S.tab==='chart')renderChart();
+    if(S.tab==='obs')renderTrials();
+  })});
+  $('quiz').addEventListener('click',function(e){
+    var b=e.target.closest('.opt');if(!b||b.disabled)return;
+    var qi=+b.dataset.q,oi=+b.dataset.o,q=QZ[qi],ok=oi===q.a;
+    qa[qi]=ok;
+    b.parentNode.querySelectorAll('.opt').forEach(function(x,j){x.disabled=true;if(j===q.a)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
+    $('qe'+qi).textContent=(ok?'Correct. ':'Not quite. ')+q.e;
+    quizScore();
+  });
+  $('armCtl').addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]');if(!b)return;
+    var a=b.dataset.act;
+    if(a==='auto')autoBalance();
+    else if(a==='ratio'){S.ratio=+b.dataset.i;renderArms();update()}
+    else if(a==='dec'){var k=+b.dataset.d;S.dec[k]=(S.dec[k]+(+b.dataset.dir)+10)%10;update()}
+    else if(a==='rec')record();
+    else if(a==='newrx'){newRx();S.trials=S.trials.filter(function(t){return t.mode!=='measure'});renderTrials();update();toast('New unknown resistor installed')}
+    else if(a==='reveal'){S.revealed=true;renderTrials();update()}
+    else if(a==='cfg'){S.cfg=b.dataset.c;renderArms();update()}
+    else if(a==='tare'){S.eps=0;setPair('eps',0);update()}
+  });
+  $('armCtl').addEventListener('wheel',function(e){
+    var dc=e.target.closest('.dc');if(!dc)return;
+    e.preventDefault();var k=+dc.dataset.d;S.dec[k]=(S.dec[k]+(e.deltaY<0?1:-1)+10)%10;update();
+  },{passive:false});
+  var app=$('wbApp');
+  $('themeBtn').addEventListener('click',function(){
+    var next=app.getAttribute('data-theme')==='dark'?'light':'dark';app.setAttribute('data-theme',next);
+    try{localStorage.setItem('wb-theme',next)}catch(e){}
+  });
+  try{var th=localStorage.getItem('wb-theme');if(th==='dark'||th==='light')app.setAttribute('data-theme',th)}catch(e){}
+  function sz(){var w=app.getBoundingClientRect().width;app.setAttribute('data-w',w>=1400?'lg':w>=760?'md':'sm')}
+  sz();
+  if(window.ResizeObserver)new ResizeObserver(sz).observe(app);else window.addEventListener('resize',sz);
+  setMode('explore');renderTrials();
+}
+init();
+})();
+</script>
+</body>
+</html>

@@ -7,8 +7,7 @@
 <style>
 .wb-app{
   
-  
-  
+    
   --bg:#F4EAD5;--surface:#FFEAF2;--surface2:#F4EAD5;--ink:#382F32;--muted:#665b5e;--line:#BCBDAC;
   --accent:#382F32;--accent-ink:#FFEAF2;--good:#2F6B45;--goodbg:#BCE3C5;--bad:#8F3A45;--badbg:#FFEAF2;
   --warn:#665b5e;--warnbg:#F4EAD5;--idle:#665b5e;--idlebg:#BCBDAC;

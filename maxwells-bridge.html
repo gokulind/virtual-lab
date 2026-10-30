@@ -1,63 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maxwell’s Bridge | KGR Virtual Lab</title>
-<style>
-:root{--navy:#12304a;--blue:#1769aa;--teal:#078b83;--bg:#f3f7fb;--ink:#182534;--muted:#5c6b7a;--line:#dce5ee}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
-header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:25px 20px}.wrap{max-width:1100px;margin:auto}header a{color:white}.back{display:inline-block;margin-bottom:8px}h1{margin:4px 0}main{max-width:1100px;margin:24px auto;padding:0 18px}.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 5px 18px #16324b0b}.panel h2{margin-top:0;font-size:1.2rem}.diagram{width:100%;height:auto;display:block;background:#fbfdff;border:1px solid var(--line);border-radius:12px}
-label{display:block;font-weight:bold;font-size:.92rem;margin:14px 0 5px}input{width:100%;font:inherit;padding:10px;border:1px solid #cbd7e2;border-radius:8px}small,.muted{color:var(--muted)}.result{background:#eaf7f5;border:1px solid #bde5df;border-radius:12px;padding:15px;margin-top:16px}.result strong{font-size:1.05rem}.btn{border:0;background:var(--blue);color:white;padding:11px 15px;border-radius:9px;font:inherit;font-weight:bold;cursor:pointer;margin-top:14px}.formula{background:#f4f7fa;padding:12px;border-radius:9px;overflow-wrap:anywhere}.warning{font-size:.88rem;color:#664d12;background:#fff8e7;border:1px solid #f1dfad;padding:12px;border-radius:10px;margin-top:14px}footer{text-align:center;color:var(--muted);padding:24px}
-@media(max-width:760px){.layout{grid-template-columns:1fr}}
-</style></head>
-<body>
-<header><div class="wrap"><a class="back" href="index.html">← Back to Virtual Lab</a><div class="muted" style="color:#d6eaff">KGR · Electrical & Electronics Engineering</div><h1>Maxwell’s Bridge</h1><div>Interactive balance-condition learning module</div></div></header>
-<main class="wrap">
-<div class="layout">
-<section class="panel">
-<h2>1. Bridge concept</h2>
-<p>Maxwell’s inductance-capacitance bridge can be used to determine an unknown coil’s inductance and resistance by comparison with a standard capacitor and resistors.</p>
-<svg class="diagram" viewBox="0 0 620 390" role="img" aria-label="Conceptual Maxwell bridge diagram">
-<rect x="1" y="1" width="618" height="388" rx="12" fill="#fbfdff" stroke="#dce5ee"/>
-<g stroke="#1769aa" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-<path d="M310 65 L145 165 L310 265 L475 165 Z"/>
-<path d="M145 165 L310 165 L475 165"/>
-<path d="M310 65 L310 20 M310 265 L310 325"/>
-<path d="M290 20 L330 20 M290 325 L330 325"/>
-</g>
-<g fill="#12304a" font-family="Arial" font-size="16" font-weight="bold">
-<text x="322" y="55">Zx = Rx + jωLx</text><text x="75" y="150">R2</text><text x="332" y="292">R3</text><text x="430" y="150">R4 ∥ C4</text>
-<text x="320" y="14" font-size="13">AC supply</text><text x="320" y="348" font-size="13">Return</text>
-<text x="318" y="151" font-size="13">Detector</text>
-</g>
-<g stroke="#078b83" stroke-width="3" fill="none"><circle cx="310" cy="165" r="10"/><path d="M300 165h20"/></g>
-<text x="18" y="370" fill="#5c6b7a" font-family="Arial" font-size="12">Conceptual teaching diagram only — exact arm arrangement may vary by textbook.</text>
-</svg>
-<p class="muted">This page demonstrates the ideal balance equations; it is not a real circuit instrument or hardware controller.</p>
-</section>
-<section class="panel">
-<h2>2. Enter known values</h2>
-<p>For the common Maxwell bridge balance form used in this teaching calculator:</p>
-<div class="formula"><strong>Lx = R2 × R3 × C4</strong><br><strong>Rx = (R2 × R3) / R4</strong></div>
-<label for="r2">R₂ (Ω)</label><input id="r2" type="number" min="0.000001" step="any" value="1000">
-<label for="r3">R₃ (Ω)</label><input id="r3" type="number" min="0.000001" step="any" value="1000">
-<label for="r4">R₄ (Ω)</label><input id="r4" type="number" min="0.000001" step="any" value="1000">
-<label for="c4">C₄ (µF)</label><input id="c4" type="number" min="0.000001" step="any" value="0.1">
-<button class="btn" id="calculate">Calculate balance values</button>
-<div class="result" aria-live="polite"><div>Unknown coil resistance, Rₓ</div><strong id="rx">1000 Ω</strong><hr><div>Unknown coil inductance, Lₓ</div><strong id="lx">0.1 H</strong></div>
-<div class="warning"><strong>Check your course convention:</strong> Bridge-arm labels and balance equations can differ between diagrams and textbooks. Verify these equations against your laboratory manual before using the page for assessment.</div>
-</section>
-</div>
-<section class="panel" style="margin-top:18px">
-<h2>3. Learning checkpoints</h2>
-<ol><li>Set the known resistor and capacitor values.</li><li>Calculate the unknown coil resistance and inductance using the displayed balance equations.</li><li>Change one component at a time and observe how the calculated unknown values change.</li><li>Record the values and compare them with the theoretical result in your lab record.</li></ol>
-<h3>Try it</h3><p>Set R₂ = 1000 Ω, R₃ = 1000 Ω, R₄ = 1000 Ω and C₄ = 0.1 µF. Then change C₄ to 0.2 µF. What happens to the calculated inductance?</p>
-</section>
-</main><footer>KGR Virtual Laboratory · Maxwell’s Bridge prototype</footer>
-<script>
-const ids=['r2','r3','r4','c4'];const get=id=>Number(document.getElementById(id).value);
-function fmt(n,unit){if(!Number.isFinite(n))return '—';return n.toLocaleString(undefined,{maximumSignificantDigits:6})+' '+unit}
-function calc(){const [r2,r3,r4,cuf]=ids.map(get);if([r2,r3,r4,cuf].some(v=>!Number.isFinite(v)||v<=0)){document.getElementById('rx').textContent='Enter positive values';document.getElementById('lx').textContent='Enter positive values';return;}const rx=(r2*r3)/r4;const lx=r2*r3*(cuf*1e-6);document.getElementById('rx').textContent=fmt(rx,'Ω');document.getElementById('lx').textContent=fmt(lx,'H');}
-document.getElementById('calculate').addEventListener('click',calc);ids.forEach(id=>document.getElementById(id).addEventListener('input',calc));calc();
-</script>
-</body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Maxwell’s Inductance–Capacitance Bridge | Virtual Lab</title><style>
+:root{--ink:#2B2526;--rule:#C8C3B6;--paper:#FBF9F3;--page:#EFEBE1;--ok:#2F6B45;--bad:#8F3A45;--mute:#5E5558}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,Arial,sans-serif}
+.sheet{max-width:980px;margin:0 auto;background:var(--paper);border-left:1px solid var(--rule);border-right:1px solid var(--rule);padding:8px 22px 22px}
+.back{display:block;padding:8px 0;color:var(--ink);font-size:14px}
+h1{font:600 25px/1.25 Georgia,"Times New Roman",serif;margin:4px 0 2px}.sub{color:var(--mute);margin:0 0 6px}
+h2{font:600 17px Georgia,"Times New Roman",serif;border-bottom:1px solid var(--rule);padding-bottom:3px;margin:20px 0 10px}
+.g{display:grid;grid-template-columns:1fr;gap:16px}@media(min-width:800px){.g{grid-template-columns:1.15fr 1fr}}
+.fig{border:1px solid var(--rule);background:#fff;padding:6px}.cap{font:italic 13px Georgia,serif;color:var(--mute);text-align:center;margin:3px 0 0}svg{display:block;width:100%;height:auto}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 9px}.row label{display:flex;align-items:center;gap:6px}.lb{min-width:112px;font-weight:600}
+input[type=range]{accent-color:var(--ink)}select{font:inherit;border:1px solid var(--ink);background:#fff;padding:2px 6px;border-radius:2px}
+button{font:inherit;font-size:14px;border:1px solid var(--ink);background:#fff;color:var(--ink);padding:3px 10px;cursor:pointer;border-radius:2px}button:hover{background:#EFE9DC}button.p{background:var(--ink);color:#fff}
+.box{border:1px solid var(--ink);background:#fff;padding:4px 10px;min-width:118px}.box small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}.box b{font:600 18px ui-monospace,Consolas,monospace}
+.bar{height:10px;border:1px solid var(--ink);background:#fff;margin-top:3px}.bar i{display:block;height:100%;background:var(--ink);width:0}
+.msg{min-height:20px;font-size:14px;color:var(--mute);margin-top:6px}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;min-width:640px}th,td{border:1px solid var(--rule);padding:5px 6px;text-align:center}th{background:#EFEBE1;font-weight:600}.tw{overflow-x:auto}
+.eq{font:italic 16px Georgia,serif;padding:8px 14px;border-left:3px solid var(--ink);background:#fff;margin:8px 0;line-height:1.9}ol,ul{padding-left:22px;margin:6px 0}
+footer{text-align:center;color:var(--mute);font-size:12px;padding:14px}
+</style></head><body>
+<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
+<div class="sheet"><a class="back" href="index.html">← Back to Virtual Laboratory</a><h1>Maxwell’s Inductance–Capacitance Bridge</h1><p class="sub">Measurement of the inductance and resistance of a coil</p><h2>1. Circuit and measurement</h2><div class="g"><div><div class="fig" id="fg"></div><p class="cap">Fig. 1  Maxwell inductance–capacitance bridge</p></div><div>
+<div class="row"><label class="lb">R<sub>2</sub></label><select id="r2"><option>100</option><option selected>1000</option><option>10000</option></select> Ω <label class="lb" style="min-width:0;margin-left:10px">R<sub>3</sub></label><select id="r3"><option>100</option><option selected>1000</option><option>10000</option></select> Ω</div>
+<div class="row"><label class="lb">R<sub>4</sub></label><input id="s4" type="range" min="0" max="20000" value="10000" style="width:150px"><b id="v4" style="font-family:ui-monospace,Consolas,monospace"></b></div>
+<div class="row"><button data-k="4" data-m="0.99">−1%</button><button data-k="4" data-m="0.999">−0.1%</button><button data-k="4" data-m="1.001">+0.1%</button><button data-k="4" data-m="1.01">+1%</button></div>
+<div class="row"><label class="lb">C<sub>4</sub></label><input id="sc" type="range" min="0" max="20000" value="10000" style="width:150px"><b id="vc" style="font-family:ui-monospace,Consolas,monospace"></b></div>
+<div class="row"><button data-k="c" data-m="0.99">−1%</button><button data-k="c" data-m="0.999">−0.1%</button><button data-k="c" data-m="1.001">+0.1%</button><button data-k="c" data-m="1.01">+1%</button></div>
+<div class="row"><div class="box" style="flex:1"><small>Detector output</small><b id="vd">0</b><div class="bar"><i id="br"></i></div></div><div class="box"><small>Status</small><b id="st">-</b></div></div>
+<div class="row"><button class="p" id="rec">Record reading</button><button id="nu">New unknown coil</button><button id="rs">Clear table</button></div><div class="msg" id="mg"></div></div></div>
+<h2>2. Observations</h2><div class="tw"><table id="tb"><thead><tr><th>S.No.</th><th>R<sub>2</sub>R<sub>3</sub> (Ω²)</th><th>R<sub>4</sub> (Ω)</th><th>C<sub>4</sub> (µF)</th><th>L<sub>x</sub> calc (mH)</th><th>L<sub>x</sub> actual (mH)</th><th>Error (%)</th><th>R<sub>x</sub> calc (Ω)</th><th>R<sub>x</sub> actual (Ω)</th><th>Error (%)</th></tr></thead><tbody></tbody></table></div>
+<h2>3. Theory</h2><p>The unknown coil (inductance L<sub>x</sub>, resistance R<sub>x</sub>) forms one arm. The opposite arm is a resistor R<sub>4</sub> in parallel with a standard capacitor C<sub>4</sub>. Balance of the bridge requires Z<sub>1</sub>Z<sub>4</sub> = Z<sub>2</sub>Z<sub>3</sub>, which gives two real equations:</p>
+<div class="eq">L<sub>x</sub> = R<sub>2</sub> R<sub>3</sub> C<sub>4</sub><br>R<sub>x</sub> = R<sub>2</sub> R<sub>3</sub> / R<sub>4</sub><br>Q = ωL<sub>x</sub> / R<sub>x</sub> = ωC<sub>4</sub>R<sub>4</sub></div>
+<p>C<sub>4</sub> sets the inductive balance and R<sub>4</sub> sets the resistive balance. The two settings interact only weakly, so the null is found by adjusting them in turn. The bridge is supplied at 1 kHz.</p>
+<h2>4. Procedure</h2><ol><li>Choose R<sub>2</sub> and R<sub>3</sub>. A larger R<sub>2</sub>R<sub>3</sub> brings the capacitor C<sub>4</sub> into a practical range.</li><li>Adjust C<sub>4</sub> and R<sub>4</sub> in turn, with the sliders and the step buttons, until the detector output is a minimum and the status reads <i>Balanced</i>.</li><li>Press <i>Record reading</i>. L<sub>x</sub> and R<sub>x</sub> are calculated from the balance equations and compared with the actual values.</li><li>Press <i>New unknown coil</i> and repeat with other values of R<sub>2</sub> and R<sub>3</sub>.</li></ol></div><footer>E.G.S. Pillay Engineering College · Virtual Electrical Measurements Laboratory</footer><script>var NS="http://www.w3.org/2000/svg",INK="#2B2526";
+function f(n){return n.toFixed(1)}function P(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}function M(p){return"M"+f(p[0])+" "+f(p[1])}function L(p){return"L"+f(p[0])+" "+f(p[1])}
+function nr(a,b){var dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return[-dy/l,dx/l]}function off(p,n,s){return[p[0]+n[0]*s,p[1]+n[1]*s]}
+function wire(){var d="";for(var i=0;i<arguments.length;i++)d+=(i?L:M)(arguments[i]);return'<path d="'+d+'"/>'}
+function sym(type,a,b,v){var n=nr(a,b),u=[(b[0]-a[0])/Math.hypot(b[0]-a[0],b[1]-a[1]),(b[1]-a[1])/Math.hypot(b[0]-a[0],b[1]-a[1])],d=M(a),i,t,p,s='';
+if(type==="r"){d+=L(P(a,b,.2));for(i=0;i<6;i++){t=.2+.6*(i+.5)/6;p=off(P(a,b,t),n,i%2?-6:6);d+=L(p)}d+=L(P(a,b,.8))+L(b)}
+else if(type==="l"){d+=L(P(a,b,.16));for(i=0;i<4;i++){var t0=.16+.68*i/4,t1=.16+.68*(i+1)/4,m=off(P(a,b,(t0+t1)/2),n,-17);d+="Q"+f(m[0])+" "+f(m[1])+" "+f(P(a,b,t1)[0])+" "+f(P(a,b,t1)[1])}d+=L(b)}
+else if(type==="c"){d+=L(P(a,b,.45))+M(P(a,b,.55))+L(b)+M(off(P(a,b,.45),n,12))+L(off(P(a,b,.45),n,-12))+M(off(P(a,b,.55),n,12))+L(off(P(a,b,.55),n,-12))}
+s='<path d="'+d+'"/>';
+if(v){var c=P(a,b,.5),e=off(off(c,n,17),u,11),st=off(off(c,n,-17),u,-11),hb=[e[0]-(e[0]-st[0])*.2,e[1]-(e[1]-st[1])*.2],hn=nr(st,e);s+='<path d="'+M(st)+L(e)+'"/><path fill="'+INK+'" d="'+M(e)+L(off(hb,hn,3.5))+L(off(hb,hn,-3.5))+'Z"/>'}return s}
+function dot(p){return'<circle cx="'+f(p[0])+'" cy="'+f(p[1])+'" r="3.4" fill="'+INK+'" stroke="none"/>'}
+function lbl(x,y,m,sub,an){return'<text x="'+x+'" y="'+y+'" text-anchor="'+(an||"middle")+'" font-family="Georgia,serif" font-style="italic" font-size="17" fill="'+INK+'" stroke="none">'+m+(sub?'<tspan font-size="11" dy="4" font-style="normal">'+sub+'</tspan>':'')+'</text>'}
+function txt(x,y,s,an,sz){return'<text x="'+x+'" y="'+y+'" text-anchor="'+(an||"middle")+'" font-family="Segoe UI,Arial,sans-serif" font-size="'+(sz||12)+'" fill="#5E5558" stroke="none">'+s+'</text>'}
+function det(c,r,ch){return'<circle cx="'+c[0]+'" cy="'+c[1]+'" r="'+r+'" fill="#fff"/><g id="nd"><line x1="'+c[0]+'" y1="'+c[1]+'" x2="'+c[0]+'" y2="'+(c[1]-r+4)+'" stroke="#8F3A45" stroke-width="2.2"/></g><circle cx="'+c[0]+'" cy="'+c[1]+'" r="2.6" fill="'+INK+'" stroke="none"/>'+(ch?'<text x="'+c[0]+'" y="'+(c[1]+r-5)+'" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="12" fill="'+INK+'" stroke="none">'+ch+'</text>':'')}
+function svg(w,h,body){return'<svg viewBox="0 0 '+w+' '+h+'" fill="none" stroke="'+INK+'" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">'+body+'</svg>'}
+var $=function(i){return document.getElementById(i)},W=2*Math.PI*1000,V=10,U,rows=[];
+var A=[240,40],Bn=[90,170],Cn=[390,170],Dn=[240,300];
+var J1=P(Cn,Dn,.28),J2=P(Cn,Dn,.72),nn=nr(Cn,Dn),o1=off(J1,nn,-18),o2=off(J2,nn,-18),i1=off(J1,nn,18),i2=off(J2,nn,18),LD=P(A,Bn,.46);
+$("fg").innerHTML=svg(580,340,
+ sym("l",A,LD)+sym("r",LD,Bn)+sym("r",A,Cn)+sym("r",Bn,Dn)+
+ wire(Cn,J1,o1)+sym("r",o1,o2)+wire(o2,J2,Dn)+wire(J1,i1)+sym("c",i1,i2,1)+wire(J2,i2)+
+ wire(Bn,[200,170])+'<circle cx="240" cy="170" r="17" fill="#fff"/>'+det([240,170],17,"")+wire([280,170],Cn)+
+ wire(A,[240,16],[460,16],[460,154])+'<circle cx="460" cy="170" r="16" fill="#fff"/><path d="M451 170q4.5-9 9 0t9 0"/>'+wire([460,186],[460,324],[240,324],Dn)+
+ dot(A)+dot(Bn)+dot(Cn)+dot(Dn)+dot(J1)+dot(J2)+
+ lbl(176,66,"L","x","end")+lbl(112,132,"R","x","end")+lbl(342,92,"R","2","start")+lbl(142,254,"R","3","end")+lbl(346,262,"R","4","start")+lbl(284,226,"C","4","end")+
+ txt(240,142,"Null detector")+txt(484,166,"AC source","start")+txt(484,182,"1 kHz","start")+txt(252,34,"A","start")+txt(76,174,"B","end")+txt(404,164,"C","start")+txt(252,318,"D","start"));
+$("nd").setAttribute("transform","rotate(0 240 170)");
+var cm=function(a,b){return{r:a,i:b||0}},ad=function(a,b){return cm(a.r+b.r,a.i+b.i)},ml=function(a,b){return cm(a.r*b.r-a.i*b.i,a.r*b.i+a.i*b.r)},dv=function(a,b){var d=b.r*b.r+b.i*b.i;return cm((a.r*b.r+a.i*b.i)/d,(a.i*b.r-a.r*b.i)/d)},ab=function(a){return Math.hypot(a.r,a.i)};
+function sv(id,mn,mx){return mn*Math.pow(mx/mn,+$(id).value/20000)}
+function sp(id,mn,mx,v){$(id).value=Math.round(20000*Math.log(Math.max(mn,Math.min(mx,v))/mn)/Math.log(mx/mn))}
+function R4(){return sv("s4",100,200000)}function C4(){return sv("sc",.001,1)*1e-6}
+function newU(){U={L:Math.round(20+Math.random()*180)/1000,R:Math.round(10+Math.random()*90)};$("mg").textContent=""}
+function vd(){var z1=cm(U.R,W*U.L),z2=cm(+$("r2").value),z3=cm(+$("r3").value),y4=cm(1/R4(),W*C4()),z4=dv(cm(1),y4),vb=ml(cm(V),dv(z3,ad(z1,z3))),vc=ml(cm(V),dv(z4,ad(z2,z4)));return ab(cm(vb.r-vc.r,vb.i-vc.i))}
+function upd(){var v=vd(),b=v<.01,pc=Math.max(0,Math.min(100,100*(Math.log10(Math.max(v,1e-4))+4)/5));$("v4").textContent=R4().toPrecision(5)+" Ω";$("vc").textContent=(C4()*1e6).toPrecision(4)+" µF";$("vd").textContent=v<1?(v*1000).toFixed(1)+" mV":v.toFixed(2)+" V";$("br").style.width=pc+"%";$("nd").setAttribute("transform","rotate("+pc*.6+" 240 170)");$("st").textContent=b?"Balanced":"Off balance";$("st").style.color=b?"#2F6B45":"#8F3A45"}
+["r2","r3","s4","sc"].forEach(function(i){$(i).oninput=upd});
+Array.prototype.forEach.call(document.querySelectorAll("button[data-k]"),function(b){b.onclick=function(){var m=+b.dataset.m;if(b.dataset.k==="4")sp("s4",100,200000,R4()*m);else sp("sc",.001,1,C4()*1e6*m);upd()}});
+$("nu").onclick=function(){newU();upd()};
+$("rec").onclick=function(){var m=$("mg");if(vd()>=.01){m.className="msg bad";m.textContent="The bridge is not balanced. Adjust C4 and R4 in turn until the detector output is a minimum. If no balance is possible, change R2 and R3.";return}
+var k=+$("r2").value*+$("r3").value,L=k*C4()*1000,R=k/R4(),eL=(L-U.L*1000)/(U.L*1000)*100,eR=(R-U.R)/U.R*100,sg=function(x){return(x>0?"+":"")+x.toFixed(2)};
+rows.push([rows.length+1,k,R4().toPrecision(5),(C4()*1e6).toPrecision(4),L.toFixed(2),(U.L*1000).toFixed(1),sg(eL),R.toFixed(2),U.R,sg(eR)]);
+$("tb").querySelector("tbody").innerHTML=rows.map(function(r){return"<tr>"+r.map(function(v){return"<td>"+v+"</td>"}).join("")+"</tr>"}).join("");m.className="msg ok";m.textContent="Reading recorded. Q = "+(W*U.L/U.R).toFixed(2)+" for this coil at 1 kHz."};
+$("rs").onclick=function(){rows=[];$("tb").querySelector("tbody").innerHTML=""};newU();upd();</script></body></html>

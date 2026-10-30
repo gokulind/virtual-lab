@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LVDT Virtual Laboratory</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#e8eef2;--surface:#ffffff;--surface2:#f1f5f8;--ink:#12212e;--muted:#58708a;--line:#d3dfe8;
+  --accent:#0d6e92;--accent-ink:#ffffff;--good:#10773a;--goodbg:#e4f5ea;--bad:#b3261e;--badbg:#fdeceb;
+  --warn:#86540a;--warnbg:#fff4d9;--idle:#4a5d70;--idlebg:#e9eff4;
+  --h1:#082f4a;--h2:#0d6e92;--wire:#2b4157;--flow:#e08a00;--needle:#d92d20;--gaugebg:#d8eef7;--dial:#fbfdff;--shadow:0 5px 22px rgba(18,33,46,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a131a;--surface:#121f2a;--surface2:#192a38;--ink:#e5eef5;--muted:#8da6bb;--line:#26394a;
+    --accent:#4fb4d8;--accent-ink:#04141c;--good:#52d68f;--goodbg:#0f2f20;--bad:#ff8c82;--badbg:#391613;
+    --warn:#f4c35e;--warnbg:#33290f;--idle:#9db3c6;--idlebg:#1a2a38;
+    --wire:#9db8cf;--flow:#ffb937;--needle:#ff6a5e;--gaugebg:#17384b;--dial:#0e1923;--shadow:0 5px 22px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a131a;--surface:#121f2a;--surface2:#192a38;--ink:#e5eef5;--muted:#8da6bb;--line:#26394a;
+  --accent:#4fb4d8;--accent-ink:#04141c;--good:#52d68f;--goodbg:#0f2f20;--bad:#ff8c82;--badbg:#391613;
+  --warn:#f4c35e;--warnbg:#33290f;--idle:#9db3c6;--idlebg:#1a2a38;
+  --wire:#9db8cf;--flow:#ffb937;--needle:#ff6a5e;--gaugebg:#17384b;--dial:#0e1923;--shadow:0 5px 22px rgba(0,0,0,.45);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+
+.top{background:linear-gradient(120deg,var(--h1),var(--h2));color:#fff;padding:16px 22px;flex-wrap:wrap;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;gap:14px;align-items:center;min-width:0}
+.logo{flex:none;width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.top h1{margin:0;font-size:21px;line-height:1.2}
+.top p{margin:2px 0 0;font-size:13px;opacity:.85}
+.icon{flex:none;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:1280px;margin:14px auto 0;padding:0 14px}
+.mode{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px;cursor:pointer;text-align:left;font-weight:700;line-height:1.3}
+.mode small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:2px}
+.mode[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mode[aria-selected="true"] small{color:inherit;opacity:.88}
+
+main{max-width:1280px;margin:14px auto 30px;padding:0 14px}
+.layout{display:grid;grid-template-columns:332px minmax(0,1fr);gap:16px;align-items:start}
+.stack{display:grid;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+h2{margin:0 0 2px;font-size:17px}
+h3{margin:18px 0 6px;font-size:15px}
+.muted{color:var(--muted);font-size:13px}
+.sec{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.sec:first-of-type{border-top:0;margin-top:8px;padding-top:0}
+.sec h3{margin:0 0 8px;font-size:13.5px;color:var(--muted);font-weight:700}
+
+.ctl{margin:9px 0}
+.ctlh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.inp{display:inline-flex;align-items:center;gap:4px}
+.inp em{font-style:normal;color:var(--muted);font-weight:600;font-size:13px}
+input[type=number],select{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:5px 7px;font-weight:700}
+input[type=number]{width:84px;text-align:right}
+select{max-width:100%}
+input[type=range]{width:100%;accent-color:var(--accent);margin:5px 0 0}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg .btn{flex:1;padding:8px 6px;text-align:center}
+.seg .btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.check{display:flex;gap:8px;align-items:center;font-weight:600;font-size:14px;margin:10px 0 2px}
+.keybtn{width:100%;display:flex;align-items:center;justify-content:space-between}
+.led{width:12px;height:12px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 3px var(--surface2)}
+.led.on{background:var(--good)}
+.hidden{display:none !important}
+
+.stage{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,1fr);gap:14px;margin-top:12px}
+.panel{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:8px;min-width:0}
+.panel svg{display:block;width:100%;height:auto}
+.formula{font-size:13.5px;background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin:8px 0}
+
+/* circuit svg */
+.wire{stroke:var(--wire);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.flow{stroke:var(--flow);stroke-width:4.6;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:.1 15;animation:dash 1.2s linear infinite;opacity:0;transition:opacity .25s}
+@keyframes dash{to{stroke-dashoffset:-15.1}}
+@media (prefers-reduced-motion:reduce){.flow{animation:none;stroke-dasharray:3 10}}
+.res{fill:var(--surface);stroke:var(--wire);stroke-width:3}
+.res.gauge{fill:var(--gaugebg);stroke:var(--accent)}
+.lbl{font-weight:800;fill:var(--ink);font-size:16px}
+.val{fill:var(--muted);font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.nv{fill:var(--accent);font-size:12.5px;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+.tag{font-size:11px;fill:var(--accent);font-weight:700}
+.node{fill:var(--accent)}
+.gcirc{fill:var(--surface);stroke:var(--accent);stroke-width:4;transition:stroke .2s}
+.gcirc.ok{stroke:var(--good)}
+.plate{stroke:var(--wire);stroke-linecap:round}
+.small{font-size:11.5px;fill:var(--muted)}
+.keyhit{cursor:pointer;fill:transparent}
+
+/* dial */
+.face{fill:var(--dial);stroke:var(--line);stroke-width:2}
+.arc{fill:none;stroke:var(--wire);stroke-width:2}
+.tmin{stroke:var(--wire);stroke-width:1.2}
+.tmaj{stroke:var(--wire);stroke-width:2.2}
+.dl{font-size:9.5px;fill:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.needle{stroke:var(--needle);stroke-width:2.8;stroke-linecap:round}
+.hub{fill:var(--wire)}
+.ovl{fill:var(--line)}
+.ovl.on{fill:var(--bad)}
+.dig{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 6px 2px;flex-wrap:wrap}
+.dig b{font-size:19px}
+.dmm{background:var(--dial);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.dmm .big{font-size:34px;font-weight:700;margin:6px 0;color:var(--accent)}
+
+/* readouts */
+.reads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.read{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:9px 10px;min-width:0}
+.read small{display:block;color:var(--muted);font-size:12px}
+.read b{display:block;font-size:16.5px;margin-top:1px;overflow-wrap:anywhere}
+.read i{display:block;font-style:normal;font-size:11.5px;color:var(--muted)}
+.status{margin-top:12px;padding:12px 14px;border-radius:11px;font-weight:600}
+.status.ok{background:var(--goodbg);color:var(--good)}
+.status.bad{background:var(--badbg);color:var(--bad)}
+.status.warn{background:var(--warnbg);color:var(--warn)}
+.status.idle{background:var(--idlebg);color:var(--idle)}
+.status span{display:block;font-weight:500;font-size:13px;margin-top:2px;opacity:.95}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+th{color:var(--muted);font-weight:700;font-size:12.5px;background:var(--surface2)}
+tr.hot td{color:var(--bad);font-weight:700}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.warnline{margin-top:8px;font-size:13px;color:var(--warn);background:var(--warnbg);border-radius:8px;padding:7px 10px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px -4px 14px;overflow-x:auto}
+.tab{border:0;background:none;padding:10px 14px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.chartbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.chartbar label{font-size:13px;font-weight:700;color:var(--muted)}
+#chart{width:100%;height:auto;background:var(--surface2);border:1px solid var(--line);border-radius:12px;touch-action:pan-y}
+.ax{stroke:var(--muted);stroke-width:1.4}
+.gl{stroke:var(--line);stroke-width:1}
+.zero{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 4}
+.tk{font-size:11px;fill:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.axt{font-size:12px;fill:var(--ink);font-weight:700}
+.cv{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round}
+.cv2{fill:none;stroke:var(--flow);stroke-width:2.4;stroke-dasharray:7 5}
+.cmsg{fill:var(--muted);font-size:15px}
+.mk{fill:var(--needle);stroke:var(--surface);stroke-width:2}
+.nl{fill:var(--good);stroke:var(--surface);stroke-width:2}
+.mkt{font-size:12px;fill:var(--ink);font-weight:700}
+.cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:5px}
+.legend i.d{border-top:3px dashed var(--flow)}
+
+.eq{background:var(--surface2);border-left:4px solid var(--accent);border-radius:6px;padding:9px 12px;margin:8px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;overflow-x:auto;white-space:nowrap}
+.doc p,.doc li{max-width:78ch}
+.doc ul,.doc ol{padding-left:22px}
+.proc{display:none}.proc.on{display:block}
+
+.qz{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:var(--surface2)}
+.qo{display:grid;gap:6px;margin-top:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 11px;cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{background:var(--goodbg);border-color:var(--good);color:var(--good);font-weight:700}
+.opt.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.qe{font-size:13px;color:var(--muted);margin-top:8px}
+.score{font-weight:800;font-size:16px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:9;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.dec{display:flex;gap:5px;justify-content:center;align-items:flex-end;margin:6px 0 10px}
+.dc{display:flex;flex-direction:column;align-items:center;gap:3px}
+.dc small{color:var(--muted);font-weight:700;font-size:11.5px}
+.dc button{width:42px;height:26px;border:1px solid var(--line);background:var(--surface2);border-radius:7px;cursor:pointer;font-size:12px;padding:0}
+.dc button:hover{border-color:var(--accent)}
+.dg{width:42px;text-align:center;font-size:25px;font-weight:700;background:var(--dial);border:1px solid var(--line);border-radius:8px;padding:2px 0}
+.dp{font-size:26px;font-weight:800;padding-bottom:30px;color:var(--muted)}
+textarea{width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px;font:12.5px ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+
+.coach{display:flex;gap:10px;align-items:flex-start;background:var(--gaugebg);border:1px solid var(--accent);border-radius:12px;padding:10px 14px;margin-top:12px;font-size:15px}
+.coach b{flex:none;color:var(--accent)}
+details.sec>summary{cursor:pointer;font-weight:700;color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::after{content:'＋';color:var(--muted)}
+details.sec[open]>summary::after{content:'－'}
+details.sec[open]>summary{margin-bottom:8px}
+.overlay{position:fixed;inset:0;background:rgba(5,15,25,.6);z-index:20;display:grid;place-items:center;padding:16px;overflow:auto}
+.wbox{background:var(--surface);color:var(--ink);border-radius:18px;max-width:560px;width:100%;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.wbox h2{font-size:21px;margin-bottom:8px}
+.wbox li{margin:5px 0}
+#swatches{display:flex;gap:7px;align-items:center;padding:0 4px}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.55);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.35)}
+#hdrCollege{font-size:13px;font-weight:700;letter-spacing:.2px;opacity:.95;margin-bottom:2px}
+.foot{max-width:1280px;margin:0 auto 24px;padding:14px;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+.foot b{color:var(--ink)}.foot a{color:var(--accent);font-weight:600}
+@media (max-width:1000px){.stage{grid-template-columns:1fr}}
+@media (max-width:1100px){.layout{grid-template-columns:1fr}}
+@media (max-width:700px){.reads{grid-template-columns:repeat(2,minmax(0,1fr))}}
+:root.embedded{padding-top:0;padding-bottom:0}
+.embedded .top{padding:10px 14px}
+.embedded .top h1{font-size:17px}
+.embedded .top p{display:none}
+.embedded .logo{width:36px;height:36px}
+.embedded .modes{margin-top:10px}
+.embedded main{margin-top:10px}
+.embedded .card{padding:12px}
+.embedded .foot{margin-bottom:8px}
+@media (max-width:620px){.modes{grid-template-columns:1fr}.top h1{font-size:18px}.top p{display:none}}
+
+.tube{fill:var(--surface2);stroke:var(--wire);stroke-width:3}
+.coil{fill:none;stroke-width:3}
+.turn{stroke-width:2;opacity:.55}
+.cP{stroke:var(--accent)}
+.cS1{stroke:var(--flow)}
+.cS2{stroke:var(--good)}
+.core{fill:var(--gaugebg);stroke:var(--wire);stroke-width:3}
+.hatch{stroke:var(--wire);stroke-width:1.5;opacity:.5}
+.rod{stroke:var(--wire);stroke-width:7;stroke-linecap:round}
+.cover{fill:var(--surface2);stroke:var(--wire);stroke-width:3}
+.drag{fill:transparent;touch-action:none}
+.srcc{fill:var(--surface);stroke:var(--accent);stroke-width:3}
+.sine{fill:none;stroke:var(--accent);stroke-width:2.2}
+.ptr{fill:var(--needle)}
+.pt{fill:var(--good);stroke:var(--surface);stroke-width:2}
+.s2l{fill:var(--good)}.s1l{fill:var(--flow)}.pl{fill:var(--accent)}
+.bar{position:relative;height:12px;background:var(--surface2);border:1px solid var(--line);border-radius:7px;margin-top:6px;overflow:hidden}
+.bar .fill{position:absolute;top:0;bottom:0;background:var(--accent)}
+.bar .mid{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--muted)}
+#scope{width:100%;height:auto;background:var(--surface2);border:1px solid var(--line);border-radius:12px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="9" width="24" height="12" rx="3"/><path d="M9 9v12M15 9v12M21 9v12" stroke-width="1.6"/><path d="M8 15h14" stroke-width="3"/></svg>
+    </div>
+    <div>
+      <div id="hdrCollege"></div>
+      <h1>LVDT Virtual Laboratory</h1>
+      <p id="hdrSub"></p>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div id="swatches" role="group" aria-label="Theme colour"></div><button class="icon" id="helpBtn" aria-label="Open quick-start help">? Help</button><button class="icon" id="themeBtn" aria-label="Switch light or dark theme">◐ Theme</button></div>
+</header>
+
+<nav class="modes" role="tablist" aria-label="Experiment">
+  <button class="mode" role="tab" data-mode="explore" aria-selected="true">Explore the LVDT<small>Move the core, watch the signals</small></button>
+  <button class="mode" role="tab" data-mode="calibrate" aria-selected="false">Calibrate and linearity<small>Record readings, find sensitivity</small></button>
+  <button class="mode" role="tab" data-mode="measure" aria-selected="false">Measure an unknown displacement<small>Use your calibration</small></button>
+</nav>
+
+<main>
+<div class="layout">
+
+  <aside class="card" aria-label="Controls">
+    <h2>Bench controls</h2>
+    <div class="muted">Settings apply to the circuit immediately.</div>
+
+    <div class="sec">
+      <h3>Excitation of the primary</h3>
+      <div class="ctl"><div class="ctlh">Voltage Vp (rms)<span class="inp"><input type="number" id="vpN" min="1" max="10" step="0.1" value="3"><em>V</em></span></div>
+        <input type="range" id="vp" min="1" max="10" step="0.1" value="3" aria-label="Primary voltage"></div>
+      <div class="ctl"><div class="ctlh">Frequency f<span class="inp"><input type="number" id="fqN" min="500" max="10000" step="100" value="2500"><em>Hz</em></span></div>
+        <input type="range" id="fq" min="500" max="10000" step="100" value="2500" aria-label="Excitation frequency"></div>
+    </div>
+
+    <div class="sec">
+      <h3 id="coreHead">Core position</h3>
+      <div id="coreCtl"></div>
+    </div>
+
+    <details class="sec" id="demCtl">
+      <summary>Demodulator settings <span class="muted">(advanced)</span></summary>
+      <label class="check"><input type="checkbox" id="autoPh" checked> Auto-align reference phase</label>
+      <div class="ctl" id="phWrap"><div class="ctlh">Reference phase<span class="inp"><input type="number" id="phN" min="0" max="180" step="1" value="0"><em>°</em></span></div>
+        <input type="range" id="ph" min="0" max="180" step="1" value="0" aria-label="Reference phase"></div>
+      <div class="muted">A phase-sensitive detector gives the full output only when its reference is in phase with the LVDT output.</div>
+    </details>
+
+    <div class="sec"><button class="btn" id="resetBtn" style="width:100%">↺ Reset this experiment</button></div>
+  </aside>
+
+  <section class="stack">
+
+    <div class="card">
+      <h2 id="modeTitle"></h2>
+      <div class="muted" id="modeDesc"></div>
+      <div class="coach" id="coach"><b>Next step</b><span id="coachTxt"></span></div>
+      <div class="stage">
+        <div class="panel"><svg id="diagram" viewBox="0 0 700 340" role="img" aria-label="LVDT cutaway diagram"></svg></div>
+        <div>
+          <div class="dmm">
+            <div class="muted">Demodulated DC output</div>
+            <div class="big mono" id="mDC">0.0 mV</div>
+            <div class="bar" aria-hidden="true"><div class="fill" id="barFill"></div><div class="mid"></div></div>
+            <div class="muted" style="margin-top:8px">AC output Vo (rms)</div>
+            <b class="mono" id="mAC" style="font-size:18px">0.0 mV</b>
+            <div class="muted" style="margin-top:6px">Phase of Vo vs Vp</div>
+            <b class="mono" id="mPh" style="font-size:16px">0°</b>
+            <div class="muted" id="mNote" style="margin-top:2px"></div>
+          </div>
+          <div class="formula mono" id="formulaBox"></div>
+        </div>
+      </div>
+      <div class="status ok" id="status" role="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Live measurements</h2>
+      <div class="reads" id="reads" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="tabs" role="tablist" aria-label="Lab sections">
+        <button class="tab" role="tab" data-tab="chart" aria-selected="true">Characteristics</button>
+        <button class="tab" role="tab" data-tab="scope" aria-selected="false">Oscilloscope</button>
+        <button class="tab" role="tab" data-tab="obs" aria-selected="false">Observations</button>
+        <button class="tab" role="tab" data-tab="theory" aria-selected="false">Theory</button>
+        <button class="tab" role="tab" data-tab="proc" aria-selected="false">Procedure</button>
+        <button class="tab" role="tab" data-tab="viva" aria-selected="false">Viva quiz</button>
+      </div>
+
+      <div id="tab-chart">
+        <div class="chartbar">
+          <label>Plot <select id="yqSel"><option value="dc">Demodulated DC output (mV, signed)</option><option value="ac">AC output Vo (mV rms)</option></select></label>
+        </div>
+        <svg id="chart" viewBox="0 0 640 330" role="img" aria-label="LVDT characteristic curve"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div id="tab-scope" class="hidden">
+        <div class="chartbar">
+          <label class="check" style="margin:0"><input type="checkbox" id="magChk"> Magnify Vo trace ×10</label>
+        </div>
+        <svg id="scope" viewBox="0 0 640 340" role="img" aria-label="Oscilloscope traces"></svg>
+        <div class="legend" id="scopeNote"></div>
+      </div>
+
+      <div id="tab-obs" class="hidden">
+        <div class="btns" style="margin:0 0 10px">
+          <button class="btn primary" id="recBtn" style="flex:none">＋ Record reading</button>
+          <button class="btn" id="sweepBtn">Auto-fill sweep</button>
+          <button class="btn" id="undoBtn">Remove last</button>
+          <button class="btn" id="clrBtn">Clear table</button>
+          <button class="btn" id="csvBtn">Copy as CSV</button>
+        </div>
+        <div class="scroll"><table id="trials"></table></div>
+        <div class="ctl" style="margin-top:12px"><div class="ctlh"><label for="fitSel">Fit readings with |x| up to</label>
+          <select id="fitSel"><option value="4">4 mm</option><option value="6">6 mm</option><option value="8">8 mm</option><option value="10" selected>10 mm</option><option value="12">12 mm</option><option value="15">15 mm</option></select></div></div>
+        <div class="formula" id="fitBox"></div>
+        <div id="csvBox" class="hidden"><div class="muted">Select all and copy (Ctrl/⌘ + C):</div><textarea id="csvText" readonly></textarea></div>
+      </div>
+
+      <div id="tab-theory" class="hidden doc">
+        <h3 style="margin-top:0">Principle</h3>
+        <p>A Linear Variable Differential Transformer (LVDT) measures linear displacement. It has one primary winding in the middle and two identical secondary windings on either side. A movable ferromagnetic core slides inside. The primary is driven by AC, and the core changes how strongly the primary couples to each secondary.</p>
+        <h3>Working</h3>
+        <div class="eq">Primary: Vp = Vm sin(ωt), typically 1–10 V at 1–10 kHz</div>
+        <div class="eq">Secondary EMFs: e₁ = M₁ · dIp/dt     e₂ = M₂ · dIp/dt</div>
+        <div class="eq">Secondaries in series opposition: Vo = e₁ − e₂ = (M₁ − M₂) · dIp/dt</div>
+        <ul>
+          <li><b>Core at centre (x = 0):</b> M₁ = M₂, so e₁ = e₂ and Vo ≈ 0. This is the null position.</li>
+          <li><b>Core toward S₁ (x &gt; 0):</b> M₁ &gt; M₂, so Vo is larger and in phase with the reference.</li>
+          <li><b>Core toward S₂ (x &lt; 0):</b> M₂ &gt; M₁, so Vo has the same size for the same distance but is 180° out of phase.</li>
+        </ul>
+        <p>The magnitude of Vo tells you how far the core has moved, and its phase tells you which way.</p>
+        <h3>Sensitivity and linearity</h3>
+        <div class="eq">Vo ≈ S · Vp · x   (within the linear range)</div>
+        <p>The sensitivity S is usually quoted in mV/V/mm, meaning output per volt of excitation per millimetre. Doubling Vp doubles the output in mV/mm, but S in mV/V/mm stays the same. Near the ends of the stroke the core leaves the windings and the curve flattens, so the response is no longer a straight line. In this lab the linear range (within 0.5 % of reading) is about ±8.3 mm.</p>
+        <h3>Signal conditioning</h3>
+        <div class="eq">Oscillator → LVDT → amplifier → phase-sensitive detector → low-pass filter → DC voltage</div>
+        <p>A plain AC voltmeter only reads the size of Vo, so it cannot tell left from right. A phase-sensitive detector (demodulator) multiplies Vo by a reference in phase with the carrier. After low-pass filtering, the DC output is proportional to x and its sign gives the direction.</p>
+        <div class="eq">Vdc = Vo cos(Δφ)   (Δφ = phase error of the reference)</div>
+        <h3>Phase and frequency</h3>
+        <p>Because the primary is inductive, the output leads the excitation by a phase angle that falls as frequency rises. The output also grows with frequency up to a plateau. That is why the auto-align option exists, and why the manual phase setting must be matched to the output phase.</p>
+        <h3>Residual null voltage</h3>
+        <p>At the centre the output is never exactly zero. Slight winding imbalance and harmonics leave a small residual voltage, usually 90° out of phase with the main signal. A phase-sensitive detector rejects most of it.</p>
+        <h3>Advantages and limits</h3>
+        <ul><li>No sliding electrical contact, so there is no wear and the life is very long.</li>
+        <li>Practically infinite resolution, limited by the electronics.</li>
+        <li>Rugged, and tolerant of dirt, moisture and temperature.</li>
+        <li>Needs AC excitation and demodulation electronics.</li>
+        <li>Response is linear only over part of the stroke, and the core must be aligned.</li></ul>
+        <h3>Applications</h3>
+        <p>Position feedback in machine tools, thickness gauges, pressure and force transducers (with a bellows or diaphragm), level measurement, and valve position sensing.</p>
+      </div>
+
+      <div id="tab-proc" class="hidden doc">
+        <div class="proc on" id="proc-explore">
+          <h3 style="margin-top:0">Explore the LVDT</h3>
+          <ol>
+            <li>Leave excitation at 3 V and 2.5 kHz. Set the core to 0 mm with the Centre button. Note S₁, S₂ and Vo.</li>
+            <li>Move the core to +5 mm, then −5 mm. Compare the sizes of S₁ and S₂ and look at the phase of Vo.</li>
+            <li>Open the Oscilloscope tab. Watch the Vo trace flip by 180° as the core crosses the centre.</li>
+            <li>Increase Vp. Observe that the output in mV/mm rises, but the output per volt does not.</li>
+            <li>Change the frequency. See how the amplitude and the phase of Vo change.</li>
+            <li>Drive the core beyond ±8 mm and see the output curve bend away from the straight line.</li>
+          </ol>
+        </div>
+        <div class="proc" id="proc-calibrate">
+          <h3 style="margin-top:0">Calibrate and find linearity</h3>
+          <ol>
+            <li>Set Vp and f and do not change them during calibration.</li>
+            <li>Move the core to −14 mm and press Record reading. Repeat in 2 mm steps up to +14 mm. (Auto-fill sweep does this for you as a shortcut.)</li>
+            <li>Open Characteristics. See the recorded points on the curve and the shaded linear range.</li>
+            <li>In Observations choose the range of |x| for the fit. Read the sensitivity in mV/mm, the maximum deviation and the linearity error as a percentage of full scale.</li>
+            <li>Repeat the fit with 6 mm and 12 mm limits. Explain why the linearity error changes.</li>
+          </ol>
+        </div>
+        <div class="proc" id="proc-measure">
+          <h3 style="margin-top:0">Measure an unknown displacement</h3>
+          <ol>
+            <li>Complete a calibration first, using the same Vp and f you will use here.</li>
+            <li>Read the demodulated DC output from the meter.</li>
+            <li>Calculate x = Vdc ÷ S, using your own sensitivity in mV/mm.</li>
+            <li>Type your answer and press Check answer. Compare it with the true value.</li>
+            <li>Press New displacement and try again, this time with a different excitation to see why you must recalibrate.</li>
+          </ol>
+        </div>
+        <h3>Precautions</h3>
+        <ul><li>Keep the core inside the linear range for accurate measurements.</li>
+        <li>Do not change excitation voltage or frequency between calibration and measurement.</li>
+        <li>Allow the electronics to warm up in a real lab, since sensitivity drifts with temperature.</li></ul>
+      </div>
+
+      <div id="tab-viva" class="hidden">
+        <div class="score" id="score"></div>
+        <div id="quiz"></div>
+        <div class="btns"><button class="btn" id="quizReset">Restart quiz</button></div>
+      </div>
+    </div>
+
+  </section>
+</div>
+</main>
+<footer class="foot" id="foot"></footer>
+
+<div class="overlay hidden" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle">
+  <div class="wbox">
+    <h2 id="wTitle">Welcome to the LVDT Lab</h2>
+    <p class="muted" id="wCourse" style="margin:0 0 10px"></p>
+    <p>An LVDT turns the position of a metal core into an AC voltage. The size of that voltage shows how far the core has moved, and its phase shows which way.</p>
+    <ol>
+      <li><b>Pick an experiment</b> from the three buttons at the top.</li>
+      <li><b>Follow the blue “Next step” box</b> above the diagram. It updates as you work.</li>
+      <li><b>Record readings</b> in Observations, then test yourself in the Viva quiz.</li>
+    </ol>
+    <h3>Words you will see</h3>
+    <ul>
+      <li><b>Core:</b> the movable iron rod. Drag it in the diagram or use the slider.</li>
+      <li><b>Primary / secondary:</b> the middle coil is driven by AC. The two side coils produce the output.</li>
+      <li><b>Null:</b> the centre position where the output is nearly zero.</li>
+      <li><b>Demodulated DC:</b> the signed voltage after the phase-sensitive detector. Its sign gives direction.</li>
+    </ul>
+    <div class="btns"><button class="btn primary" id="wGo">Start the lab</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var clamp=function(v,a,b){return Math.min(b,Math.max(a,v))};
+
+var CFG={
+  COLLEGE_NAME:'E.G.S. Pillay Engineering College',
+  DEPT:'Electrical and Electronics Engineering',
+  COURSE_CODE:'2302EE304',
+  COURSE_NAME:'Measurements and Instrumentation',
+  INSTRUCTOR_NAME:'Mr. K. Gokulraj, AP/EEE',
+  INSTRUCTOR_EMAIL:'gokulraj@egspec.org',
+  DEFAULT_ACCENT:'blue'   // blue | green | maroon | purple | orange | teal
+};
+var ACCENTS={blue:{n:'Blue',h:200,s:82},green:{n:'Green',h:145,s:70},maroon:{n:'Maroon',h:350,s:70},purple:{n:'Purple',h:268,s:60},orange:{n:'Orange',h:22,s:88},teal:{n:'Teal',h:174,s:72}};
+var accent=CFG.DEFAULT_ACCENT;
+function isDark(){var t=document.documentElement.getAttribute('data-theme');return t?t==='dark':!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)}
+function applyAccent(){
+  var a=ACCENTS[accent]||ACCENTS.blue,r=document.documentElement.style,d=isDark(),H=a.h,s=a.s;
+  var lightL=(H>10&&H<60)?36:31;
+  r.setProperty('--accent',d?'hsl('+H+' '+Math.min(s,75)+'% 62%)':'hsl('+H+' '+s+'% '+lightL+'%)');
+  r.setProperty('--gaugebg',d?'hsl('+H+' 45% 20%)':'hsl('+H+' 60% 91%)');
+  r.setProperty('--h1','hsl('+H+' '+Math.min(s,75)+'% 15%)');
+  r.setProperty('--h2','hsl('+H+' '+s+'% '+(lightL-3)+'%)');
+  document.querySelectorAll('.sw').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.c===accent)});
+}
+function buildSwatches(){
+  var box=$('swatches');box.innerHTML='';
+  Object.keys(ACCENTS).forEach(function(k){
+    var b=document.createElement('button'),a=ACCENTS[k];
+    b.className='sw';b.dataset.c=k;b.title=a.n+' theme';b.setAttribute('aria-label',a.n+' theme colour');
+    b.style.background='hsl('+a.h+' '+a.s+'% 45%)';
+    b.addEventListener('click',function(){accent=k;try{localStorage.setItem('lvdt-accent',k)}catch(e){}applyAccent()});
+    box.appendChild(b);
+  });
+}
+function applyCollege(){
+  $('hdrCollege').textContent=CFG.COLLEGE_NAME;
+  $('hdrSub').textContent=CFG.DEPT+' · '+CFG.COURSE_CODE+' '+CFG.COURSE_NAME;
+  $('wCourse').textContent=CFG.COLLEGE_NAME+' · '+CFG.DEPT+' · '+CFG.COURSE_CODE+' '+CFG.COURSE_NAME;
+  var f=$('foot');f.innerHTML='';
+  function line(parts){var d=document.createElement('div');parts.forEach(function(x){d.appendChild(x)});f.appendChild(d)}
+  function b(t){var e=document.createElement('b');e.textContent=t;return e}
+  function tx(t){return document.createTextNode(t)}
+  line([b(CFG.COLLEGE_NAME)]);
+  line([tx(CFG.DEPT)]);
+  line([tx(CFG.COURSE_CODE+' · '+CFG.COURSE_NAME+' Laboratory')]);
+  var a=document.createElement('a');a.href='mailto:'+CFG.INSTRUCTOR_EMAIL;a.textContent=CFG.INSTRUCTOR_EMAIL;
+  line([tx('Lab in-charge: '+CFG.INSTRUCTOR_NAME+' · '),a]);
+  document.title='LVDT Lab · '+CFG.COLLEGE_NAME;
+}
+
+/* ---------- state ---------- */
+var S={mode:'explore',vp:3,f:2500,x:0,xt:0,auto:true,phRef:0,revealed:false,
+  trials:[],tab:'chart',yq:'dc',fitMax:10,mag:false};
+
+/* ---------- LVDT model ---------- */
+var XM=15,NEXP=6,KS=0.02,FC=1000,E0=0.2,VRES=0.002,PX=7,XMAX=15;
+function fx(x){return x/Math.pow(1+Math.pow(Math.abs(x)/XM,NEXP),1/NEXP)}
+function gain(f){var r=f/FC;return r/Math.sqrt(1+r*r)}
+function phi0(f){return Math.atan2(FC,f)*180/Math.PI}
+function model(x,vp,f){
+  var G=gain(f),sig=vp*KS*G*fx(x),e1=vp*G*E0+sig/2,e2=vp*G*E0-sig/2,vres=VRES*vp*G,p0=phi0(f);
+  var ref=S.auto?p0:S.phRef,d=(p0-ref)*Math.PI/180;
+  var dc=sig*Math.cos(d)-vres*Math.sin(d);
+  var ph=p0+(sig<0?180:0);if(ph>180)ph-=360;
+  return {x:x,vp:vp,f:f,G:G,sig:sig,e1:e1,e2:e2,vres:vres,vac:Math.hypot(sig,vres),p0:p0,ph:ph,dc:dc,sens:vp*KS*G*1000};
+}
+var LIN=(function(){for(var x=0.1;x<=XMAX;x+=0.05){if(Math.abs(fx(x)/x-1)>0.005)return Math.round((x-0.05)*10)/10}return XMAX})();
+
+/* ---------- formatting ---------- */
+function fmtV(v){var a=Math.abs(v);if(a>=1)return v.toFixed(3)+' V';return (v*1e3).toFixed(1)+' mV'}
+function sgn(v,d){return (v>0?'+':'')+v.toFixed(d)}
+function curX(){return S.mode==='measure'?S.xt:S.x}
+function hidden(){return S.mode==='measure'&&!S.revealed}
+function newUnknown(){var v;do{v=Math.round((Math.random()*18-9)*10)/10}while(Math.abs(v)<0.8);S.xt=v;S.revealed=false}
+
+/* ---------- diagram ---------- */
+function coil(x0,x1,cls){
+  var s='<rect class="coil '+cls+'" x="'+x0+'" y="120" width="'+(x1-x0)+'" height="100" rx="8"/>';
+  for(var xx=x0+7;xx<x1-3;xx+=9)s+='<line class="turn '+cls+'" x1="'+xx+'" y1="122" x2="'+xx+'" y2="218"/>';
+  return s;
+}
+function buildDiagram(){
+  var s='';
+  s+='<rect class="tube" x="110" y="135" width="480" height="70" rx="6"/>';
+  s+=coil(125,305,'cS2')+coil(305,395,'cP')+coil(395,575,'cS1');
+  s+='<g id="coreG"><line class="rod" x1="200" y1="170" x2="500" y2="170"/><rect class="core" x="260" y="150" width="180" height="40" rx="6"/>';
+  for(var k=275;k<430;k+=12)s+='<line class="hatch" x1="'+k+'" y1="153" x2="'+(k+8)+'" y2="187"/>';
+  s+='</g>';
+  s+='<g id="coverG" class="hidden"><rect class="cover" x="110" y="135" width="480" height="70" rx="6"/><text x="350" y="175" text-anchor="middle" class="lbl">core position hidden</text></g>';
+  s+='<rect id="dragHit" class="drag" x="110" y="128" width="480" height="84"><title>Drag the core left or right</title></rect>';
+  // source
+  s+='<path class="wire" d="M330 120 V58 H334"/><path class="wire" d="M370 120 V58 H366"/>';
+  s+='<circle class="srcc" cx="350" cy="48" r="18"/><path class="sine" d="M341 48 q4.5 -9 9 0 t9 0"/>';
+  s+='<text id="vpTxt" class="nv" x="378" y="52"></text>';
+  // labels
+  s+='<text class="lbl s2l" x="215" y="244" text-anchor="middle">S₂ (left)</text><text id="v2" class="val" x="215" y="261" text-anchor="middle"></text>';
+  s+='<text class="lbl pl" x="350" y="244" text-anchor="middle">Primary</text><text class="val" x="350" y="261" text-anchor="middle">AC excited</text>';
+  s+='<text class="lbl s1l" x="485" y="244" text-anchor="middle">S₁ (right)</text><text id="v1" class="val" x="485" y="261" text-anchor="middle"></text>';
+  // ruler
+  s+='<line class="wire" x1="245" y1="296" x2="455" y2="296" style="stroke-width:2.5"/>';
+  for(var m=-15;m<=15;m++){var xx=350+m*PX,mj=m%5===0;s+='<line class="'+(mj?'tmaj':'tmin')+'" x1="'+xx+'" y1="296" x2="'+xx+'" y2="'+(296+(mj?9:5))+'"/>';if(mj)s+='<text class="dl" x="'+xx+'" y="319" text-anchor="middle">'+m+'</text>'}
+  s+='<text class="small" x="470" y="319">mm</text>';
+  s+='<path id="ptr" class="ptr" d="M0 291 L-7 279 L7 279 Z"/>';
+  s+='<text id="xTxt" class="nv" x="350" y="337" text-anchor="middle"></text>';
+  $('diagram').innerHTML=s;
+  var hit=$('dragHit'),dragging=false;
+  function move(e){
+    var svg=$('diagram'),r=svg.getBoundingClientRect(),px=(e.clientX-r.left)*700/r.width;
+    S.x=Math.round(clamp((px-350)/PX,-XMAX,XMAX)*10)/10;syncX();update();
+  }
+  hit.addEventListener('pointerdown',function(e){if(S.mode==='measure')return;dragging=true;try{hit.setPointerCapture(e.pointerId)}catch(x){}move(e);e.preventDefault()});
+  hit.addEventListener('pointermove',function(e){if(dragging)move(e)});
+  hit.addEventListener('pointerup',function(){dragging=false});
+  hit.addEventListener('pointercancel',function(){dragging=false});
+}
+function updDiagram(m,hide){
+  var x=curX();
+  $('coreG').setAttribute('transform','translate('+(x*PX)+' 0)');
+  $('coreG').style.display=hide?'none':'';
+  $('coverG').classList.toggle('hidden',!hide);
+  $('dragHit').style.cursor=S.mode==='measure'?'default':'ew-resize';
+  $('ptr').setAttribute('transform','translate('+(350+x*PX)+' 0)');
+  $('ptr').style.display=hide?'none':'';
+  $('v1').textContent=hide?'?':fmtV(m.e1);$('v2').textContent=hide?'?':fmtV(m.e2);
+  $('vpTxt').textContent='Vp = '+S.vp.toFixed(1)+' V · '+(S.f/1000).toFixed(1)+' kHz';
+  $('xTxt').textContent=hide?'x = ?':'x = '+sgn(x,1)+' mm';
+}
+
+/* ---------- meter, readouts, status, coach ---------- */
+function updMeter(m,hide){
+  $('mDC').textContent=sgn(m.dc*1e3,1)+' mV';
+  $('mAC').textContent=fmtV(m.vac);
+  $('mPh').textContent=sgn(m.ph,1)+'°';
+  var fs=S.vp*KS*gain(S.f)*XMAX;
+  var fr=clamp(m.dc/fs,-1,1),f=$('barFill');
+  f.style.left=(fr<0?50+fr*50:50)+'%';f.style.width=(Math.abs(fr)*50)+'%';
+  var n;
+  if(Math.abs(m.sig)<m.vres*2)n='Near null: only the small residual voltage remains.';
+  else n=m.sig>0?'Output in phase with the primary-side reference (core toward S₁).':'Output 180° out of phase (core toward S₂).';
+  $('mNote').textContent=n;
+}
+function card(l,v,sub){return '<div class="read"><small>'+l+'</small><b class="mono">'+v+'</b>'+(sub?'<i>'+sub+'</i>':'')+'</div>'}
+function updReads(m,hide){
+  var h='',c=fitCal();
+  if(S.mode==='measure'&&hide){
+    h+=card('Demodulated DC',sgn(m.dc*1e3,1)+' mV','read this and divide by S');
+    h+=card('AC output Vo',fmtV(m.vac),'rms');
+    h+=card('Phase of Vo',sgn(m.ph,1)+'°','vs primary');
+    h+=card('Excitation',S.vp.toFixed(1)+' V · '+(S.f/1000).toFixed(1)+' kHz');
+    h+=card('Your calibration',c?c.slope.toFixed(2)+' mV/mm':'—',c?c.n+' points':'not done yet');
+    h+=card('Core position','?','hidden until check');
+  }else{
+    var x=curX(),dev=(fx(x)-x)/x*100;
+    h+=card('Core position',sgn(x,1)+' mm','from the centre');
+    h+=card('S₁ output',fmtV(m.e1),'rms');
+    h+=card('S₂ output',fmtV(m.e2),'rms');
+    h+=card('Vo = S₁ − S₂',fmtV(m.vac),'AC, rms');
+    h+=card('Demodulated DC',sgn(m.dc*1e3,1)+' mV','signed');
+    h+=card('Sensitivity at null',m.sens.toFixed(1)+' mV/mm',(m.sens/S.vp).toFixed(2)+' mV/V/mm');
+    h+=card('Deviation from line',Math.abs(x)<0.2?'—':sgn(dev,2)+' %','of reading');
+    h+=card('Linear range','±'+LIN.toFixed(1)+' mm','within 0.5 % of reading');
+  }
+  $('reads').innerHTML=h;
+}
+function updStatus(m,hide){
+  var el=$('status'),x=curX(),cls,h;
+  if(hide){cls='idle';h='<b>Core position is hidden.</b><span>Use the DC output and your sensitivity to work out x.</span>'}
+  else if(Math.abs(x)<0.15){cls='ok';h='<b>At null</b> — the two secondary voltages are equal, so Vo is only the residual ('+fmtV(m.vres)+').<span>Move the core either way to see the output grow.</span>'}
+  else if(Math.abs(x)>=XMAX-0.05){cls='warn';h='<b>End of travel</b> — the core is at the stroke limit.<span>The curve flattens here because the core leaves the windings.</span>'}
+  else if(Math.abs(x)>LIN){cls='warn';h='<b>Beyond the linear range (±'+LIN.toFixed(1)+' mm)</b> — output no longer follows a straight line.<span>The reading is '+Math.abs((fx(x)-x)/x*100).toFixed(1)+' % below the ideal line.</span>'}
+  else{cls='idle';h='<b>Core '+Math.abs(x).toFixed(1)+' mm '+(x>0?'toward S₁':'toward S₂')+'</b> — inside the linear range.<span>Vo is '+(x>0?'in phase':'180° out of phase')+' with the reference.</span>'}
+  el.className='status '+cls;el.innerHTML=h;
+}
+function updCoach(m){
+  var t,x=curX();
+  if(S.mode==='explore'){
+    if(Math.abs(x)<0.15)t='The core is at the centre, so the output is almost zero. Drag the core in the diagram or use the slider to move it right.';
+    else if(Math.abs(x)>LIN)t='You are beyond the linear range. Bring the core back inside ±'+LIN.toFixed(1)+' mm. Then open the Oscilloscope tab and watch the phase flip as you cross the centre.';
+    else t='Move the core through the centre to the other side. Watch S₁ and S₂ swap in size, and the DC output change sign. Then open the Oscilloscope tab.';
+  }else if(S.mode==='calibrate'){
+    var done={};S.trials.forEach(function(r){if(r.vp===S.vp&&r.f===S.f)done[Math.round(r.x)]=1});
+    var next=null,i,targets=[-14,-12,-10,-8,-6,-4,-2,0,2,4,6,8,10,12,14];
+    for(i=0;i<targets.length;i++){if(!done[targets[i]]){next=targets[i];break}}
+    var n=S.trials.length;
+    if(!n)t='Move the core to −14 mm and press Record reading. Keep Vp and f unchanged while you calibrate.';
+    else if(next!==null)t='Good. Next, set the core to '+(next>0?'+':'')+next+' mm and press Record reading. You have '+n+' reading'+(n>1?'s':'')+'.';
+    else t='Calibration complete. Open Observations to read the sensitivity and linearity error, and Characteristics to see the fit.';
+  }else{
+    if(S.revealed)t='Done. Check your error in the left panel, or press New displacement and try again.';
+    else if(!fitCal())t='First record a calibration in the Calibrate experiment, using the same Vp and f. Then come back here and divide the DC output by your sensitivity.';
+    else t='Read the DC output on the meter. Then x = Vdc ÷ S, using your sensitivity. Type your answer and press Check answer.';
+  }
+  $('coachTxt').textContent=t;
+}
+function updFormula(){
+  var el=$('formulaBox');
+  if(S.mode==='measure')el.innerHTML='x = Vdc ÷ S<br>S from your calibration (mV/mm)';
+  else el.innerHTML='Vo = e₁ − e₂ = (M₁ − M₂)·dIp/dt<br>Vo ≈ S · Vp · x';
+}
+
+/* ---------- controls ---------- */
+function pair(id,label,val,min,max,step,unit){
+  return '<div class="ctl"><div class="ctlh">'+label+'<span class="inp"><input type="number" id="'+id+'N" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"><em>'+unit+'</em></span></div>'+
+  '<input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'" aria-label="'+label+'"></div>';
+}
+function bindPair(id,min,max,set){
+  var s=$(id),n=$(id+'N');
+  s.addEventListener('input',function(){n.value=s.value;set(+s.value)});
+  n.addEventListener('input',function(){if(n.value===''||isNaN(+n.value))return;var v=clamp(+n.value,min,max);s.value=v;set(v)});
+  n.addEventListener('change',function(){n.value=clamp(+n.value||min,min,max)});
+}
+function setPair(id,v){var a=$(id),b=$(id+'N');if(a)a.value=v;if(b)b.value=v}
+function syncX(){setPair('x',S.x)}
+function renderCtl(){
+  var el=$('coreCtl'),h='';
+  if(S.mode==='measure'){
+    $('coreHead').textContent='Unknown displacement';
+    h+='<div class="formula">The core is held by a hidden actuator at an unknown position between about −9 and +9 mm.</div>';
+    h+='<div class="ctl"><div class="ctlh"><label for="est">Your estimate of x</label><span class="inp"><input type="number" id="est" step="0.1" placeholder="0.0"><em>mm</em></span></div></div>';
+    h+='<div class="btns"><button class="btn primary" data-act="check">Check answer</button><button class="btn" data-act="newx">New displacement</button></div>';
+    h+='<div class="btns"><button class="btn" data-act="reveal" id="revBtn" style="flex:1">Reveal x</button></div>';
+    h+='<div class="formula" id="calInfo" style="margin-top:10px"></div><div class="formula" id="measOut" style="display:none"></div>';
+  }else{
+    $('coreHead').textContent='Core position';
+    h+=pair('x','Core displacement x',S.x,-XMAX,XMAX,0.1,'mm');
+    h+='<div class="seg">'+[[-5,'−5'],[-1,'−1'],[-0.1,'−0.1'],[0.1,'+0.1'],[1,'+1'],[5,'+5']].map(function(s){return '<button class="btn" data-act="nud" data-v="'+s[0]+'" aria-label="Move core by '+s[0]+' mm">'+s[1]+'</button>'}).join('')+'</div>';
+    h+='<div class="btns"><button class="btn" data-act="centre" style="flex:1">Centre (null)</button></div>';
+    h+='<div class="btns"><button class="btn primary" data-act="rec">Record reading</button>'+(S.mode==='calibrate'?'<button class="btn" data-act="sweep">Auto-fill sweep</button>':'')+'</div>';
+    h+='<div class="muted" style="margin-top:6px">Tip: drag the core inside the diagram.</div>';
+  }
+  el.innerHTML=h;
+  if(S.mode!=='measure')bindPair('x',-XMAX,XMAX,function(v){S.x=v;update()});
+}
+function updMeasureUI(){
+  var b=$('revBtn');if(b)b.disabled=S.revealed;
+  var ci=$('calInfo');
+  if(ci){
+    var c=fitCal();
+    if(!c)ci.innerHTML='<b>No calibration yet.</b><br>Record readings in <i>Calibrate and linearity</i>, then return here.';
+    else{
+      var same=(c.vp===S.vp&&c.f===S.f);
+      ci.innerHTML='<b>Your calibration:</b> S = '+c.slope.toFixed(2)+' mV/mm<br>made at '+c.vp.toFixed(1)+' V, '+(c.f/1000).toFixed(1)+' kHz ('+c.n+' points)'+(same?'':'<br><span style="color:var(--bad)">⚠ Excitation changed since calibration. Sensitivity no longer applies.</span>');
+    }
+  }
+  var o=$('measOut');
+  if(o){
+    if(S.revealed){
+      var est=parseFloat(($('est')||{}).value);
+      var t='<b>True x = '+sgn(S.xt,1)+' mm</b>';
+      if(!isNaN(est)){var er=est-S.xt;t+='<br>Your estimate = '+sgn(est,2)+' mm<br>Error = <b>'+sgn(er,2)+' mm</b> ('+sgn(er/XMAX*100,2)+' % of ±15 mm)<br>'+(Math.abs(er)<=0.2?'Excellent.':Math.abs(er)<=0.5?'Good.':'Check your calibration and arithmetic.')}
+      o.style.display='block';o.innerHTML=t;
+    }else o.style.display='none';
+  }
+}
+
+/* ---------- observations and fit ---------- */
+function record(){
+  var m=model(S.x,S.vp,S.f);
+  S.trials.push({x:S.x,vp:S.vp,f:S.f,vac:m.vac*1e3,ph:m.ph,dc:m.dc*1e3});
+  renderTrials();update();toast('Reading '+S.trials.length+' recorded');
+}
+function sweep(){
+  S.trials=[];
+  for(var x=-14;x<=14;x+=2){var m=model(x,S.vp,S.f);S.trials.push({x:x,vp:S.vp,f:S.f,vac:m.vac*1e3,ph:m.ph,dc:m.dc*1e3})}
+  renderTrials();update();toast('15 readings filled at the current excitation');
+}
+function fitCal(){
+  var last=S.trials[S.trials.length-1];if(!last)return null;
+  var pts=S.trials.filter(function(t){return t.vp===last.vp&&t.f===last.f&&Math.abs(t.x)<=S.fitMax+1e-9});
+  if(pts.length<3)return null;
+  var n=pts.length,sx=0,sy=0,sxx=0,sxy=0,i;
+  pts.forEach(function(p){sx+=p.x;sy+=p.dc;sxx+=p.x*p.x;sxy+=p.x*p.dc});
+  var den=n*sxx-sx*sx;if(Math.abs(den)<1e-9)return null;
+  var a=(n*sxy-sx*sy)/den,b=(sy-a*sx)/n,maxdev=0,ssr=0,sst=0,my=sy/n,xm=0;
+  pts.forEach(function(p){var e=p.dc-(a*p.x+b);maxdev=Math.max(maxdev,Math.abs(e));ssr+=e*e;sst+=(p.dc-my)*(p.dc-my);xm=Math.max(xm,Math.abs(p.x))});
+  var fs=Math.abs(a)*xm;
+  return {n:n,slope:a,b:b,maxdev:maxdev,pct:fs>0?maxdev/fs*100:0,r2:sst>0?1-ssr/sst:1,vp:last.vp,f:last.f,xm:xm};
+}
+function renderTrials(){
+  var h='<tr><th>#</th><th>x (mm)</th><th>Vp (V)</th><th>f (kHz)</th><th>Vo AC (mV)</th><th>Phase (°)</th><th>Vdc (mV)</th></tr>';
+  if(!S.trials.length)h+='<tr><td colspan="7" class="l muted">No readings yet.</td></tr>';
+  S.trials.forEach(function(t,i){h+='<tr><td>'+(i+1)+'</td><td>'+sgn(t.x,1)+'</td><td>'+t.vp.toFixed(1)+'</td><td>'+(t.f/1000).toFixed(1)+'</td><td>'+t.vac.toFixed(1)+'</td><td>'+t.ph.toFixed(1)+'</td><td>'+sgn(t.dc,1)+'</td></tr>'});
+  $('trials').innerHTML=h;
+  var c=fitCal(),box=$('fitBox');
+  if(!c)box.innerHTML='Record at least 3 readings (with the same Vp and f) to see the sensitivity and linearity error.';
+  else box.innerHTML='<b>Straight-line fit</b> using '+c.n+' readings, |x| ≤ '+S.fitMax+' mm<br>'+
+    'Sensitivity S = <b>'+c.slope.toFixed(2)+' mV/mm</b> = '+(c.slope/c.vp).toFixed(2)+' mV/V/mm<br>'+
+    'Offset at x = 0: '+sgn(c.b,2)+' mV · R² = '+c.r2.toFixed(5)+'<br>'+
+    'Maximum deviation: '+c.maxdev.toFixed(2)+' mV = <b>'+c.pct.toFixed(2)+' % of full scale</b> (±'+c.xm+' mm)';
+}
+function toCSV(){
+  var rows=[['n','x_mm','Vp_V','f_Hz','Vo_ac_mV','phase_deg','Vdc_mV']];
+  S.trials.forEach(function(t,i){rows.push([i+1,t.x,t.vp,t.f,t.vac.toFixed(3),t.ph.toFixed(2),t.dc.toFixed(3)])});
+  var c=fitCal();if(c)rows.push(['sensitivity_mV_per_mm',c.slope.toFixed(3),'linearity_pct_FS',c.pct.toFixed(3)]);
+  return rows.map(function(r){return r.join(',')}).join('\n');
+}
+function copyCSV(){
+  if(!S.trials.length){toast('Nothing to copy yet.');return}
+  var txt=toCSV(),box=$('csvBox'),ta=$('csvText');ta.value=txt;
+  function manual(){box.classList.remove('hidden');ta.focus();ta.select()}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast('CSV copied to clipboard');box.classList.add('hidden')},manual)}else manual()}catch(e){manual()}
+}
+
+/* ---------- chart ---------- */
+var CH=null;
+function ticks(min,max,n){
+  var span=max-min,raw=span/n,mag=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/mag;
+  var step=(f<1.5?1:f<3?2:f<7?5:10)*mag,t=[];
+  for(var v=Math.ceil(min/step-1e-9)*step;v<=max+1e-9;v+=step)t.push(+v.toFixed(10));
+  return t;
+}
+function tk(v){return String(+v.toPrecision(4))}
+function renderChart(){
+  var svg=$('chart');
+  if(hidden()){svg.innerHTML='<text class="cmsg" x="320" y="165" text-anchor="middle">The characteristic is locked until you check your answer or reveal x.</text>';$('legend').innerHTML='';CH=null;return}
+  var dc=S.yq==='dc',sl=S.vp*KS*gain(S.f)*1000,xs=[],ex=[],id=[],i,m;
+  for(i=-150;i<=150;i++){var x=i/10;m=model(x,S.vp,S.f);xs.push(x);ex.push(dc?m.dc*1000:m.vac*1000);id.push(dc?sl*x:Math.abs(sl*x))}
+  var pts=S.trials.filter(function(t){return t.vp===S.vp&&t.f===S.f}).map(function(t){return {x:t.x,y:dc?t.dc:t.vac}});
+  var cx=curX(),cm=model(cx,S.vp,S.f),mk={x:cx,y:dc?cm.dc*1000:cm.vac*1000};
+  var W=640,H=330,ml=66,mr=22,mt=18,mb=48,pw=W-ml-mr,ph=H-mt-mb,xmin=-15,xmax=15,ymin=0,ymax=0;
+  [ex,id].forEach(function(a){a.forEach(function(y){if(y<ymin)ymin=y;if(y>ymax)ymax=y})});
+  if(ymax-ymin<1e-9){ymax=1;ymin=-1}
+  var pad=(ymax-ymin)*.08;ymin-=pad;ymax+=pad;
+  var sx=function(x){return ml+(x-xmin)/(xmax-xmin)*pw},sy=function(y){return mt+(1-(y-ymin)/(ymax-ymin))*ph};
+  var h='';
+  h+='<rect x="'+sx(-LIN)+'" y="'+mt+'" width="'+(sx(LIN)-sx(-LIN))+'" height="'+ph+'" fill="var(--accent)" opacity=".09"/>';
+  ticks(xmin,xmax,10).forEach(function(v){h+='<line class="gl" x1="'+sx(v)+'" y1="'+mt+'" x2="'+sx(v)+'" y2="'+(mt+ph)+'"/><text class="tk" x="'+sx(v)+'" y="'+(mt+ph+16)+'" text-anchor="middle">'+tk(v)+'</text>'});
+  ticks(ymin,ymax,6).forEach(function(v){h+='<line class="gl" x1="'+ml+'" y1="'+sy(v)+'" x2="'+(ml+pw)+'" y2="'+sy(v)+'"/><text class="tk" x="'+(ml-7)+'" y="'+(sy(v)+4)+'" text-anchor="end">'+tk(v)+'</text>'});
+  h+='<line class="zero" x1="'+ml+'" y1="'+sy(0)+'" x2="'+(ml+pw)+'" y2="'+sy(0)+'"/><line class="zero" x1="'+sx(0)+'" y1="'+mt+'" x2="'+sx(0)+'" y2="'+(mt+ph)+'"/>';
+  h+='<line class="ax" x1="'+ml+'" y1="'+mt+'" x2="'+ml+'" y2="'+(mt+ph)+'"/><line class="ax" x1="'+ml+'" y1="'+(mt+ph)+'" x2="'+(ml+pw)+'" y2="'+(mt+ph)+'"/>';
+  h+='<text class="axt" x="'+(ml+pw/2)+'" y="'+(H-8)+'" text-anchor="middle">Core displacement x (mm)</text>';
+  h+='<text class="axt" transform="translate(16 '+(mt+ph/2)+') rotate(-90)" text-anchor="middle">'+(dc?'Demodulated DC (mV)':'AC output Vo (mV rms)')+'</text>';
+  [id,ex].forEach(function(arr,k){var d='';for(i=0;i<xs.length;i++)d+=(i?'L':'M')+sx(xs[i]).toFixed(1)+' '+sy(arr[i]).toFixed(1);h+='<path class="'+(k?'cv':'cv2')+'" d="'+d+'"/>'});
+  pts.forEach(function(p){h+='<circle class="pt" cx="'+sx(p.x)+'" cy="'+sy(p.y)+'" r="4.5"/>'});
+  h+='<circle class="mk" cx="'+sx(mk.x)+'" cy="'+clamp(sy(mk.y),mt,mt+ph)+'" r="6"/>';
+  h+='<g id="xh" class="hidden"><line id="xhl" class="cross" y1="'+mt+'" y2="'+(mt+ph)+'"/><text id="xht" class="mkt"></text></g>';
+  svg.innerHTML=h;
+  $('legend').innerHTML='<span><i></i>Actual response</span><span><i class="d"></i>Ideal straight line</span><span><svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle"><circle cx="7" cy="7" r="5" fill="var(--good)"/></svg> Recorded readings</span><span><svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle"><circle cx="7" cy="7" r="5.5" fill="var(--needle)"/></svg> Present position</span><span>Shaded band = linear range ±'+LIN.toFixed(1)+' mm</span>';
+  CH={xs:xs,ys:ex,sx:sx,ml:ml,pw:pw,W:W,mt:mt};
+}
+function chartHover(e){
+  if(!CH)return;
+  var svg=$('chart'),r=svg.getBoundingClientRect(),px=(e.clientX-r.left)*CH.W/r.width;
+  if(px<CH.ml||px>CH.ml+CH.pw){$('xh').classList.add('hidden');return}
+  var dx=-15+(px-CH.ml)/CH.pw*30,n=clamp(Math.round((dx+15)*10),0,300),X=CH.sx(CH.xs[n]);
+  $('xh').classList.remove('hidden');
+  var l=$('xhl');l.setAttribute('x1',X);l.setAttribute('x2',X);
+  var t=$('xht');t.textContent=tk(CH.xs[n])+' mm → '+tk(CH.ys[n])+' mV';
+  t.setAttribute('x',clamp(X+8,CH.ml+4,CH.ml+CH.pw-140));t.setAttribute('y',CH.mt+14);
+}
+
+/* ---------- oscilloscope ---------- */
+function renderScope(){
+  var m=model(curX(),S.vp,S.f),hide=hidden(),svg=$('scope');
+  var W=640,H=340,ml=84,mr=12,pw=W-ml-mr,TWO=2*Math.PI,NS=360;
+  var lanes=hide?[0,3]:[0,1,2,3],lh=H/lanes.length,amp=lh*0.38,r2=Math.SQRT2,ph0=m.p0*Math.PI/180;
+  var smax=Math.max(m.e1,m.e2)*r2*1.05,sc2=amp/smax,sc1=amp/(S.vp*r2),sc4=sc2*(S.mag?10:1);
+  var names=['CH1  Vp','CH2  S₁','CH3  S₂','CH4  Vo = S₁ − S₂'],cols=['var(--accent)','var(--flow)','var(--good)','var(--needle)'];
+  var vals=[fmtV(S.vp),hide?'?':fmtV(m.e1),hide?'?':fmtV(m.e2),fmtV(m.vac)];
+  var h='',li,k,th;
+  lanes.forEach(function(c,li){
+    var top=li*lh,cy=top+lh/2;
+    h+='<clipPath id="cl'+li+'"><rect x="'+ml+'" y="'+(top+2)+'" width="'+pw+'" height="'+(lh-4)+'"/></clipPath>';
+    h+='<line class="gl" x1="'+ml+'" y1="'+cy+'" x2="'+(ml+pw)+'" y2="'+cy+'"/><rect x="'+ml+'" y="'+(top+2)+'" width="'+pw+'" height="'+(lh-4)+'" fill="none" stroke="var(--line)"/>';
+    h+='<text class="axt" x="6" y="'+(cy-6)+'" style="fill:'+cols[c]+'">'+names[c].split('  ')[0]+'</text><text class="tk" x="6" y="'+(cy+8)+'">'+names[c].split('  ')[1]+'</text><text class="tk" x="6" y="'+(cy+22)+'">'+vals[c]+' rms</text>';
+    var d='';
+    for(k=0;k<=NS;k++){
+      th=TWO*3*k/NS;var v;
+      if(c===0)v=S.vp*r2*Math.sin(th)*sc1;
+      else if(c===1)v=m.e1*r2*Math.sin(th+ph0)*sc2;
+      else if(c===2)v=m.e2*r2*Math.sin(th+ph0)*sc2;
+      else v=r2*(m.sig*Math.sin(th+ph0)+m.vres*Math.sin(th+ph0+Math.PI/2))*sc4;
+      d+=(k?'L':'M')+(ml+pw*k/NS).toFixed(1)+' '+(cy-v).toFixed(1);
+    }
+    h+='<path d="'+d+'" fill="none" stroke="'+cols[c]+'" stroke-width="2.4" clip-path="url(#cl'+li+')"/>';
+  });
+  for(k=0;k<=3;k++){var gx=ml+pw*k/3;h+='<line class="zero" x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+H+'" opacity=".55"/>'}
+  svg.innerHTML=h;
+  var T=1000/S.f;
+  $('scopeNote').innerHTML='<span>3 cycles = '+(3*T).toFixed(2)+' ms ('+T.toFixed(2)+' ms per cycle)</span><span>Dotted lines mark the start of each Vp cycle, so you can read the phase of Vo against them.</span>'+(S.mag?'<span>Vo trace magnified ×10</span>':'')+(hide?'<span>S₁ and S₂ traces hidden in this experiment.</span>':'');
+}
+
+/* ---------- quiz ---------- */
+var QZ=[
+ {q:'What does LVDT stand for?',o:['Linear Variable Differential Transformer','Low Voltage Digital Transducer','Linear Voltage Dependent Thermistor','Level Variable Direct Transmitter'],a:0,e:'It is a transformer whose output depends on the linear position of a movable core.'},
+ {q:'Why is the output nearly zero when the core is at the centre?',o:['The primary is switched off','Both secondary EMFs are equal and oppose each other','The core is saturated','The secondaries are open circuit'],a:1,e:'With the core centred, M₁ = M₂, so e₁ = e₂. In series opposition they cancel.'},
+ {q:'Why are the two secondary windings connected in series opposition?',o:['To double the output at null','To give a differential output whose size shows distance and whose phase shows direction','To reduce the excitation current','To remove the need for a core'],a:1,e:'The difference e₁ − e₂ is zero at null and changes sign when the core crosses the centre.'},
+ {q:'When the core moves from +5 mm to −5 mm, the phase of Vo',o:['Stays the same','Changes by 90°','Changes by 180°','Becomes random'],a:2,e:'Which secondary dominates swaps, so Vo reverses sign. That is a 180° phase change.'},
+ {q:'Why is a phase-sensitive detector used instead of a simple AC voltmeter?',o:['It is cheaper','A plain AC meter cannot tell which side of null the core is on','It increases the primary voltage','It removes the need for calibration'],a:1,e:'An AC voltmeter reads only magnitude. The demodulator output is a signed DC voltage, so direction is preserved.'},
+ {q:'If the excitation voltage is doubled, the sensitivity in mV/mm',o:['Halves','Stays the same','Doubles','Becomes zero'],a:2,e:'Output scales with Vp. The sensitivity in mV/V/mm stays the same, which is why it is quoted per volt.'},
+ {q:'Why does the output curve flatten near the ends of the stroke?',o:['The supply voltage drops','The core leaves the windings so coupling stops changing linearly','The frequency changes','The coils overheat'],a:1,e:'Near the ends the core no longer overlaps the secondary properly, so the response is no longer a straight line.'},
+ {q:'A calibrated LVDT has S = 55 mV/mm. The demodulated output reads +220 mV. What is x?',o:['+2.0 mm','+4.0 mm','+8.0 mm','+12.1 mm'],a:1,e:'x = Vdc ÷ S = 220 ÷ 55 = +4.0 mm toward S₁.'},
+ {q:'Which is an advantage of an LVDT?',o:['It needs no AC excitation','It has a sliding electrical contact that gives a precise reading','No wear and practically infinite resolution','It works equally well over any stroke length'],a:2,e:'The core never touches the coils, so there is no friction or wear, and resolution is limited only by the electronics.'},
+ {q:'What causes the residual voltage at the null position?',o:['A faulty core','Slight winding imbalance and harmonics','A supply at the wrong frequency','The ruler scale'],a:1,e:'No real LVDT is perfectly symmetric. The small leftover voltage is mostly 90° out of phase, so the demodulator rejects most of it.'}
+];
+var qa=[];
+function renderQuiz(){
+  qa=[];
+  $('quiz').innerHTML=QZ.map(function(q,i){return '<div class="qz"><div><b>'+(i+1)+'.</b> '+q.q+'</div><div class="qo">'+q.o.map(function(o,j){return '<button class="opt" data-q="'+i+'" data-o="'+j+'">'+o+'</button>'}).join('')+'</div><div class="qe" id="qe'+i+'"></div></div>'}).join('');
+  quizScore();
+}
+function quizScore(){
+  var right=qa.filter(function(x){return x===true}).length,done=qa.filter(function(x){return x!==undefined}).length;
+  $('score').textContent='Score: '+right+' / '+QZ.length+(done===QZ.length?(right===QZ.length?'  Perfect.':'  Quiz complete.'):'');
+}
+
+/* ---------- misc ---------- */
+var tt=0;
+function toast(m){var e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('show')},2200)}
+var MODES={
+  explore:{t:'Explore the LVDT',d:'Slide the core and watch the two secondary voltages, the phase of the output, and the signed DC output from the demodulator.'},
+  calibrate:{t:'Calibrate and find linearity',d:'Record the DC output at several core positions, then find the sensitivity in mV/mm and how far the response departs from a straight line.'},
+  measure:{t:'Measure an unknown displacement',d:'A hidden actuator holds the core at an unknown position. Use your calibration to work out x from the DC output.'}
+};
+function setMode(m){
+  S.mode=m;
+  document.querySelectorAll('.mode').forEach(function(b){b.setAttribute('aria-selected',b.dataset.mode===m)});
+  $('modeTitle').textContent=MODES[m].t;$('modeDesc').textContent=MODES[m].d;
+  document.querySelectorAll('.proc').forEach(function(p){p.classList.toggle('on',p.id==='proc-'+m)});
+  if(m==='measure'&&!S.xt)newUnknown();
+  renderCtl();update();
+}
+function update(){
+  var x=curX(),m=model(x,S.vp,S.f),hide=hidden();
+  updDiagram(m,hide);updMeter(m,hide);updReads(m,hide);updStatus(m,hide);updCoach(m);updFormula();
+  if(S.mode==='measure')updMeasureUI();
+  $('phWrap').classList.toggle('hidden',S.auto);
+  if(S.tab==='chart')renderChart();
+  if(S.tab==='scope')renderScope();
+}
+function resetExp(){
+  S.vp=3;S.f=2500;setPair('vp',3);setPair('fq',2500);S.auto=true;$('autoPh').checked=true;S.phRef=0;setPair('ph',0);
+  if(S.mode!=='measure'){S.x=0}
+  if(S.mode==='calibrate'){S.trials=[];renderTrials()}
+  if(S.mode==='measure'){newUnknown()}
+  renderCtl();update();toast('Experiment reset');
+}
+function showWelcome(on){$('welcome').classList.toggle('hidden',!on);if(!on){try{localStorage.setItem('lvdt-seen','1')}catch(e){}}}
+
+function init(){
+  try{if(window.self!==window.top)document.documentElement.classList.add('embedded')}catch(e){document.documentElement.classList.add('embedded')}
+  try{var ac=localStorage.getItem('lvdt-accent');if(ac&&ACCENTS[ac])accent=ac}catch(e){}
+  buildSwatches();applyCollege();buildDiagram();renderQuiz();newUnknown();
+  bindPair('vp',1,10,function(v){S.vp=v;update()});
+  bindPair('fq',500,10000,function(v){S.f=v;update()});
+  bindPair('ph',0,180,function(v){S.phRef=v;update()});
+  $('autoPh').addEventListener('change',function(e){S.auto=e.target.checked;update()});
+  $('resetBtn').addEventListener('click',resetExp);
+  $('recBtn').addEventListener('click',function(){if(S.mode==='measure'){toast('Recording is for the Explore and Calibrate experiments.');return}record()});
+  $('sweepBtn').addEventListener('click',function(){if(S.mode==='measure'){toast('Switch to the Calibrate experiment first.');return}sweep()});
+  $('undoBtn').addEventListener('click',function(){S.trials.pop();renderTrials();update()});
+  $('clrBtn').addEventListener('click',function(){S.trials=[];renderTrials();update();$('csvBox').classList.add('hidden')});
+  $('csvBtn').addEventListener('click',copyCSV);
+  $('fitSel').addEventListener('change',function(e){S.fitMax=+e.target.value;renderTrials();update()});
+  $('yqSel').addEventListener('change',function(e){S.yq=e.target.value;renderChart()});
+  $('magChk').addEventListener('change',function(e){S.mag=e.target.checked;renderScope()});
+  $('chart').addEventListener('pointermove',chartHover);
+  $('chart').addEventListener('pointerleave',function(){var x=$('xh');if(x)x.classList.add('hidden')});
+  $('quizReset').addEventListener('click',renderQuiz);
+  document.querySelectorAll('.mode').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.mode)})});
+  document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){
+    S.tab=b.dataset.tab;
+    document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+    ['chart','scope','obs','theory','proc','viva'].forEach(function(k){$('tab-'+k).classList.toggle('hidden',k!==S.tab)});
+    if(S.tab==='chart')renderChart();
+    if(S.tab==='scope')renderScope();
+    if(S.tab==='obs')renderTrials();
+  })});
+  $('quiz').addEventListener('click',function(e){
+    var b=e.target.closest('.opt');if(!b||b.disabled)return;
+    var qi=+b.dataset.q,oi=+b.dataset.o,q=QZ[qi],ok=oi===q.a;qa[qi]=ok;
+    b.parentNode.querySelectorAll('.opt').forEach(function(x,j){x.disabled=true;if(j===q.a)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
+    $('qe'+qi).textContent=(ok?'Correct. ':'Not quite. ')+q.e;quizScore();
+  });
+  $('coreCtl').addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act;
+    if(a==='nud'){S.x=Math.round(clamp(S.x+(+b.dataset.v),-XMAX,XMAX)*10)/10;syncX();update()}
+    else if(a==='centre'){S.x=0;syncX();update()}
+    else if(a==='rec')record();
+    else if(a==='sweep')sweep();
+    else if(a==='newx'){newUnknown();renderCtl();update();toast('New hidden displacement set')}
+    else if(a==='reveal'){S.revealed=true;update()}
+    else if(a==='check'){
+      var est=parseFloat($('est').value);
+      if(isNaN(est)){toast('Type your estimate of x first.');return}
+      S.revealed=true;update();
+    }
+  });
+  $('themeBtn').addEventListener('click',function(){
+    var root=document.documentElement,cur=root.getAttribute('data-theme');
+    if(!cur)cur=isDark()?'dark':'light';
+    var next=cur==='dark'?'light':'dark';root.setAttribute('data-theme',next);
+    try{localStorage.setItem('lvdt-theme',next)}catch(e){}
+    applyAccent();
+  });
+  try{var th=localStorage.getItem('lvdt-theme');if(th==='dark'||th==='light')document.documentElement.setAttribute('data-theme',th)}catch(e){}
+  $('helpBtn').addEventListener('click',function(){showWelcome(true)});
+  $('wGo').addEventListener('click',function(){showWelcome(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')showWelcome(false)});
+  var seen=false;try{seen=localStorage.getItem('lvdt-seen')==='1'}catch(e){}
+  if(!seen)$('welcome').classList.remove('hidden');
+  if(window.matchMedia){var mq=window.matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',applyAccent)}
+  applyAccent();
+  setMode('explore');renderTrials();
+}
+init();
+})();
+</script>
+</body>
+</html>

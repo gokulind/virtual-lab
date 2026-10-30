@@ -1,101 +1,843 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KGR EEE Virtual Laboratory</title>
-<style>
-:root{--navy:#12304a;--blue:#1769aa;--teal:#078b83;--bg:#f3f7fb;--ink:#182534;--muted:#5c6b7a;--line:#dce5ee}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
-header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:34px 22px}
-.wrap{max-width:1120px;margin:auto}header .eyebrow{letter-spacing:.12em;text-transform:uppercase;font-size:.78rem;opacity:.85}
-h1{margin:10px 0;font-size:clamp(1.8rem,4vw,2.8rem)}header p{max-width:720px;line-height:1.6;margin-bottom:0;color:#eaf4ff}
-main{max-width:1120px;margin:26px auto;padding:0 18px}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
-input,select{font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:white}
-input{flex:1;min-width:220px}.section-title{margin:28px 0 12px;font-size:1.25rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px}
-.card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 18px #16324b0b;display:flex;flex-direction:column;min-height:210px}
-.tag{display:inline-block;width:max-content;font-size:.75rem;font-weight:bold;background:#e6f5f3;color:#08736d;padding:6px 9px;border-radius:20px}
-.card h3{margin:14px 0 8px}.card p{color:var(--muted);line-height:1.5;font-size:.94rem;flex:1}
-.btn{display:inline-block;background:var(--blue);color:white;text-decoration:none;padding:11px 14px;border-radius:9px;font-weight:bold;text-align:center}
-.btn.disabled{background:#e7edf3;color:#687789;cursor:default}.note{background:#fff8e7;border:1px solid #f1dfad;padding:14px 16px;border-radius:12px;line-height:1.5;color:#5c4a1e;margin:22px 0}
-footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem}
 
-/* palette: #FFEAF2 #382F32 #BCBDAC #F4EAD5 #BCE3C5 */
-:root{--navy:#382F32;--blue:#382F32;--teal:#8FB69A;--bg:#F4EAD5;--ink:#382F32;--muted:#665b5e;--line:#BCBDAC}
-body{background:#F4EAD5;color:#382F32}header{background:#382F32!important;border-bottom:4px solid #BCBDAC}header p{color:#FFEAF2}
-.card{background:#FFEAF2;border-color:#BCBDAC;box-shadow:0 4px 14px #382F3210}.tag{background:#BCE3C5;color:#382F32}
-.btn{background:#382F32;color:#FFEAF2}.btn.disabled{background:#BCBDAC;color:#665b5e}.note{background:#F4EAD5;border-color:#BCBDAC;color:#382F32}
-input,select,textarea{background:#FFF9F8;border-color:#BCBDAC;color:#382F32}footer{color:#665b5e}
-  .visitor-counter {
-    text-align: center;
-    margin: 25px auto;
-    padding: 15px;
-    background: #f1f5f9;
-    border-radius: 10px;
-    max-width: 250px;
-    font-size: 16px;
+<title>KGR EEE Virtual Laboratory</title>
+
+<meta name="description" content="KGR EEE Virtual Laboratory - Interactive electrical measurements, bridges, sensors, transducers and digital electronics experiments.">
+
+<style>
+:root {
+    --navy: #382F32;
+    --blue: #382F32;
+    --teal: #8FB69A;
+    --bg: #F4EAD5;
+    --ink: #382F32;
+    --muted: #665b5e;
+    --line: #BCBDAC;
+    --pink: #FFEAF2;
+    --green: #BCE3C5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+}
+
+/* College identification bar */
+
+.college-bar {
+    background: var(--navy);
+    color: var(--pink);
+    border-bottom: 4px solid var(--line);
+    padding: 12px 20px;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+
+    line-height: 1.5;
+}
+
+.college-name {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.college-location {
+    font-size: 12px;
+    color: var(--line);
+}
+
+.developer-info {
+    font-size: 12px;
+    color: var(--line);
+    text-align: right;
+}
+
+.developer-name {
+    color: var(--green);
+    font-size: 13px;
     font-weight: bold;
-    color: #1e293b;
+    letter-spacing: 0.5px;
+}
+
+/* Main header */
+
+header {
+    background: var(--navy);
+    color: white;
+    padding: 36px 22px;
+    border-bottom: 4px solid var(--line);
+}
+
+.wrap {
+    max-width: 1120px;
+    margin: auto;
+}
+
+.eyebrow {
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    color: var(--green);
+}
+
+h1 {
+    margin: 10px 0;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+
+header p {
+    max-width: 720px;
+    line-height: 1.7;
+    margin-bottom: 0;
+    color: var(--pink);
+}
+
+/* Main content */
+
+main {
+    max-width: 1120px;
+    margin: 28px auto;
+    padding: 0 18px;
+}
+
+/* Search and filter */
+
+.toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+input,
+select {
+    font: inherit;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #FFF9F8;
+    color: var(--ink);
+}
+
+input {
+    flex: 1;
+    min-width: 220px;
+}
+
+input:focus,
+select:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+}
+
+.section-title {
+    margin: 28px 0 16px;
+    font-size: 1.4rem;
+}
+
+/* Experiment cards */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+    gap: 18px;
+}
+
+.card {
+    background: var(--pink);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+
+    box-shadow: 0 4px 14px #382F3210;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 225px;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px #382F3220;
+}
+
+.tag {
+    display: inline-block;
+    width: max-content;
+    max-width: 100%;
+
+    font-size: 0.75rem;
+    font-weight: bold;
+
+    background: var(--green);
+    color: var(--ink);
+
+    padding: 6px 9px;
+    border-radius: 20px;
+}
+
+.card h3 {
+    margin: 14px 0 8px;
+    line-height: 1.4;
+    font-size: 1.08rem;
+}
+
+.card p {
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 0.94rem;
+    flex: 1;
+}
+
+.btn {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--pink);
+
+    text-decoration: none;
+    padding: 11px 14px;
+
+    border-radius: 9px;
+    font-weight: bold;
+    text-align: center;
+
+    transition: background 0.2s ease;
+}
+
+.btn:hover {
+    background: #665b5e;
+}
+
+.btn.disabled {
+    background: var(--line);
+    color: var(--muted);
+    cursor: default;
+}
+
+.no-results {
+    display: none;
+    text-align: center;
+    padding: 25px;
+    margin-top: 20px;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    color: var(--muted);
+}
+
+/* Visitor counter */
+
+.visitor-counter {
+    max-width: 360px;
+    margin: 38px auto 25px;
+    padding: 24px;
+
+    text-align: center;
+
+    background: var(--pink);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+
+    box-shadow: 0 4px 14px #382F3210;
+    color: var(--ink);
+}
+
+.visitor-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.visitor-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.visitor-description {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 14px;
 }
 
 .visitor-counter img {
     display: inline-block;
-    vertical-align: middle;
-    margin-left: 8px;
+    min-height: 20px;
+    max-width: 100%;
+}
+
+/* Footer */
+
+footer {
+    background: var(--navy);
+    color: var(--pink);
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    border-top: 4px solid var(--line);
+}
+
+.footer-subtitle {
+    color: var(--line);
+    font-size: 0.78rem;
+}
+
+/* Mobile layout */
+
+@media (max-width: 600px) {
+    .college-bar {
+        align-items: flex-start;
+    }
+
+    .developer-info {
+        text-align: left;
+    }
+
+    header {
+        padding: 28px 18px;
+    }
+
+    main {
+        margin-top: 20px;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    input,
+    select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .visitor-counter {
+        max-width: 100%;
+    }
 }
 </style>
 </head>
-<body>
-<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
 
-<header><div class="wrap">
-<div class="eyebrow">KGR · Electrical & Electronics Engineering</div>
-<h1>Virtual Laboratory</h1>
-<p>Explore electrical measurements, bridges, sensors and digital interfacing through guided experiment pages. Select an experiment to open its learning module or simulation.</p>
-</div></header>
-<main>
-<div class="toolbar">
-<input id="search" type="search" placeholder="Search experiments (e.g., Maxwell, ADC, LVDT)…" aria-label="Search experiments">
-<select id="category" aria-label="Filter by category"><option value="all">All categories</option><option>DC Bridges</option><option>Electrical Measurements</option><option>Sensors & Transducers</option><option>Digital Electronics</option></select>
+<body>
+
+<!-- COLLEGE HEADER -->
+
+<div class="college-bar">
+
+    <div>
+        <div class="college-name">
+            E.G.S. Pillay Engineering College (Autonomous)
+        </div>
+
+        <div class="college-location">
+            Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering
+        </div>
+    </div>
+
+    <div class="developer-info">
+        Developed by
+        <br>
+
+        <span class="developer-name">
+            GOKULRAJ
+        </span>
+
+        <br>
+
+        Assistant Professor, Department of EEE
+    </div>
+
 </div>
-<h2 class="section-title">Experiments</h2>
-<div class="grid" id="cards">
-<article class="card" data-category="DC Bridges" data-search="wheatstone bridge unknown resistance galvanometer balance">
-<span class="tag">DC Bridges</span><h3>Wheatstone Bridge</h3><p>Balance the bridge and find an unknown resistance from the ratio arms.</p><a class="btn" href="wheatstone-bridge.html">Open Simulation</a></article>
-<article class="card" data-category="Electrical Measurements" data-search="two wattmeter method three phase power factor">
-<span class="tag">Electrical Measurements</span><h3>Two-Wattmeter Method</h3><p>Measure three-phase power and power factor with two wattmeters.</p><a class="btn" href="two-wattmeter.html">Open Simulation</a></article>
-<article class="card" data-category="DC Bridges" data-search="kelvin double bridge low resistance">
-<span class="tag">DC Bridges</span><h3>Kelvin’s Double Bridge</h3><p>Study the measurement of low resistance and the role of ratio arms and lead resistance.</p><a class="btn" href="kelvin-double-bridge.html">Open Simulation</a></article>
-<article class="card" data-category="DC Bridges" data-search="maxwell bridge inductance capacitance ac bridge">
-<span class="tag">DC/AC Bridges</span><h3>Maxwell’s Bridge</h3><p>Explore bridge balance, unknown inductance, resistance and standard capacitance.</p><a class="btn" href="maxwells-bridge.html">Open Simulation</a></article>
-<article class="card" data-category="DC Bridges" data-search="schering bridge capacitance dielectric loss">
-<span class="tag">AC Bridges</span><h3>Schering Bridge</h3><p>Learn capacitance and dielectric-loss measurement in an AC bridge.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
-<article class="card" data-category="Electrical Measurements" data-search="single phase energy meter calibration watt hour">
-<span class="tag">Electrical Measurements</span><h3>Single-Phase Energy Meter Calibration</h3><p>Compare meter readings with reference energy and calculate percentage error.</p><a class="btn" href="energy-meter.html">Open Simulation</a></article>
-<article class="card" data-category="Electrical Measurements" data-search="dynamometer wattmeter power measurement">
-<span class="tag">Electrical Measurements</span><h3>Dynamometer Wattmeter</h3><p>Understand current and pressure coils and power measurement.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
-<article class="card" data-category="Sensors & Transducers" data-search="LVDT displacement transducer">
-<span class="tag">Sensors & Transducers</span><h3>LVDT</h3><p>Investigate displacement, differential output and transducer sensitivity.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
-<article class="card" data-category="Sensors & Transducers" data-search="pressure measurement trainer transducer gauge voltage output">
-<span class="tag">Sensors & Transducers</span><h3>Pressure Measurement Trainer</h3><p>Apply pressure, read the gauge and transducer output, and plot pressure against output voltage.</p><a class="btn" href="pressure-measurement-trainer.html">Open Simulation</a></article>
-<article class="card" data-category="Sensors & Transducers" data-search="flow sensor turbine hall effect pulse frequency flow rate calibration">
-<span class="tag">Sensors & Transducers</span><h3>Flow Sensor Trainer</h3><p>Count turbine sensor pulses, find the flow rate and calibrate against a collection tank.</p><a class="btn" href="flow-sensor-trainer.html">Open Simulation</a></article>
-<article class="card" data-category="Sensors & Transducers" data-search="temperature pressure flow sensor transducer">
-<span class="tag">Sensors & Transducers</span><h3>Temperature, Pressure & Flow Transducers</h3><p>Review sensor response, calibration and output characteristics.</p><a class="btn disabled" aria-disabled="true">Learning page coming soon</a></article>
-<article class="card" data-category="Digital Electronics" data-search="ADC analog to digital converter interface">
-<span class="tag">Digital Electronics</span><h3>ADC Interface</h3><p>Convert an analogue input into a digital value and explore resolution.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
-<article class="card" data-category="Digital Electronics" data-search="DAC digital to analog converter interface">
-<span class="tag">Digital Electronics</span><h3>DAC Interface</h3><p>Convert digital input codes to analogue output voltage.</p><a class="btn" href="dac-trainer.html">Open Simulation</a></article>
-<div class="visitor-counter">
-  <span>👥 Total Visitors:</span>
-  <img src="https://visitor-badge.laobi.icu/badge?page_id=kgr.virtual.laboratory"
-       alt="Visitor Count"> </div>
+
+<!-- MAIN PAGE HEADER -->
+
+<header>
+    <div class="wrap">
+
+        <div class="eyebrow">
+            KGR · Electrical & Electronics Engineering
+        </div>
+
+        <h1>
+            Virtual Laboratory
+        </h1>
+
+        <p>
+            Explore electrical measurements, bridges, sensors and digital
+            interfacing through interactive experiment pages and simulations.
+            Select an experiment to open its learning module.
+        </p>
+
+    </div>
+</header>
+
+<!-- MAIN CONTENT -->
+
+<main>
+
+    <!-- SEARCH AND CATEGORY FILTER -->
+
+    <div class="toolbar">
+
+        <input
+            id="search"
+            type="search"
+            placeholder="Search experiments (e.g., Maxwell, ADC, LVDT)…"
+            aria-label="Search experiments"
+        >
+
+        <select id="category" aria-label="Filter by category">
+
+            <option value="all">All categories</option>
+
+            <option value="DC Bridges">DC Bridges</option>
+
+            <option value="Electrical Measurements">
+                Electrical Measurements
+            </option>
+
+            <option value="Sensors & Transducers">
+                Sensors & Transducers
+            </option>
+
+            <option value="Digital Electronics">
+                Digital Electronics
+            </option>
+
+        </select>
+
+    </div>
+
+    <!-- EXPERIMENT LIST -->
+
+    <h2 class="section-title">
+        Experiments
+    </h2>
+
+    <div class="grid" id="cards">
+
+        <!-- 1. WHEATSTONE BRIDGE -->
+
+        <article
+            class="card"
+            data-category="DC Bridges"
+            data-search="wheatstone bridge unknown resistance galvanometer balance"
+        >
+
+            <span class="tag">DC Bridges</span>
+
+            <h3>Wheatstone Bridge</h3>
+
+            <p>
+                Balance the bridge and find an unknown resistance
+                from the ratio arms.
+            </p>
+
+            <a class="btn" href="wheatstone-bridge.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+        <!-- 2. TWO-WATTMETER METHOD -->
+
+        <article
+            class="card"
+            data-category="Electrical Measurements"
+            data-search="two wattmeter method three phase power factor"
+        >
+
+            <span class="tag">Electrical Measurements</span>
+
+            <h3>Two-Wattmeter Method</h3>
+
+            <p>
+                Measure three-phase power and power factor
+                using two wattmeters.
+            </p>
+
+            <a class="btn" href="two-wattmeter.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+        <!-- 3. KELVIN DOUBLE BRIDGE -->
+
+        <article
+            class="card"
+            data-category="DC Bridges"
+            data-search="kelvin double bridge low resistance"
+        >
+
+            <span class="tag">DC Bridges</span>
+
+            <h3>Kelvin’s Double Bridge</h3>
+
+            <p>
+                Study low-resistance measurement and the role
+                of ratio arms and lead resistance.
+            </p>
+
+            <a class="btn" href="kelvin-double-bridge.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+        <!-- 4. MAXWELL BRIDGE -->
+
+        <article
+            class="card"
+            data-category="DC Bridges"
+            data-search="maxwell bridge inductance capacitance ac bridge"
+        >
+
+            <span class="tag">DC/AC Bridges</span>
+
+            <h3>Maxwell’s Bridge</h3>
+
+            <p>
+                Explore bridge balance, unknown inductance,
+                resistance and standard capacitance.
+            </p>
+
+            <a class="btn" href="maxwells-bridge.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+        <!-- 5. SCHERING BRIDGE -->
+
+        <article
+            class="card"
+            data-category="DC Bridges"
+            data-search="schering bridge capacitance dielectric loss ac bridge"
+        >
+
+            <span class="tag">AC Bridges</span>
+
+            <h3>Schering Bridge</h3>
+
+            <p>
+                Learn capacitance and dielectric-loss measurement
+                using an AC bridge.
+            </p>
+
+            <a class="btn disabled"
+               aria-disabled="true"
+               role="link"
+            >
+                Simulation Coming Soon
+            </a>
+
+        </article>
+
+        <!-- 6. ENERGY METER CALIBRATION -->
+
+        <article
+            class="card"
+            data-category="Electrical Measurements"
+            data-search="single phase energy meter calibration watt hour"
+        >
+
+            <span class="tag">Electrical Measurements</span>
+
+            <h3>Single-Phase Energy Meter Calibration</h3>
+
+            <p>
+                Compare meter readings with reference energy
+                and calculate percentage error.
+            </p>
+
+            <a class="btn" href="energy-meter.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+        <!-- 7. DYNAMOMETER WATTMETER -->
+
+        <article
+            class="card"
+            data-category="Electrical Measurements"
+            data-search="dynamometer wattmeter power measurement current pressure coils"
+        >
+
+            <span class="tag">Electrical Measurements</span>
+
+            <h3>Dynamometer Wattmeter</h3>
+
+            <p>
+                Understand current and pressure coils
+                and electrical power measurement.
+            </p>
+
+            <a class="btn disabled"
+               aria-disabled="true"
+               role="link"
+            >
+                Simulation Coming Soon
+            </a>
+
+        </article>
+
+        <!-- 8. LVDT -->
+
+        <article
+            class="card"
+            data-category="Sensors & Transducers"
+            data-search="LVDT linear variable differential transformer displacement transducer"
+        >
+
+            <span class="tag">Sensors & Transducers</span>
+
+            <h3>LVDT</h3>
+
+            <p>
+                Investigate displacement, differential output
+                and transducer sensitivity.
+            </p>
+
+            <a class="btn disabled"
+               aria-disabled="true"
+               role="link"
+            >
+                Simulation Coming Soon
+            </a>
+
+        </article>
+
+        <!-- 9. PRESSURE MEASUREMENT -->
+
+        <article
+            class="card"
+            data-category="Sensors & Transducers"
+            data-search="pressure measurement trainer transducer gauge voltage output"
+        >
+
+            <span class="tag">Sensors & Transducers</span>
+
+            <h3>Pressure Measurement Trainer</h3>
+
+            <p>
+                Apply pressure, read the gauge and transducer output,
+                and plot pressure against output voltage.
+            </p>
+
+            <a class="btn" href="pressure-measurement-trainer.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+        <!-- 10. FLOW SENSOR -->
+
+        <article
+            class="card"
+            data-category="Sensors & Transducers"
+            data-search="flow sensor turbine hall effect pulse frequency flow rate calibration"
+        >
+
+            <span class="tag">Sensors & Transducers</span>
+
+            <h3>Flow Sensor Trainer</h3>
+
+            <p>
+                Count turbine sensor pulses, calculate flow rate
+                and calibrate against a collection tank.
+            </p>
+
+            <a class="btn" href="flow-sensor-trainer.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+                <!-- 11. ADC INTERFACE -->
+
+        <article
+            class="card"
+            data-category="Digital Electronics"
+            data-search="ADC analog to digital converter interface resolution"
+        >
+
+            <span class="tag">Digital Electronics</span>
+
+            <h3>ADC Interface</h3>
+
+            <p>
+                Convert an analogue input into a digital value
+                and explore converter resolution.
+            </p>
+
+            <a class="btn disabled"
+               aria-disabled="true"
+               role="link"
+            >
+                Simulation Coming Soon
+            </a>
+
+        </article>
+
+        <!-- 12. DAC INTERFACE -->
+
+        <article
+            class="card"
+            data-category="Digital Electronics"
+            data-search="DAC digital to analog converter interface output voltage"
+        >
+
+            <span class="tag">Digital Electronics</span>
+
+            <h3>DAC Interface</h3>
+
+            <p>
+                Convert digital input codes into an analogue
+                output voltage.
+            </p>
+
+            <a class="btn" href="dac-trainer.html">
+                Open Simulation
+            </a>
+
+        </article>
+
+    </div>
+
+    <!-- NO SEARCH RESULTS MESSAGE -->
+
+    <div id="noResults" class="no-results">
+        No experiments match your search.
+        Try another keyword or category.
+    </div>
+
+    <!-- VISITOR COUNTER -->
+
+    <section
+        class="visitor-counter"
+        aria-label="Virtual Laboratory visitor statistics"
+    >
+
+        <div class="visitor-icon">
+            👥
+        </div>
+
+        <div class="visitor-title">
+            Virtual Laboratory
+        </div>
+
+        <div class="visitor-description">
+            Thank you for visiting our Electrical and Electronics
+            Engineering Virtual Laboratory.
+        </div>
+
+        <div class="visitor-description">
+            Total Visits
+        </div>
+
+        <img
+            src="https://visitor-badge.laobi.icu/badge?page_id=kgr-eee-virtual-laboratory"
+            alt="Total website visits"
+            loading="lazy"
+        >
+
+    </section>
+
 </main>
-<footer>Virtual Laboratory · Electrical & Electronics Engineering</footer>
+
+<!-- FOOTER -->
+
+<footer>
+
+    <div>
+        Virtual Laboratory . Electrical & Electronics Engineering
+    </div>
+
+    <div class="footer-subtitle">
+        E.G.S. Pillay Engineering College (Autonomous), Nagapattinam
+    </div>
+
+    <div class="footer-subtitle">
+        Developed by Gokulraj, Assistant Professor, Department of EEE
+    </div>
+
+</footer>
+
+<!-- SEARCH AND CATEGORY FILTER SCRIPT -->
+
 <script>
-const search=document.getElementById('search'), category=document.getElementById('category');
-function filterCards(){const q=search.value.toLowerCase().trim(), c=category.value;document.querySelectorAll('.card').forEach(card=>{const matchesText=(card.innerText+' '+card.dataset.search).toLowerCase().includes(q);const matchesCategory=c==='all'||card.dataset.category===c;card.style.display=matchesText&&matchesCategory?'flex':'none';});}
-search.addEventListener('input',filterCards);category.addEventListener('change',filterCards);
+const search = document.getElementById('search');
+const category = document.getElementById('category');
+const cards = document.querySelectorAll('.card');
+const noResults = document.getElementById('noResults');
+
+function filterCards() {
+
+    const q = search.value.toLowerCase().trim();
+    const selectedCategory = category.value;
+
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+
+        const searchText = (
+            card.innerText + ' ' + card.dataset.search
+        ).toLowerCase();
+
+        const matchesText = searchText.includes(q);
+
+        const matchesCategory =
+            selectedCategory === 'all' ||
+            card.dataset.category === selectedCategory;
+
+        const visible = matchesText && matchesCategory;
+
+        card.style.display = visible ? 'flex' : 'none';
+
+        if (visible) {
+            visibleCount++;
+        }
+
+    });
+
+    noResults.style.display =
+        visibleCount === 0 ? 'block' : 'none';
+
+}
+
+search.addEventListener('input', filterCards);
+
+category.addEventListener('change', filterCards);
 </script>
-</body></html>
+
+</body>
+</html>
+```

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calibration and Testing of a Single Phase Energy Meter</title>
+<style>
+:root{--bg:#F4EAD5;--card:#FFEAF2;--ink:#382F32;--mute:#665B5E;--line:#BCBDAC;--teal:#382F32;--red:#8F3A45;--acc:#8FB69A;--bench:#BCBDAC;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:10px}
+.ban{background:#382F32;border-bottom:4px solid #BCBDAC;color:#FFEAF2;border-radius:8px;padding:9px 16px;display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cn{font-size:clamp(16px,3vw,21px);font-weight:700;line-height:1.2}.cs{font-size:14px;color:#BCBDAC}
+.who{margin-left:auto;font-size:13px;color:#BCBDAC;text-align:right;line-height:1.5}.who b{color:#BCE3C5;font-size:15px;letter-spacing:1px}
+[contenteditable]{outline:none;border-bottom:1px dashed rgba(255,255,255,.4)}
+h1{font-size:clamp(17px,3.2vw,22px);margin:0 0 2px;line-height:1.2}
+h2{font-size:15.5px;margin:0 0 5px}
+.sub{color:var(--mute);margin:0 0 8px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}
+.bench{background:var(--bench);border-radius:6px}
+.sc{overflow-x:auto}
+svg{display:block;width:100%;height:auto}
+#bd{min-width:700px;max-width:800px;margin:0 auto}
+svg text{font-family:system-ui,Arial,sans-serif;fill:var(--ink)}
+.t{fill:#2b3137;stroke:#000;stroke-width:1.5;cursor:pointer}.t:hover{fill:#2A7F82}.t.sel{fill:#F2B84B}
+.tl{font-size:12.5px;font-weight:700;text-anchor:middle;cursor:pointer}
+.wr{fill:none;stroke-width:4;stroke-linecap:round;cursor:pointer}.wr:hover{stroke-width:7}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:8px}
+.ctl label{display:flex;align-items:center;gap:6px;font-size:15px}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--teal)}
+button.p{background:var(--teal);color:#FFEAF2;border-color:var(--teal)}button.r{background:var(--red);color:#FFEAF2;border-color:var(--red)}
+select,input[type=number]{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:4px 8px}
+.swp{background:#382F32;border:2px solid var(--acc);border-radius:10px;padding:3px 10px 6px;display:flex;flex-direction:column;align-items:center;color:#BCE3C5;font-weight:700;letter-spacing:1px;font-size:11px}
+.lcd{font:700 18px/1 ui-monospace,Consolas,monospace;background:#242629;color:#BCE3C5;padding:5px 9px;border-radius:5px;letter-spacing:1px;margin-top:2px}
+.msg{min-height:20px;margin-top:6px;font-size:14px;color:var(--mute)}.msg.bad{color:var(--red)}.msg.ok{color:#2F6B45}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:5px 6px;text-align:center}th{background:var(--bench);font-size:13px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--line);margin-bottom:12px}
+.tab{border:none;border-radius:6px 6px 0 0;padding:6px 13px;font-weight:600;color:var(--mute);background:transparent;margin-bottom:-2px;border-bottom:3px solid transparent}
+.tab.on{color:var(--teal);border-bottom-color:var(--acc);background:var(--bg)}
+.pn{display:none}.pn.on{display:block}
+.pn ol,.pn ul{margin:6px 0 10px;padding-left:22px;color:var(--mute)}.pn li{margin-bottom:3px}
+.fm{background:var(--bg);border-radius:6px;padding:8px 12px;line-height:1.8;font-size:14.5px}
+.ml{font-family:ui-monospace,Consolas,monospace;font-size:13.5px;line-height:1.8;background:var(--bg);border-radius:6px;padding:10px 14px;margin-top:8px;overflow-x:auto;white-space:pre}
+.ml b{color:var(--teal)}
+.dmw svg{max-width:600px;margin:0 auto}.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;font-size:14px}@media(max-width:680px){.cols{grid-template-columns:1fr}}.pn h2{margin-top:10px}
+@media print{.noprint{display:none!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div style="margin:0 0 6px"><a href="index.html" style="color:var(--teal);font-weight:600;text-decoration:none">← Back to Virtual Laboratory</a></div>
+<div class="ban">
+<div><div class="cn">E.G.S. Pillay Engineering College (Autonomous)</div><div class="cs">Nagapattinam, Tamil Nadu</div><div class="cs">Department of Electrical and Electronics Engineering · Electrical Measurements Laboratory</div></div>
+<div class="who">Prepared by<br><b contenteditable="true" id="nm" spellcheck="false">GOKULRAJ</b><br><span contenteditable="true" spellcheck="false">Assistant Professor</span>, <span contenteditable="true" spellcheck="false">Department of EEE</span></div>
+</div>
+<h1>Calibration and Testing of a Single Phase Energy Meter</h1>
+<p class="sub noprint">Wire the circuit, load the meter with lamps, count its impulses and find its percentage error. The dotted banner details can be edited.</p>
+
+<div class="card">
+<div class="sc bench"><svg id="bd" viewBox="0 0 820 462" role="img" aria-label="Virtual lab bench"></svg></div>
+<div class="ctl noprint"><button id="chk" class="p">Check connections</button><button id="aw">Auto-wire</button><button id="cw">Clear wires</button><span id="cs" style="color:var(--mute);font-size:14px"></span></div>
+<div class="msg" id="m1"></div>
+<div class="ctl noprint">
+<label>Lamps (100 W each) <select id="nb"></select></label>
+<label>Speed <select id="sp"><option value="1" selected>1× (real time)</option><option value="5">5×</option><option value="10">10×</option></select></label>
+<div class="swp">STOPWATCH<span class="lcd" id="sw">00:00:00</span></div>
+<button id="b1" class="p">Start</button><button id="b2">Stop</button><button id="b3" class="r">Reset</button>
+<label><input type="checkbox" id="aid" checked> Count aid <b id="av" style="min-width:2em"></b></label>
+</div>
+<div class="msg" id="m3"></div>
+<div class="ctl noprint"><label>Green LED blinks counted <input id="ci" type="number" min="0" style="width:90px"></label><button id="ad" class="p">Add reading</button></div>
+<div class="msg" id="m2"></div>
+</div>
+
+<div class="card">
+<h2>Observation table</h2>
+<div class="sc"><table id="tb"><thead><tr><th>S.No.</th><th>Load (kW)</th><th>Voltage (V)</th><th>Current (A)</th><th>Impulses</th><th>Actual energy A (kWh)</th><th>Recorded energy R (kWh)</th><th>Relative error (%)</th></tr></thead><tbody></tbody></table></div>
+<div class="ctl noprint"><button onclick="window.print()">Print</button><button id="rs" class="r">Reset experiment</button></div>
+</div>
+
+<div class="card">
+<div class="tabs noprint" role="tablist"><button class="tab on" data-p="proc">Procedure</button><button class="tab" data-p="theo">Theory Calculation</button><button class="tab" data-p="gra">Graph</button><button class="tab" data-p="mod">Model Calculation</button></div>
+
+<div class="pn on" id="p-proc">
+<h2>Aim</h2><p style="margin:0 0 8px;color:var(--mute)">To calibrate and test a single phase static energy meter by direct loading, and to find its percentage error.</p>
+<h2>Apparatus</h2><ul><li>1-phase 230 V, 50 Hz supply with MCB</li><li>Voltmeter 0–400 V, ammeter 0–8 A, wattmeter 0–1200 W</li><li>Static energy meter, 3200 imp/kWh</li><li>Lamp load, ten lamps of 100 W each, and a stopwatch</li></ul>
+<h2>Procedure</h2>
+<ol>
+<li>Make the connections by clicking one terminal and then another. Click a wire to remove it. Wrong wires can be cleared with Clear wires.</li>
+<li>Connections: S1–A1, A2–V1, V1–Mw, Mw–C, S2–V2, S2–V, V–N1, L–M, N2–L2, Le–L1.</li>
+<li>Press Check connections. When they are correct, click the MCB to turn the supply on.</li>
+<li>Select the number of lamps from the Lamp load list.</li>
+<li>Press Start on the stopwatch and count the blinks of the green LED on the energy meter.</li>
+<li>Press Stop when the stopwatch reads 00:01:00. Use 5× or 10× speed to shorten the wait.</li>
+<li>Enter the blink count and press Add reading. The reading goes into the observation table.</li>
+<li>Repeat with different numbers of lamps, then use the other tabs for the theory calculation, graph and model calculation.</li>
+<li>Press Print to print the page, or Reset experiment to start again.</li>
+</ol></div>
+
+<div class="pn" id="p-theo">
+<h2>Energy measurement</h2>
+<div class="fm">Actual energy <b>A = V × I × T / 1000</b> kWh (T in hours)<br>Recorded energy <b>R = N / K</b> kWh, N = impulses, K = 3200 imp/kWh<br>Relative error <b>= (R − A) / A × 100 %</b></div>
+<h2>Induction type (rotating disc) energy meter</h2>
+<div class="dmw"><svg id="dm" viewBox="0 0 880 580" role="img" aria-label="Working diagram of an induction type energy meter"></svg>
+<div class="ctl noprint" style="justify-content:center"><label>Load <input id="dl" type="range" min="0" max="100" value="50"></label><span style="color:var(--mute);font-size:13px">The disc speed follows the load.</span></div></div>
+<div class="cols"><div><h2>Construction</h2><ul>
+<li><b>Driving system:</b> a shunt magnet with a many-turn pressure coil across the supply, and a series magnet with a few-turn current coil in the load circuit.</li>
+<li><b>Moving system:</b> a light aluminium disc on a spindle, running in the air gap of both magnets.</li>
+<li><b>Braking system:</b> a permanent magnet near the disc edge, with an adjustable position.</li>
+<li><b>Registering system:</b> a worm and gear train that turns the dials as the spindle rotates.</li></ul></div>
+<div><h2>Working</h2><ul>
+<li>The current coil makes flux φ1 proportional to I. The pressure coil makes flux φ2 proportional to V, lagging it by about 90° (set by the copper shading bands).</li>
+<li>The two alternating fluxes induce eddy currents in the disc. Their interaction gives a driving torque Td ∝ φ1 φ2 sin α, which equals V I cos φ, the power.</li>
+<li>The braking torque is proportional to speed, Tb ∝ N. At steady speed Td = Tb, so N ∝ P.</li>
+<li>Revolutions in a time t ∝ P × t, the energy. Energy = revolutions ÷ meter constant (rev/kWh).</li>
+<li>Calibration: brake magnet position (speed), lag adjustment (phase) and friction compensation (light load).</li></ul></div></div>
+<h2>Theoretical (actual) energy for each reading</h2>
+<div class="sc"><table id="tt"><thead><tr><th>S.No.</th><th>V (V)</th><th>I (A)</th><th>P = V × I (W)</th><th>T (min)</th><th>A = V·I·T / 1000 (kWh)</th><th>Expected impulses A × 3200</th></tr></thead><tbody></tbody></table></div>
+<div class="msg" id="tn"></div></div>
+
+<div class="pn" id="p-gra">
+<h2>Relative error vs load</h2>
+<div class="sc"><svg id="gr" viewBox="0 0 640 270" style="min-width:540px" role="img" aria-label="Graph of relative error against load"></svg></div>
+<div class="msg" id="gm"></div></div>
+
+<div class="pn" id="p-mod">
+<h2>Model calculation</h2>
+<div class="ctl noprint" style="margin-top:0"><label>Reading <select id="mc"></select></label></div>
+<div class="ml" id="mt">Add a reading to see its worked calculation.</div></div>
+</div>
+</div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},NS="http://www.w3.org/2000/svg";
+var T={S1:[45,198],S2:[105,198],A1:[210,198],A2:[290,198],V1:[410,198],V2:[490,198],Mw:[602,198],L:[657,198],C:[712,198],V:[767,198],M:[520,280],N1:[580,280],N2:[640,280],Le:[700,280],L2:[230,280],L1:[330,280]};
+var REQ=[["S1","A1"],["A2","V1"],["V1","Mw"],["Mw","C"],["S2","V"],["V","N1"],["N2","L2"],["Le","L1"],["L","M"],["S2","V2"]];
+var COL=["#E4572E","#2E86AB","#3BAA6F","#8E6BBF","#E1A730","#1B998B","#D1495B","#6C757D","#C97B2B","#4C9F70"];
+var EPS=0.018,wires=[],sel=null,ok=false,mcb=false,data=[];
+function strip(x,w){return'<rect x="'+x+'" y="164" width="'+w+'" height="48" fill="#F4EAD5" stroke="#222"/>'}
+function dial(x,w,lab,max,maj,id){var cx=x+w/2,cy=122,s='<rect x="'+x+'" y="14" width="'+w+'" height="124" rx="5" fill="#fff" stroke="#222" stroke-width="2"/><rect x="'+x+'" y="138" width="'+w+'" height="26" fill="#1c1f22"/><text x="'+cx+'" y="157" text-anchor="middle" style="fill:#fff" font-weight="700" font-size="14" letter-spacing="1">'+lab+'</text>'+strip(x,w);
+for(var i=0;i<=maj*5;i++){var a=(-55+110*i/(maj*5))*Math.PI/180,r=i%5?74:68;s+='<line x1="'+(cx+r*Math.sin(a))+'" y1="'+(cy-r*Math.cos(a))+'" x2="'+(cx+80*Math.sin(a))+'" y2="'+(cy-80*Math.cos(a))+'" stroke="#222" stroke-width="'+(i%5?1:1.6)+'"/>'}
+for(i=0;i<=maj;i++){a=(-55+110*i/maj)*Math.PI/180;s+='<text x="'+(cx+56*Math.sin(a))+'" y="'+(cy-56*Math.cos(a)+4)+'" text-anchor="middle" font-size="11" style="fill:#222">'+max*i/maj+'</text>'}
+return s+'<text x="'+cx+'" y="92" text-anchor="middle" font-size="22" font-weight="700" style="fill:#222">'+id+'</text><g id="n'+id+'"><line x1="'+cx+'" y1="'+cy+'" x2="'+cx+'" y2="'+(cy-72)+'" stroke="#d00" stroke-width="3"/></g><circle cx="'+cx+'" cy="'+cy+'" r="7" fill="#111"/>'}
+var h='<rect x="10" y="14" width="130" height="150" rx="5" fill="#E9EDF0" stroke="#222" stroke-width="2"/>'+strip(10,130)+'<rect x="30" y="26" width="90" height="30" rx="3" fill="#fff" stroke="#222"/><text id="mt2" x="75" y="49" text-anchor="middle" font-size="21" font-weight="700" style="fill:#C23B2A">OFF</text><rect x="30" y="66" width="90" height="62" rx="3" fill="#BBC4CA" stroke="#222"/><g id="lv" style="cursor:pointer"><rect id="lvr" x="45" y="74" width="60" height="46" rx="4" fill="#C23B2A" stroke="#222"/></g><text x="75" y="150" text-anchor="middle" font-size="15" font-weight="700" style="fill:#222">MCB</text>';
+h+=dial(160,180,"AMMETER",8,4,"A")+dial(360,180,"VOLTMETER",400,4,"V")+dial(560,250,"WATTMETER",1200,4,"W");
+// contemporary static energy meter
+h+='<g transform="translate(0,-20)">'+'<rect x="420" y="282" width="390" height="198" rx="14" fill="#F3F5F7" stroke="#222" stroke-width="2"/><rect x="500" y="287" width="220" height="26" rx="4" fill="#C9D0D6" stroke="#222"/><text x="615" y="348" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="2" style="fill:#222">STATIC kWh METER</text><rect x="440" y="360" width="236" height="62" rx="5" fill="#242629" stroke="#222"/><text id="rg" x="548" y="404" text-anchor="middle" font-family="monospace" font-size="30" font-weight="700" style="fill:#BCE3C5">0000.000</text><text x="660" y="415" text-anchor="end" font-size="11" style="fill:#BCE3C5">kWh</text><circle id="led" cx="730" cy="378" r="9" fill="#2E9B4E" stroke="#222"/><text x="730" y="406" text-anchor="middle" font-size="11" font-weight="700" style="fill:#222">IMP</text><circle cx="772" cy="378" r="6" fill="#7a2a24" stroke="#222"/><text x="772" y="406" text-anchor="middle" font-size="11" style="fill:#555">ERR</text><text x="440" y="446" font-size="12.5" style="fill:#333">230 V · 50 Hz · Class 1.0</text><text x="440" y="466" font-size="12.5" style="fill:#333">3200 imp/kWh</text>';
+for(var i=0;i<14;i++)h+='<rect x="'+(700+i*7)+'" y="440" width="'+(i%3?2:4)+'" height="28" fill="#333"/>';
+// lamp load
+h+='<polygon points="40,326 370,326 392,482 8,482" fill="#D2A56B" stroke="#8A6035" stroke-width="2"/><rect x="200" y="287" width="160" height="26" rx="4" fill="#C9D0D6" stroke="#222"/><text x="22" y="346" font-size="14" font-weight="700" style="fill:#4a2f12">LAMP LOAD</text><text x="12" y="300" font-size="13" style="fill:var(--mute)">Supply: <tspan id="ss" font-weight="700">OFF</tspan> · Wires <tspan id="sw2" font-weight="700">0/10</tspan></text>';
+for(i=0;i<10;i++){var bx=62+(i%5)*62,by=i<5?376:440;h+='<g id="lamp'+i+'"><circle cx="'+bx+'" cy="'+by+'" r="18" fill="#B8BEC3" stroke="#555"/><rect x="'+(bx-8)+'" y="'+(by+16)+'" width="16" height="9" fill="#777"/></g>'}
+h+='</g>';var tg="";for(var k in T){var p=T[k];tg+='<circle class="t" data-k="'+k+'" cx="'+p[0]+'" cy="'+p[1]+'" r="9"/><text class="tl" data-k="'+k+'" x="'+p[0]+'" y="'+(p[1]<250?p[1]-15:p[1]+26)+'">'+k+'</text>'}
+$("bd").innerHTML=h+'<g id="wg"></g>'+tg;
+for(i=0;i<=10;i++){var o=document.createElement("option");o.value=i;o.textContent=i;$("nb").appendChild(o)}
+function path(a,b){var A=T[a],B=T[b];if(Math.abs(A[1]-B[1])<20){var sg=24+Math.min(44,Math.abs(A[0]-B[0])*.13);var sd=A[1]>250?-sg:sg;return"M"+A+"C"+A[0]+","+(A[1]+sd)+" "+B[0]+","+(B[1]+sd)+" "+B}return"M"+A+"C"+A[0]+","+(A[1]+50)+" "+B[0]+","+(B[1]-50)+" "+B}
+function has(a,b){return wires.some(function(w){return(w[0]===a&&w[1]===b)||(w[0]===b&&w[1]===a)})}
+function score(){return REQ.filter(function(r){return has(r[0],r[1])}).length}
+function draw(){var g=$("wg");g.innerHTML="";wires.forEach(function(w,i){var p=document.createElementNS(NS,"path");p.setAttribute("d",path(w[0],w[1]));p.setAttribute("class","wr");p.setAttribute("stroke",COL[i%10]);p.onclick=function(){wires.splice(i,1);ok=false;draw()};g.appendChild(p)});
+Array.prototype.forEach.call(document.querySelectorAll(".t"),function(c){c.classList.toggle("sel",c.getAttribute("data-k")===sel)});$("sw2").textContent=score()+"/10";$("cs").textContent=wires.length+" wires placed"}
+function term(k){if(!sel)sel=k;else if(sel===k)sel=null;else{if(!has(sel,k)){wires.push([sel,k]);ok=false}sel=null}draw()}
+Array.prototype.forEach.call(document.querySelectorAll(".t,.tl"),function(c){c.onclick=function(){term(c.getAttribute("data-k"))}});
+function msg(id,t,c){$(id).textContent=t;$(id).className="msg "+(c||"")}
+$("chk").onclick=function(){var n=score();if(n===10&&wires.length===10){ok=true;msg("m1","All connections are correct. Click the MCB to turn the supply on.","ok")}else{ok=false;msg("m1",n+" of 10 required connections are correct"+(wires.length>n?". Remove any wrong wires and check again.":". Add the missing wires."),"bad")}};
+$("aw").onclick=function(){wires=REQ.map(function(r){return r.slice()});ok=false;sel=null;draw()};
+$("cw").onclick=function(){wires=[];ok=false;sel=null;draw();msg("m1","")};
+$("lv").onclick=function(){mcb=!mcb;$("mt2").textContent=mcb?"ON":"OFF";$("mt2").style.fill=mcb?"#2E9B4E":"#C23B2A";$("lvr").setAttribute("fill",mcb?"#2E9B4E":"#C23B2A");$("lvr").setAttribute("y",mcb?80:74);if(mcb&&!ok)msg("m1","Supply is on, but the circuit has not been verified. Press Check connections.","bad")};
+// simulation
+var m3f=0,simT=0,run=false,cnt=0,phase=0,flash=0,reg=0,cur={V:0,W:0,A:0},last=performance.now(),CX={A:250,V:450,W:685};
+function pw(){return ok&&mcb}
+var ch={};function chg(k,v){if(ch[k]===v)return false;ch[k]=v;return true}
+function ang(id,v,max){var d=Math.round((-55+110*Math.min(1.05,v/max))*10)/10;if(chg("a"+id,d))$("n"+id).setAttribute("transform","rotate("+d+" "+CX[id]+" 122)")}
+function fmt(t){t=Math.floor(t);return[Math.floor(t/3600),Math.floor(t%3600/60),t%60].map(function(x){return("0"+x).slice(-2)}).join(":")}
+function rst(){simT=0;run=false;cnt=0}
+$("b1").onclick=function(){run=true};$("b2").onclick=function(){run=false};$("b3").onclick=rst;$("nb").onchange=rst;
+var theoOn=false,WW=2*Math.PI*.6;
+function frame(now){var dt=Math.min((now-last)/1000,.05);last=now;
+var sp=+$("sp").value,on=pw(),n=+$("nb").value,V=on?230+.4*Math.sin(now/900):0,P=on?100*n*Math.pow(V/230,2):0,I=V>0?P/V:0,kd=Math.min(1,dt*6);
+cur.V+=(V-cur.V)*kd;cur.W+=(P-cur.W)*kd;cur.A+=(I-cur.A)*kd;ang("V",cur.V,400);ang("W",cur.W,1200);ang("A",cur.A,8);
+if(chg("ln",on+"|"+n)){$("ss").textContent=on?"ON":"OFF";for(var i=0;i<10;i++){var lit=on&&i<n,g=$("lamp"+i).firstChild;g.setAttribute("fill",lit?"#FFE066":"#B8BEC3");g.style.filter=lit?"drop-shadow(0 0 8px #FFD54A)":"none"}}
+var rate=P/3.6e6*3200*(1+EPS),p0=Math.floor(phase);phase+=rate*dt*sp;var nn=Math.floor(phase)-p0;if(nn>0){flash=1;if(run)cnt+=nn}
+flash=Math.max(0,flash-dt*8);var lo=Math.round((.35+.65*flash)*20)/20;if(chg("led",lo))$("led").style.opacity=lo;
+reg+=P/1000*dt*sp/3600;var rt=("0000"+reg.toFixed(3)).slice(-8);if(chg("rg",rt))$("rg").textContent=rt;
+if(run)simT=Math.min(simT+dt*sp,359999);
+var w=run&&!on?"The stopwatch is running, but the supply is off or the circuit is not verified, so the LED will not blink.":(run&&on&&n===0?"The stopwatch is running, but no lamps are selected.":"");if(chg("w",w))msg("m3",w,w?"bad":"");
+var st=fmt(simT);if(chg("sw",st))$("sw").textContent=st;var av=$("aid").checked?cnt:"";if(chg("av",av))$("av").textContent=av;
+if(theoOn)dmStep(dt);requestAnimationFrame(frame)}
+// rotating-disc meter diagram
+var dm={t:0,a:0,r:0};
+(function(){function cl(id,x,y,w,n,g){var q='<g id="'+id+'">';for(var i=0;i<n;i++)q+='<rect x="'+x+'" y="'+(y+i*g)+'" width="'+w+'" height="'+(g-2)+'" rx="'+(g/2-1)+'" fill="url(#dgo)" stroke="#5a3a12" stroke-width=".8"/>';return q+'</g>'}
+function ar(id,x,y1,y2,m){return'<g id="'+id+'"><path d="M'+x+' '+y1+'V'+y2+'" stroke="var(--'+(m==="a"?"acc":"teal")+')" stroke-width="4" marker-end="url(#dm'+m+')"/></g>'}
+var d='<defs><linearGradient id="dgm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E3E9EE"/><stop offset="1" stop-color="#8E9DA9"/></linearGradient><linearGradient id="dgo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2B35C"/><stop offset="1" stop-color="#C46F1C"/></linearGradient><radialGradient id="dgd" cx=".5" cy=".45" r=".7"><stop offset="0" stop-color="#F4F6F8"/><stop offset="1" stop-color="#9AA7B1"/></radialGradient><marker id="dma" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#C8963E"/></marker><marker id="dmt" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2A7F82"/></marker></defs>';
+d+='<path d="M290 330H350V470H590V330H650V505H290Z" fill="url(#dgm)" stroke="#34495A" stroke-width="1.5"/>'+cl("dsa",278,372,84,8,10)+cl("dsb",578,372,84,8,10);
+d+='<ellipse cx="470" cy="293" rx="310" ry="62" fill="#8795A1" stroke="#34495A"/><rect x="160" y="285" width="620" height="8" fill="#8795A1"/><g id="dr"><circle r="310" fill="url(#dgd)" stroke="#34495A" vector-effect="non-scaling-stroke"/>';
+for(var i=0;i<60;i++){var a=i*Math.PI/30;d+='<line x1="'+(285*Math.cos(a)).toFixed(1)+'" y1="'+(285*Math.sin(a)).toFixed(1)+'" x2="'+(302*Math.cos(a)).toFixed(1)+'" y2="'+(302*Math.sin(a)).toFixed(1)+'" stroke="#34495A" stroke-width="1" vector-effect="non-scaling-stroke" opacity=".6"/>'}
+for(i=0;i<8;i++){a=i*Math.PI/4;d+='<line x1="'+(40*Math.cos(a)).toFixed(1)+'" y1="'+(40*Math.sin(a)).toFixed(1)+'" x2="'+(270*Math.cos(a)).toFixed(1)+'" y2="'+(270*Math.sin(a)).toFixed(1)+'" stroke="#34495A" stroke-width="1" vector-effect="non-scaling-stroke" opacity=".3"/>'}
+d+='<circle cx="240" cy="0" r="14" fill="#B5483B"/></g>';
+d+='<path d="M320 70H640V245H600V105H490V225H450V105H360V245H320Z" fill="url(#dgm)" stroke="#34495A" stroke-width="1.5"/>'+cl("dpc",438,112,64,8,10)+'<rect x="446" y="204" width="48" height="6" rx="2" fill="#3B7DD8" stroke="#34495A"/><rect x="446" y="213" width="48" height="6" rx="2" fill="#3B7DD8" stroke="#34495A"/>';
+d+='<path d="M765 252H850V322H765V308H836V264H765Z" fill="#2B3640"/><g id="ded" fill="none" stroke="var(--red)" stroke-width="2.2"><ellipse cx="340" cy="272" rx="26" ry="8"/><ellipse cx="470" cy="266" rx="24" ry="7"/><ellipse cx="620" cy="272" rx="26" ry="8"/></g>';
+d+=ar("dfa",340,248,270,"a")+ar("dfb",470,228,262,"a")+ar("dfc",620,248,270,"a")+ar("dga",320,376,350,"t")+ar("dgb",620,376,350,"t");
+d+='<rect x="466" y="18" width="8" height="514" fill="#9AA7B1" stroke="#34495A" stroke-width=".8"/><rect x="440" y="6" width="60" height="12" fill="#8795A1" stroke="#34495A"/><rect x="440" y="532" width="60" height="12" fill="#8795A1" stroke="#34495A"/><path d="M356 52H466" stroke="#8795A1" stroke-width="3" stroke-dasharray="3 3"/><rect x="134" y="28" width="222" height="52" rx="4" fill="#0B1218"/><text id="drg" x="245" y="64" text-anchor="middle" font-family="monospace" font-size="28" font-weight="700" style="fill:#FFB347">0000.00</text>';
+var L=[["Register",245,20,"middle"],["Shunt magnet",650,92],["Pressure coil",512,152],["Cu shading bands",512,218],["Aluminium disc",148,290,"end"],["Braking magnet",872,344,"end"],["Series magnet",430,560,"end"],["Current coil",270,470,"end"],["Spindle and worm gear",480,560]];
+L.forEach(function(l){d+='<text x="'+l[1]+'" y="'+l[2]+'" font-size="15" font-weight="700" text-anchor="'+(l[3]||"start")+'">'+l[0]+'</text>'});
+d+='<text x="300" y="262" text-anchor="end" font-size="15" font-weight="700" style="fill:var(--acc)">φ2</text><text x="296" y="366" text-anchor="end" font-size="15" font-weight="700" style="fill:var(--teal)">φ1</text>';
+$("dm").innerHTML=d})();
+function dflip(id,s,o,cy){var g=$(id);g.setAttribute("transform","translate(0,"+cy+") scale(1,"+(s>=0?1:-1)+") translate(0,"+(-cy)+")");g.style.opacity=o}
+function dmStep(dt){var L=$("dl").value/100;dm.t+=dt;var p1=Math.sin(WW*dm.t),p2=Math.sin(WW*dm.t-Math.PI/2),o2=.25+.75*Math.abs(p2),o1=(L?Math.min(1,.25+.75*L):0)*Math.abs(p1);
+dm.a=(dm.a+L*.9*360*dt)%360;$("dr").setAttribute("transform","translate(470 285) scale(1 .2) rotate("+dm.a.toFixed(1)+")");
+dflip("dfa",p2,o2,259);dflip("dfc",p2,o2,259);dflip("dfb",-p2,o2,245);dflip("dga",p1,o1,363);dflip("dgb",-p1,o1,363);
+$("dpc").style.opacity=.55+.45*Math.abs(p2);$("dsa").style.opacity=$("dsb").style.opacity=.55+.45*o1;$("ded").style.opacity=.15+.85*L*Math.abs(p1);
+dm.r+=L*dt*.02;$("drg").textContent=("0000"+dm.r.toFixed(2)).slice(-7)}
+$("ad").onclick=function(){var c=$("ci").value;if(run){msg("m2","Press Stop on the stopwatch first.","bad");return}if(simT<30){msg("m2","Let the stopwatch run for about one minute (00:01:00) before pressing Stop.","bad");return}if(c===""){msg("m2","Enter the blink count first.","bad");return}c=+c;if(Math.abs(c-cnt)>2){msg("m2","Your count does not match the meter blinks. Recount using the count aid and try again.","bad");return}
+var n=+$("nb").value,V=+(230+.4*Math.sin(performance.now()/900)).toFixed(1),I=+(100*n/V).toFixed(2),A=V*I*(simT/3600)/1000,R=c/3200;
+data.push({V:V,I:I,T:simT,N:c,A:A,R:R,e:(R-A)/A*100});var tt=fmt(simT);$("ci").value="";rst();render();msg("m2","Reading added (time used: "+tt+"). Change the lamps and repeat.","ok")};
+$("rs").onclick=function(){wires=[];ok=false;sel=null;data=[];rst();reg=0;$("nb").value=0;$("ci").value="";msg("m1","");msg("m2","");if(mcb)$("lv").onclick();draw();render()};
+// tables, graph, model
+var sg=function(x){return(x>0?"+":"")+x.toFixed(2)};
+function body(id,rows){$(id).querySelector("tbody").innerHTML=rows.map(function(r){return"<tr>"+r.map(function(x){return"<td>"+x+"</td>"}).join("")+"</tr>"}).join("")}
+function plot(){var g=$("gr"),W=640,H=270,L=56,Rr=18,Tp=16,B=46,pw2=W-L-Rr,ph=H-Tp-B;
+var pts=data.map(function(d){return[d.V*d.I/1000,d.e]}).sort(function(a,b){return a[0]-b[0]});
+var mx=1,me=0;pts.forEach(function(p){mx=Math.max(mx,Math.ceil(p[0]*5)/5);me=Math.max(me,Math.abs(p[1]))});var ym=Math.max(5,Math.ceil(me/5)*5);
+var X=function(v){return L+v/mx*pw2},Y=function(e){return Tp+(ym-e)/(2*ym)*ph};
+var h2='<rect x="'+L+'" y="'+Y(1)+'" width="'+pw2+'" height="'+(Y(-1)-Y(1))+'" fill="var(--teal)" opacity=".18"/>';
+[-ym,-ym/2,0,ym/2,ym].forEach(function(e){h2+='<line x1="'+L+'" x2="'+(L+pw2)+'" y1="'+Y(e)+'" y2="'+Y(e)+'" stroke="'+(e===0?"var(--ink)":"var(--line)")+'" stroke-width="'+(e===0?1.5:1)+'"/><text x="'+(L-8)+'" y="'+(Y(e)+4)+'" text-anchor="end" font-size="12" style="fill:var(--mute)">'+e+'</text>'});
+for(var v=0;v<=mx+1e-9;v+=.2)h2+='<line x1="'+X(v)+'" x2="'+X(v)+'" y1="'+Tp+'" y2="'+(Tp+ph)+'" stroke="var(--line)" stroke-dasharray="3 4"/><text x="'+X(v)+'" y="'+(Tp+ph+18)+'" text-anchor="middle" font-size="12" style="fill:var(--mute)">'+v.toFixed(1)+'</text>';
+h2+='<text x="'+(L+pw2/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="13" font-weight="600">Load (kW)</text><text transform="translate(14 '+(Tp+ph/2)+') rotate(-90)" text-anchor="middle" font-size="13" font-weight="600">Relative error (%)</text><text x="'+(L+pw2-4)+'" y="'+(Y(1)-4)+'" text-anchor="end" font-size="11" style="fill:var(--teal)">class 1.0 limit ±1%</text>';
+if(!pts.length)h2+='<text x="'+(L+pw2/2)+'" y="'+(Tp+ph/2-14)+'" text-anchor="middle" font-size="14" style="fill:var(--mute)">Add readings to see the graph</text>';
+else{h2+='<polyline fill="none" stroke="var(--teal)" stroke-width="2.5" points="'+pts.map(function(p){return X(p[0])+","+Y(p[1])}).join(" ")+'"/>';
+pts.forEach(function(p){var bad=Math.abs(p[1])>1;h2+='<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="5.5" fill="'+(bad?"var(--red)":"var(--teal)")+'" stroke="var(--card)" stroke-width="1.5"/><text x="'+X(p[0])+'" y="'+(Y(p[1])+(p[1]>=0?-11:20))+'" text-anchor="middle" font-size="12" font-weight="600">'+sg(p[1])+'</text>'})}
+g.innerHTML=h2;
+if(data.length){var m=data.reduce(function(s,d){return s+d.e},0)/data.length,ma=data.reduce(function(s,d){return s+Math.abs(d.e)},0)/data.length;msg("gm","Mean error "+sg(m)+" %, mean absolute error "+ma.toFixed(2)+" % over "+data.length+" reading"+(data.length>1?"s":"")+".")}else msg("gm","")}
+function model(){var k=+$("mc").value,d=data[k],el=$("mt");if(!d){el.textContent="Add a reading to see its worked calculation.";return}
+var th=d.T/3600,P=d.V*d.I,lim=Math.abs(d.e)<=1;
+el.innerHTML="<b>Reading "+(k+1)+"</b>\nGiven    V = "+d.V.toFixed(1)+" V,  I = "+d.I.toFixed(2)+" A,  T = "+(d.T/60).toFixed(2)+" min = "+th.toFixed(5)+" h\n         Impulses N = "+d.N+",  Meter constant K = 3200 imp/kWh\n\n<b>Step 1  Power</b>\n         P = V × I = "+d.V.toFixed(1)+" × "+d.I.toFixed(2)+" = "+P.toFixed(1)+" W\n<b>Step 2  Actual energy</b>\n         A = V × I × T / 1000 = "+P.toFixed(1)+" × "+th.toFixed(5)+" / 1000 = "+d.A.toFixed(5)+" kWh\n<b>Step 3  Recorded energy</b>\n         R = N / K = "+d.N+" / 3200 = "+d.R.toFixed(5)+" kWh\n<b>Step 4  Relative error</b>\n         e = (R − A) / A × 100 = ("+d.R.toFixed(5)+" − "+d.A.toFixed(5)+") / "+d.A.toFixed(5)+" × 100 = "+sg(d.e)+" %\n\nResult   The meter runs "+(d.e>0?"fast":"slow")+" by "+Math.abs(d.e).toFixed(2)+" %, which is "+(lim?"within":"outside")+" the ±1 % limit of a class 1.0 meter."}
+$("mc").onchange=model;
+function render(){body("tb",data.map(function(d,i){return[i+1,(d.V*d.I/1000).toFixed(2),d.V.toFixed(1),d.I.toFixed(2),d.N,d.A.toFixed(5),d.R.toFixed(5),sg(d.e)]}));
+body("tt",data.map(function(d,i){return[i+1,d.V.toFixed(1),d.I.toFixed(2),(d.V*d.I).toFixed(1),(d.T/60).toFixed(2),d.A.toFixed(5),(d.A*3200).toFixed(1)]}));
+msg("tn",data.length?"":"No readings yet. Add readings from the bench above.");
+var s=$("mc"),keep=Math.min(+s.value||0,Math.max(0,data.length-1));s.innerHTML=data.map(function(d,i){return'<option value="'+i+'">Reading '+(i+1)+"</option>"}).join("");s.value=keep;plot();model()}
+Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(b){b.onclick=function(){Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.classList.toggle("on",x===b)});Array.prototype.forEach.call(document.querySelectorAll(".pn"),function(p){p.classList.toggle("on",p.id==="p-"+b.getAttribute("data-p"))});theoOn=b.getAttribute("data-p")==="theo"}});
+draw();render();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

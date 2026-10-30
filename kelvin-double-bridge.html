@@ -1,0 +1,67 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kelvin Double Bridge | Virtual Lab</title><style>
+:root{--ink:#2B2526;--rule:#C8C3B6;--paper:#FBF9F3;--page:#EFEBE1;--ok:#2F6B45;--bad:#8F3A45;--mute:#5E5558}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,Arial,sans-serif}
+.sheet{max-width:980px;margin:0 auto;background:var(--paper);border-left:1px solid var(--rule);border-right:1px solid var(--rule);padding:8px 22px 22px}
+.back{display:block;padding:8px 0;color:var(--ink);font-size:14px}
+h1{font:600 25px/1.25 Georgia,"Times New Roman",serif;margin:4px 0 2px}.sub{color:var(--mute);margin:0 0 6px}
+h2{font:600 17px Georgia,"Times New Roman",serif;border-bottom:1px solid var(--rule);padding-bottom:3px;margin:20px 0 10px}
+.g{display:grid;grid-template-columns:1fr;gap:16px}@media(min-width:800px){.g{grid-template-columns:1.15fr 1fr}}
+.fig{border:1px solid var(--rule);background:#fff;padding:6px}.cap{font:italic 13px Georgia,serif;color:var(--mute);text-align:center;margin:3px 0 0}svg{display:block;width:100%;height:auto}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 9px}.row label{display:flex;align-items:center;gap:6px}.lb{min-width:112px;font-weight:600}
+input[type=range]{accent-color:var(--ink)}select{font:inherit;border:1px solid var(--ink);background:#fff;padding:2px 6px;border-radius:2px}
+button{font:inherit;font-size:14px;border:1px solid var(--ink);background:#fff;color:var(--ink);padding:3px 10px;cursor:pointer;border-radius:2px}button:hover{background:#EFE9DC}button.p{background:var(--ink);color:#fff}
+.box{border:1px solid var(--ink);background:#fff;padding:4px 10px;min-width:118px}.box small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}.box b{font:600 18px ui-monospace,Consolas,monospace}
+.bar{height:10px;border:1px solid var(--ink);background:#fff;margin-top:3px}.bar i{display:block;height:100%;background:var(--ink);width:0}
+.msg{min-height:20px;font-size:14px;color:var(--mute);margin-top:6px}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;min-width:640px}th,td{border:1px solid var(--rule);padding:5px 6px;text-align:center}th{background:#EFEBE1;font-weight:600}.tw{overflow-x:auto}
+.eq{font:italic 16px Georgia,serif;padding:8px 14px;border-left:3px solid var(--ink);background:#fff;margin:8px 0;line-height:1.9}ol,ul{padding-left:22px;margin:6px 0}
+footer{text-align:center;color:var(--mute);font-size:12px;padding:14px}
+</style></head><body>
+<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
+<div class="sheet"><a class="back" href="index.html">← Back to Virtual Laboratory</a><h1>Kelvin Double Bridge</h1><p class="sub">Measurement of a low resistance</p><h2>1. Circuit and measurement</h2><div class="g"><div><div class="fig" id="fg"></div><p class="cap">Fig. 1  Kelvin double bridge for low resistance</p></div><div>
+<div class="row"><label class="lb">Ratio P/Q = p/q</label><select id="rt"><option>0.1</option><option selected>1</option><option>10</option></select></div>
+<div class="row"><label class="lb">Standard S</label><input id="sv" type="range" min="0" max="1" step="0.0001" value="0.5" style="width:150px"><b id="sl" style="font-family:ui-monospace,Consolas,monospace">0.5000 Ω</b></div>
+<div class="row"><button data-d="-0.01">−0.01</button><button data-d="-0.001">−0.001</button><button data-d="-0.0001">−0.0001</button><button data-d="0.0001">+0.0001</button><button data-d="0.001">+0.001</button><button data-d="0.01">+0.01</button></div>
+<div class="row"><label class="lb">Yoke resistance r</label><select id="yr"><option value="0">0 Ω</option><option value="0.002" selected>0.002 Ω</option><option value="0.01">0.01 Ω</option></select></div>
+<div class="row"><label class="lb">Inner arm mismatch</label><input id="mm" type="range" min="-5" max="5" step="0.5" value="0" style="width:120px"><b id="ml">0%</b></div>
+<div class="row"><div class="box"><small>Galvanometer</small><b id="gd">0.0 div</b></div><div class="box"><small>Status</small><b id="st">-</b></div></div>
+<div class="row"><button class="p" id="rec">Record reading</button><button id="nr">New unknown Rx</button><button id="rs">Clear table</button></div><div class="msg" id="mg"></div></div></div>
+<h2>2. Observations</h2><div class="tw"><table id="tb"><thead><tr><th>S.No.</th><th>P/Q</th><th>S (Ω)</th><th>R<sub>x</sub> = S·P/Q (Ω)</th><th>Actual R<sub>x</sub> (Ω)</th><th>Error (%)</th></tr></thead><tbody></tbody></table></div>
+<h2>3. Theory</h2><p>Resistances below about 1 Ω are measured with a four-terminal standard and unknown, joined by a short thick link (yoke) of resistance r. The second pair of ratio arms, p and q, removes the effect of this link.</p>
+<div class="eq">R<sub>x</sub> = S·(P/Q) + [ q·r / (p + q + r) ] · (P/Q − p/q)</div>
+<p>When the two ratios are made equal, P/Q = p/q, the second term is zero and the result does not depend on r:</p><div class="eq">R<sub>x</sub> = S · P/Q</div>
+<h2>4. Procedure</h2><ol><li>Select the ratio P/Q = p/q and the yoke resistance r.</li><li>Adjust the standard resistor S with the slider and the step buttons until the galvanometer reads zero.</li><li>Press <i>Record reading</i>. R<sub>x</sub> = S × P/Q is entered in the table and compared with the actual value.</li><li>Increase the inner arm mismatch and null the bridge again. Note how the yoke resistance now changes the result.</li><li>Press <i>New unknown Rx</i> and repeat. If no balance is possible, change the ratio.</li></ol></div><footer>E.G.S. Pillay Engineering College · Virtual Electrical Measurements Laboratory</footer><script>var NS="http://www.w3.org/2000/svg",INK="#2B2526";
+function f(n){return n.toFixed(1)}function P(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}function M(p){return"M"+f(p[0])+" "+f(p[1])}function L(p){return"L"+f(p[0])+" "+f(p[1])}
+function nr(a,b){var dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return[-dy/l,dx/l]}function off(p,n,s){return[p[0]+n[0]*s,p[1]+n[1]*s]}
+function wire(){var d="";for(var i=0;i<arguments.length;i++)d+=(i?L:M)(arguments[i]);return'<path d="'+d+'"/>'}
+function sym(type,a,b,v){var n=nr(a,b),u=[(b[0]-a[0])/Math.hypot(b[0]-a[0],b[1]-a[1]),(b[1]-a[1])/Math.hypot(b[0]-a[0],b[1]-a[1])],d=M(a),i,t,p,s='';
+if(type==="r"){d+=L(P(a,b,.2));for(i=0;i<6;i++){t=.2+.6*(i+.5)/6;p=off(P(a,b,t),n,i%2?-6:6);d+=L(p)}d+=L(P(a,b,.8))+L(b)}
+else if(type==="l"){d+=L(P(a,b,.16));for(i=0;i<4;i++){var t0=.16+.68*i/4,t1=.16+.68*(i+1)/4,m=off(P(a,b,(t0+t1)/2),n,-17);d+="Q"+f(m[0])+" "+f(m[1])+" "+f(P(a,b,t1)[0])+" "+f(P(a,b,t1)[1])}d+=L(b)}
+else if(type==="c"){d+=L(P(a,b,.45))+M(P(a,b,.55))+L(b)+M(off(P(a,b,.45),n,12))+L(off(P(a,b,.45),n,-12))+M(off(P(a,b,.55),n,12))+L(off(P(a,b,.55),n,-12))}
+s='<path d="'+d+'"/>';
+if(v){var c=P(a,b,.5),e=off(off(c,n,17),u,11),st=off(off(c,n,-17),u,-11),hb=[e[0]-(e[0]-st[0])*.2,e[1]-(e[1]-st[1])*.2],hn=nr(st,e);s+='<path d="'+M(st)+L(e)+'"/><path fill="'+INK+'" d="'+M(e)+L(off(hb,hn,3.5))+L(off(hb,hn,-3.5))+'Z"/>'}return s}
+function dot(p){return'<circle cx="'+f(p[0])+'" cy="'+f(p[1])+'" r="3.4" fill="'+INK+'" stroke="none"/>'}
+function lbl(x,y,m,sub,an){return'<text x="'+x+'" y="'+y+'" text-anchor="'+(an||"middle")+'" font-family="Georgia,serif" font-style="italic" font-size="17" fill="'+INK+'" stroke="none">'+m+(sub?'<tspan font-size="11" dy="4" font-style="normal">'+sub+'</tspan>':'')+'</text>'}
+function txt(x,y,s,an,sz){return'<text x="'+x+'" y="'+y+'" text-anchor="'+(an||"middle")+'" font-family="Segoe UI,Arial,sans-serif" font-size="'+(sz||12)+'" fill="#5E5558" stroke="none">'+s+'</text>'}
+function det(c,r,ch){return'<circle cx="'+c[0]+'" cy="'+c[1]+'" r="'+r+'" fill="#fff"/><g id="nd"><line x1="'+c[0]+'" y1="'+c[1]+'" x2="'+c[0]+'" y2="'+(c[1]-r+4)+'" stroke="#8F3A45" stroke-width="2.2"/></g><circle cx="'+c[0]+'" cy="'+c[1]+'" r="2.6" fill="'+INK+'" stroke="none"/>'+(ch?'<text x="'+c[0]+'" y="'+(c[1]+r-5)+'" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="12" fill="'+INK+'" stroke="none">'+ch+'</text>':'')}
+function svg(w,h,body){return'<svg viewBox="0 0 '+w+' '+h+'" fill="none" stroke="'+INK+'" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">'+body+'</svg>'}
+var Rx,rows=[],$=function(i){return document.getElementById(i)};
+var A=[100,210],B=[200,210],C=[280,210],D=[380,210],CC=[240,50],DD=[240,140],GC=[240,95];
+$("fg").innerHTML=svg(480,340,
+ sym("r",A,B)+sym("r",B,C)+sym("r",C,D,1)+
+ wire(A,[100,50])+sym("r",[100,50],[240,50])+wire([240,50],[240,79])+det(GC,16,"G")+wire([240,111],DD)+wire([380,50],[380,210])+sym("r",[380,50],[240,50])+
+ sym("r",B,[200,140])+wire([200,140],DD)+sym("r",C,[280,140])+wire([280,140],DD)+
+ wire(A,[100,300],[140,300])+'<path d="M140 300H156M156 286V314M166 292V308M166 300H180"/>'+wire([180,300],[210,300])+sym("r",[210,300],[330,300],1)+wire([330,300],[380,300],D)+
+ dot(A)+dot(B)+dot(C)+dot(D)+dot(CC)+dot(DD)+
+ lbl(170,40,"P")+lbl(310,40,"Q")+lbl(150,238,"R","x")+lbl(240,238,"r")+lbl(330,238,"S")+lbl(270,326,"R","h")+lbl(160,326,"E")+lbl(186,182,"p","","end")+lbl(294,182,"q","","start")+txt(252,44,"C","start")+txt(252,156,"D","start")+txt(160,236,"")+txt(240,262,"yoke",null,11));
+function sbal(){var q=100,rt=+$("rt").value,pq=rt*(1+ +$("mm").value/100),r=+$("yr").value;return(Rx-(q*r/(q*pq+q+r))*(rt-pq))/rt}
+function nr0(){Rx=Math.round((0.02+Math.random()*0.88)*1000)/1000;$("mg").textContent=""}
+function dv(){return(+$("sv").value-sbal())*1500}
+function upd(){var d=dv(),c=Math.max(-50,Math.min(50,d)),b=Math.abs(d)<.3;$("sl").textContent=(+$("sv").value).toFixed(4)+" Ω";$("ml").textContent=$("mm").value+"%";$("nd").setAttribute("transform","rotate("+c/50*60+" 240 95)");$("gd").textContent=(d>0?"+":"")+d.toFixed(1)+" div";$("st").textContent=b?"Balanced":"Off balance";$("st").style.color=b?"#2F6B45":"#8F3A45"}
+["rt","sv","yr","mm"].forEach(function(i){$(i).oninput=upd});
+Array.prototype.forEach.call(document.querySelectorAll("button[data-d]"),function(b){b.onclick=function(){$("sv").value=Math.max(0,Math.min(1,+$("sv").value+ +b.dataset.d)).toFixed(4);upd()}});
+$("nr").onclick=function(){nr0();upd()};
+$("rec").onclick=function(){var m=$("mg");if(Math.abs(dv())>=.3){m.className="msg bad";m.textContent="The bridge is not balanced. Adjust S until the galvanometer reads zero, or change the ratio if no balance is possible.";return}
+var rt=+$("rt").value,s=+$("sv").value,x=s*rt,e=(x-Rx)/Rx*100;rows.push([rows.length+1,rt,s.toFixed(4),x.toFixed(4),Rx.toFixed(4),(e>0?"+":"")+e.toFixed(2)]);
+$("tb").querySelector("tbody").innerHTML=rows.map(function(r){return"<tr>"+r.map(function(v){return"<td>"+v+"</td>"}).join("")+"</tr>"}).join("");m.className="msg ok";m.textContent="Reading recorded."};
+$("rs").onclick=function(){rows=[];$("tb").querySelector("tbody").innerHTML=""};nr0();upd();</script></body></html>

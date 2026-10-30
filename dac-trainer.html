@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAC Trainer Kit — Virtual Lab</title>
+<style>
+:root{--pink:#FFEAF2;--charcoal:#382F32;--sage:#BCBDAC;--cream:#F4EAD5;--mint:#BCE3C5;--muted:#665b5e;--line:#BCBDAC}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--charcoal);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:var(--charcoal);color:var(--pink);border-bottom:4px solid var(--sage);padding:20px 15px 18px;text-align:center}
+header h1{margin:0 0 5px;font-size:clamp(22px,4vw,30px);font-weight:650;letter-spacing:0}
+header p{margin:0;color:var(--pink);font-size:14px}
+main{max-width:1150px;margin:18px auto;padding:0 13px 28px;display:grid;gap:15px}
+.card{background:var(--pink);border:1px solid var(--sage);border-radius:14px;padding:17px;box-shadow:0 4px 14px #382F3210}
+h2{margin:0 0 12px;font-size:19px;color:var(--charcoal)}
+.sub,.muted{font-size:13px;color:var(--muted)}
+.sub{margin:-6px 0 14px}
+.kit{background:var(--sage);padding:12px;border-radius:12px;border:1px solid #a2a492;box-shadow:inset 0 1px 0 var(--cream),0 7px 18px #382F3215}
+.kithead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 9px 12px;font-weight:800;letter-spacing:1px;color:var(--charcoal)}
+.kithead small{font-size:11px;letter-spacing:.6px;color:var(--muted)}
+.panelgrid{display:grid;grid-template-columns:1fr;gap:11px}
+.panel{background:var(--cream);border:1px solid #a2a492;border-radius:8px;padding:13px;min-width:0}
+.label{font-size:11px;letter-spacing:.7px;font-weight:800;color:#5b5053;margin-bottom:8px}
+.display{background:#242629;border:4px solid #7c817a;border-radius:6px;color:var(--mint);font:700 clamp(23px,4vw,32px) ui-monospace,Consolas,monospace;text-align:center;letter-spacing:2px;padding:12px;text-shadow:0 0 7px #BCE3C5}
+.unit{text-align:center;font-size:12px;color:var(--muted);margin-top:4px}
+.diagram{width:100%;height:auto;display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px}
+.tile{background:var(--cream);border:1px solid var(--sage);border-radius:10px;padding:12px;min-width:0}
+.tile small{display:block;color:var(--muted);margin-bottom:5px}
+.value{font-size:clamp(21px,3vw,28px);font-weight:800;color:var(--charcoal);overflow-wrap:anywhere}
+input[type=range]{width:100%;accent-color:var(--charcoal)}
+input[type=number]{width:100%;padding:9px 10px;border:1px solid var(--sage);border-radius:8px;font:inherit;background:#fff9f8;color:var(--charcoal)}
+.controls{display:grid;grid-template-columns:1fr;gap:12px}
+.control{padding:13px;border:1px solid var(--sage);border-radius:11px;background:var(--cream)}
+.control label{font-weight:750;display:block;margin-bottom:5px}
+button{border:0;border-radius:8px;padding:10px 13px;font:700 14px system-ui;cursor:pointer;background:var(--charcoal);color:var(--pink);margin:4px 4px 4px 0}
+button.mint{background:var(--mint);color:var(--charcoal);box-shadow:0 2px 0 #8fb69a}
+button.sage{background:var(--sage);color:var(--charcoal)}
+button:active{transform:translateY(1px)}
+.bitgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.bit{border:1px solid var(--sage);background:#fff7f8;border-radius:9px;text-align:center;padding:8px 3px}
+.bit b{display:block;font-size:13px;margin-bottom:6px}
+.bit button{width:100%;margin:0;padding:9px 2px;background:#deded6;color:var(--charcoal)}
+.bit button.on{background:var(--mint);box-shadow:inset 0 0 0 2px #87b794}
+.status{display:inline-block;padding:5px 9px;border-radius:50px;background:var(--mint);color:var(--charcoal);font-size:12px;font-weight:750}
+canvas{display:block;width:100%;height:290px;border:1px solid var(--sage);border-radius:9px;background:#fff9f8}
+.tablewrap{overflow:auto}table{width:100%;min-width:520px;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #ddd8ca}th{background:var(--sage);color:var(--charcoal);font-size:13px}tbody tr:nth-child(even){background:#fff6f8}
+.formulas{display:grid;grid-template-columns:1fr;gap:9px}.formula{background:var(--cream);border:1px solid var(--sage);padding:12px;border-radius:9px}
+.note{background:var(--cream);border-left:4px solid var(--sage);padding:11px 13px;border-radius:6px}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:0 10px 20px}
+@media(min-width:720px){main{padding-left:20px;padding-right:20px}.card{padding:21px}.panelgrid{grid-template-columns:1.05fr .95fr}.controls{grid-template-columns:1fr 1fr}.bitgrid{grid-template-columns:repeat(8,minmax(0,1fr))}.formulas{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
+
+<header><h1>Digital-to-Analog Converter (DAC) Trainer</h1><p>8-bit digital input · Analog voltage output · Virtual instrumentation lab</p></header>
+<div style="max-width:1180px;margin:10px auto 0;padding:0 13px"><a href="index.html" style="color:#382F32;font-weight:700;text-decoration:none">← Back to Virtual Laboratory</a></div>
+<main>
+<section class="card">
+<h2>DAC trainer kit — front panel</h2>
+<p class="sub">Generic unbranded trainer layout inspired by a teaching laboratory instrument.</p>
+<div class="kit">
+<div class="kithead"><span>DIGITAL TO ANALOG CONVERTER</span><small>INSTRUMENTATION LAB · VIRTUAL TRAINER</small></div>
+<div class="panelgrid">
+<div class="panel">
+<div class="label">8-BIT DIGITAL INPUT (D7–D0)</div>
+<div id="frontBits" class="bitgrid"></div>
+<p class="muted">Green switches indicate logic 1. Grey switches indicate logic 0.</p>
+<div class="label" style="margin-top:14px">DIGITAL CODE</div>
+<div class="display"><span id="frontDecimal">128</span></div>
+<div class="unit">DECIMAL INPUT CODE · 0–255</div>
+</div>
+<div class="panel">
+<div class="label">ANALOG OUTPUT VOLTAGE</div>
+<div class="display"><span id="frontVoltage">2.500</span> V</div>
+<div class="unit">DC OUTPUT · IDEAL MODEL</div>
+<svg class="diagram" viewBox="0 0 430 175" aria-label="DAC block diagram">
+<rect x="8" y="20" width="108" height="62" rx="7" fill="#FFEAF2" stroke="#BCBDAC" stroke-width="2"/>
+<text x="62" y="43" text-anchor="middle" font-size="12" fill="#382F32" font-weight="700">DIGITAL</text><text x="62" y="59" text-anchor="middle" font-size="12" fill="#382F32" font-weight="700">INPUT</text><text x="62" y="73" text-anchor="middle" font-size="10" fill="#665b5e">D7–D0</text>
+<path d="M116 51 H153" stroke="#382F32" stroke-width="3"/><path d="M145 44 L154 51 L145 58" fill="none" stroke="#382F32" stroke-width="3"/>
+<rect x="157" y="11" width="123" height="80" rx="7" fill="#BCE3C5" stroke="#849a89" stroke-width="2"/>
+<text x="218" y="38" text-anchor="middle" font-size="13" fill="#382F32" font-weight="800">DAC</text><text x="218" y="55" text-anchor="middle" font-size="11" fill="#382F32">CONVERTER</text><text x="218" y="73" text-anchor="middle" font-size="10" fill="#665b5e">8-bit</text>
+<path d="M280 51 H319" stroke="#382F32" stroke-width="3"/><path d="M311 44 L320 51 L311 58" fill="none" stroke="#382F32" stroke-width="3"/>
+<rect x="323" y="20" width="99" height="62" rx="7" fill="#FFEAF2" stroke="#BCBDAC" stroke-width="2"/>
+<text x="372" y="43" text-anchor="middle" font-size="12" fill="#382F32" font-weight="700">ANALOG</text><text x="372" y="59" text-anchor="middle" font-size="12" fill="#382F32" font-weight="700">OUTPUT</text><text x="372" y="73" text-anchor="middle" font-size="10" fill="#665b5e">Vout</text>
+<path d="M218 91 V119 H164" stroke="#7c817a" stroke-width="2" fill="none"/><path d="M171 113 L163 119 L171 125" stroke="#7c817a" stroke-width="2" fill="none"/>
+<rect x="35" y="132" width="129" height="30" rx="5" fill="#F4EAD5" stroke="#BCBDAC"/><text x="99" y="151" text-anchor="middle" font-size="11" fill="#382F32">REFERENCE VOLTAGE</text>
+<text x="276" y="144" font-size="10" fill="#665b5e">Digital code controls</text><text x="276" y="158" font-size="10" fill="#665b5e">the output level.</text>
+</svg>
+<div class="label">OUTPUT TERMINALS</div>
+<svg viewBox="0 0 360 65" style="width:100%" aria-label="Output terminals">
+<circle cx="38" cy="25" r="14" fill="#382F32" stroke="#241e20" stroke-width="2"/><circle cx="38" cy="25" r="5" fill="#FFEAF2"/>
+<circle cx="88" cy="25" r="14" fill="#BCBDAC" stroke="#8f9481" stroke-width="2"/><circle cx="88" cy="25" r="5" fill="#F4EAD5"/>
+<text x="38" y="52" text-anchor="middle" font-size="10" fill="#382F32">VOUT</text><text x="88" y="52" text-anchor="middle" font-size="10" fill="#382F32">GND</text>
+<text x="130" y="29" font-size="11" fill="#665b5e">Measure VOUT with a voltmeter</text>
+</svg>
+</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>Digital input and reference voltage</h2>
+<div class="controls">
+<div class="control">
+<label>Set decimal input code (0–255)</label>
+<div class="value"><span id="decimalLabel">128</span> / 255</div>
+<input id="decimal" type="range" min="0" max="255" step="1" value="128">
+<input id="decimalNumber" type="number" min="0" max="255" step="1" value="128" aria-label="Decimal DAC input code">
+<div class="actions"><button class="mint" id="zero">All bits OFF</button><button class="mint" id="half">Mid-scale (128)</button><button class="sage" id="full">Full-scale (255)</button></div>
+<p class="muted">You can use the decimal slider or toggle each bit below.</p>
+<div id="bits" class="bitgrid"></div>
+</div>
+<div class="control">
+<label for="reference">Reference voltage (Vref)</label>
+<div class="value"><span id="refLabel">5.00</span> V</div>
+<input id="reference" type="range" min="1" max="5" step="0.1" value="5">
+<div class="grid">
+<div class="tile"><small>Resolution (V/step)</small><div class="value" id="resolution">0.01953</div></div>
+<div class="tile"><small>Output voltage</small><div class="value"><span id="voltage">2.510</span> V</div></div>
+<div class="tile"><small>Binary input</small><div class="value" style="font-size:19px" id="binary">10000000</div></div>
+<div class="tile"><small>Ideal output range</small><div class="value" style="font-size:20px">0–Vref</div></div>
+</div>
+<p><span class="status" id="status">Output updated</span></p>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>DAC transfer characteristic</h2>
+<p class="sub">Digital input code on the X-axis and analog output voltage on the Y-axis.</p>
+<canvas id="chart" width="1000" height="360"></canvas>
+</section>
+
+<section class="card">
+<h2>Observation table</h2>
+<div class="tablewrap"><table><thead><tr><th>S. No.</th><th>Decimal input</th><th>Binary input D7–D0</th><th>Expected output (V)</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="actions"><button id="record">Record current reading</button><button class="sage" id="standard">Add standard codes</button><button class="sage" id="clear">Clear table</button><button class="sage" id="csv">Download CSV</button></div>
+</section>
+
+<section class="card">
+<h2>Formula and working principle</h2>
+<div class="formulas">
+<div class="formula"><b>1. Resolution</b><p>For an 8-bit DAC:</p><p>Resolution = Vref / 256</p></div>
+<div class="formula"><b>2. Ideal output voltage</b><p>Vout = Digital code × Vref / 256</p><p>Digital code range: 0–255</p></div>
+<div class="formula"><b>3. Example</b><p>For code 128 and Vref = 5 V:</p><p>Vout = 128 × 5 / 256 = 2.5 V</p></div>
+</div>
+<p class="note"><b>Note:</b> This is an ideal 8-bit DAC simulation for teaching. Real DAC ICs may use different output scaling, offset, gain and endpoint conventions. Actual lab readings will depend on the DAC module and circuit used.</p>
+</section>
+</main>
+<div class="footer">DAC Virtual Lab · Generic unbranded trainer kit · Suggested for classroom demonstration</div>
+<script>
+const $=id=>document.getElementById(id);
+let records=[];
+function code(){return Math.max(0,Math.min(255,Math.round(Number($('decimal').value)||0)))}
+function ref(){return Number($('reference').value)}
+function vout(d=code(),r=ref()){return d*r/256}
+function binary(d=code()){return d.toString(2).padStart(8,'0')}
+function makeBitButtons(parentId,front=false){const parent=$(parentId);parent.innerHTML='';for(let i=7;i>=0;i--){const box=document.createElement('div');box.className='bit';const b=document.createElement('b');b.textContent='D'+i+(i===7?' · MSB':i===0?' · LSB':'');const btn=document.createElement('button');btn.type='button';btn.dataset.bit=i;btn.id=(front?'front':'')+'bit'+i;btn.addEventListener('click',()=>{let d=code()^(1<<i);$('decimal').value=d;$('decimalNumber').value=d;render()});box.append(b,btn);parent.appendChild(box)}}
+function syncBits(){let d=code();for(let i=0;i<8;i++){const b=$('bit'+i),fb=$('frontbit'+i),on=!!(d&(1<<i));[b,fb].forEach(btn=>{btn.textContent=on?'1 · ON':'0 · OFF';btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',String(on))})}}
+function draw(){const c=$('chart'),ctx=c.getContext('2d'),w=c.width,h=c.height,P={l:63,r:24,t:24,b:48},pw=w-P.l-P.r,ph=h-P.t-P.b;ctx.clearRect(0,0,w,h);ctx.font='13px Arial';ctx.strokeStyle='#e2deda';ctx.fillStyle='#665b5e';ctx.lineWidth=1;for(let i=0;i<=5;i++){let x=P.l+pw*i/5,y=P.t+ph-ph*i/5;ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,P.t+ph);ctx.stroke();ctx.fillText(String(Math.round(255*i/5)),x-10,P.t+ph+22);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+pw,y);ctx.stroke();ctx.fillText((ref()*i/5).toFixed(1),16,y+4)}ctx.strokeStyle='#382F32';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=255;i++){let x=P.l+pw*i/255,y=P.t+ph-ph*vout(i)/ref();if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();let x=P.l+pw*code()/255,y=P.t+ph-ph*vout()/ref();ctx.fillStyle='#79b58c';ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#382F32';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#382F32';ctx.font='bold 13px Arial';ctx.fillText('Analog output voltage (V)',P.l,15);ctx.fillText('Digital input code',w/2-48,h-7)}
+function render(){let d=code(),r=ref(),v=vout(d,r),res=r/256,b=binary(d);$('decimalLabel').textContent=d;$('decimalNumber').value=d;$('refLabel').textContent=r.toFixed(2);$('resolution').textContent=res.toFixed(5);$('voltage').textContent=v.toFixed(4);$('binary').textContent=b;$('frontDecimal').textContent=d;$('frontVoltage').textContent=v.toFixed(4);syncBits();draw()}
+function record(d=code()){records.push({d,b:binary(d),v:vout(d,ref()),r:ref()});renderTable()}
+function renderTable(){$('rows').innerHTML='';records.forEach((rec,i)=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+(i+1)+'</td><td>'+rec.d+'</td><td>'+rec.b+'</td><td>'+rec.v.toFixed(4)+'</td>';$('rows').appendChild(tr)})}
+makeBitButtons('bits');makeBitButtons('frontBits',true);
+$('decimal').addEventListener('input',()=>{$('decimalNumber').value=code();render()});
+$('decimalNumber').addEventListener('change',()=>{$('decimal').value=Math.max(0,Math.min(255,Math.round(Number($('decimalNumber').value)||0)));render()});
+$('reference').addEventListener('input',render);
+$('zero').addEventListener('click',()=>{$('decimal').value=0;render()});
+$('half').addEventListener('click',()=>{$('decimal').value=128;render()});
+$('full').addEventListener('click',()=>{$('decimal').value=255;render()});
+$('record').addEventListener('click',()=>record());
+$('standard').addEventListener('click',()=>[0,32,64,96,128,160,192,224,255].forEach(d=>record(d)));
+$('clear').addEventListener('click',()=>{records=[];renderTable()});
+$('csv').addEventListener('click',()=>{const rows=[['S.No.','Decimal input','Binary input','Vref (V)','Expected output (V)'],...records.map((r,i)=>[i+1,r.d,r.b,r.r.toFixed(2),r.v.toFixed(4)])];const csv=rows.map(row=>row.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='dac_observation_table.csv';a.click();URL.revokeObjectURL(url)});
+render();
+</script>
+</body></html>

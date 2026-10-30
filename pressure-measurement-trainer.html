@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pressure Measurement Trainer — Virtual Lab</title>
+<style>
+:root{--navy:#16394f;--blue:#1874ad;--blue2:#d9eef8;--ink:#1d3444;--muted:#627787;--line:#d0dce4;--paper:#fff;--bg:#eaf0f4;--green:#18805c;--orange:#d28a21;--red:#c84d43}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:#294b5d;color:#fff;padding:20px 16px 18px;text-align:center;border-bottom:4px solid #b7c8d0}
+header h1{font-size:clamp(22px,4vw,30px);font-weight:650;margin:0 0 5px;letter-spacing:0}
+header p{margin:0;color:#e1e9ed;font-size:14px}
+main{max-width:1180px;margin:18px auto;padding:0 13px 30px;display:grid;gap:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 5px 18px #1c3d5010}
+h2{font-size:19px;margin:0 0 13px;color:#173c53}
+.sub{font-size:13px;color:var(--muted);margin:-6px 0 14px}
+.kit-shell{background:linear-gradient(145deg,#c7cdd0,#f1f2ef 42%,#bfc6c9);padding:12px;border-radius:15px;border:1px solid #a8b3b8;box-shadow:inset 0 1px 0 #fff,0 8px 22px #102f431c}
+.kit-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 9px 12px;color:#274757;font-weight:800;letter-spacing:1.1px}
+.kit-title span:last-child{font-size:11px;letter-spacing:.7px;color:#687983}
+.diagram{display:grid;grid-template-columns:1fr;gap:12px}
+.visual-box{background:linear-gradient(#f9faf8,#e8eceb);border:1px solid #aeb9bc;border-radius:9px;padding:6px;min-width:0;box-shadow:inset 0 1px 3px #6a7f8717}
+.visual-box svg{width:100%;height:auto;display:block}
+.system-label{font-size:11px;fill:#334c59;font-weight:700;letter-spacing:.5px}
+.digital{font:700 29px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:2px;fill:#62ff9b}
+.small-digital{font:700 21px ui-monospace,SFMono-Regular,Consolas,monospace;fill:#62ff9b}
+.kit-bottom{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.mini-panel{background:linear-gradient(#fafbf8,#e4e8e6);border:1px solid #aeb9bc;border-radius:8px;padding:12px}
+.mini-panel strong{display:block;font-size:12px;letter-spacing:.6px;color:#405866;margin-bottom:7px}
+.control-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.control{padding:13px;border:1px solid var(--line);border-radius:12px;background:#fbfdfe}
+.control label{font-weight:750;display:block;margin-bottom:5px}
+.big{font-size:27px;font-weight:800;color:var(--blue);line-height:1.25}
+input[type=range]{width:100%;accent-color:var(--blue);margin:9px 0}
+input[type=number]{width:100%;padding:9px 10px;border:1px solid #c8d5dd;border-radius:8px;font:inherit}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+button{border:0;border-radius:9px;padding:10px 14px;font:700 14px system-ui;cursor:pointer;background:var(--blue);color:#fff;box-shadow:0 2px 0 #0c4c78}
+button:hover{filter:brightness(1.04)}button:active{transform:translateY(1px)}
+button.green{background:var(--green);box-shadow:0 2px 0 #0c5c40}button.light{background:#e6eef3;color:#243f50;box-shadow:0 2px 0 #c6d5de}
+.status{display:inline-block;border-radius:50px;padding:5px 10px;font-weight:750;font-size:12px;background:#e4f6ec;color:#11714f}
+.status.warn{background:#fff0db;color:#925a08}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.metric{background:#f5f9fb;border:1px solid var(--line);padding:12px;border-radius:11px;min-width:0}
+.metric small{display:block;color:var(--muted);margin-bottom:5px}
+.metric strong{display:block;font-size:clamp(19px,3vw,26px);color:#176fa7;overflow-wrap:anywhere}
+.metric .unit{font-size:12px;color:var(--muted);font-weight:500}
+canvas{display:block;width:100%;height:300px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.table-wrap{overflow-x:auto}table{width:100%;min-width:590px;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #e0e7ec}th{background:#eff5f8;color:#365061;font-size:13px}tbody tr:nth-child(even){background:#fafcfd}
+.formula-grid{display:grid;grid-template-columns:1fr;gap:9px}.formula{background:#f3f8fb;border:1px solid #e0e9ee;border-radius:10px;padding:12px}
+.note{border-left:4px solid var(--orange);padding:11px 13px;background:#fff8e9;border-radius:7px;margin:12px 0 0}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:0 10px 20px}
+@media(min-width:760px){main{padding-left:20px;padding-right:20px}.card{padding:21px}.diagram{grid-template-columns:1.12fr .88fr}.kit-bottom{grid-template-columns:repeat(3,1fr)}.control-grid{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.formula-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* User-provided palette: #FFEAF2 #382F32 #BCBDAC #F4EAD5 #BCE3C5 */
+:root {
+  --navy: #382F32;
+  --blue: #382F32;
+  --blue2: #FFEAF2;
+  --ink: #382F32;
+  --muted: #665b5e;
+  --line: #BCBDAC;
+  --paper: #FFEAF2;
+  --bg: #F4EAD5;
+  --green: #BCE3C5;
+  --orange: #BCBDAC;
+  --red: #382F32;
+}
+body { background: #F4EAD5; color: #382F32; }
+header {
+  background: #382F32;
+  color: #FFEAF2;
+  border-bottom: 4px solid #BCBDAC;
+}
+header p { color: #FFEAF2; }
+.card { background: #FFEAF2; border-color: #BCBDAC; box-shadow: 0 4px 14px #382F3210; }
+h2 { color: #382F32; }
+.kit-shell {
+  background: #BCBDAC;
+  border-color: #9fa18f;
+  box-shadow: inset 0 1px 0 #F4EAD5, 0 8px 18px #382F3216;
+}
+.kit-title { color: #382F32; }
+.kit-title span:last-child { color: #665b5e; }
+.visual-box, .mini-panel {
+  background: #F4EAD5;
+  border-color: #BCBDAC;
+  box-shadow: none;
+}
+.control { background: #F4EAD5; border-color: #BCBDAC; }
+.metric { background: #F4EAD5; border-color: #BCBDAC; }
+.control label, .metric strong, .big { color: #382F32; }
+input[type=range] { accent-color: #382F32; }
+input[type=number] { background: #FFF8F4; border-color: #BCBDAC; color: #382F32; }
+button { background: #382F32; color: #FFEAF2; box-shadow: 0 2px 0 #241e20; }
+button.green { background: #BCE3C5; color: #382F32; box-shadow: 0 2px 0 #8fb69a; }
+button.light { background: #BCBDAC; color: #382F32; box-shadow: 0 2px 0 #a2a492; }
+.status { background: #BCE3C5; color: #382F32; }
+.status.warn { background: #F4EAD5; color: #382F32; border: 1px solid #BCBDAC; }
+.digital { fill: #BCE3C5; }
+.small-digital { fill: #BCE3C5; }
+th { background: #BCBDAC; color: #382F32; }
+tbody tr:nth-child(even) { background: #FFF6F8; }
+.formula { background: #F4EAD5; border-color: #BCBDAC; }
+.note { background: #F4EAD5; border-left-color: #BCBDAC; color: #382F32; }
+canvas { border-color: #BCBDAC; }
+.display { border-color: #BCBDAC; }
+.footer { color: #665b5e; }
+
+</style>
+</head>
+<body>
+<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
+
+<header>
+  <h1>Pressure Measurement Trainer Kit</h1>
+  <p>Interactive virtual laboratory · Strain-gauge transducer · 0–100 psi · 0–5 V</p>
+</header>
+<div style="max-width:1180px;margin:10px auto 0;padding:0 13px"><a href="index.html" style="color:#382F32;font-weight:700;text-decoration:none">← Back to Virtual Laboratory</a></div>
+<main>
+<section class="card">
+  <h2>Trainer kit — equipment layout</h2>
+  <p class="sub">Use the controls below to operate the virtual pressure system. The drawing is an illustrative generic kit, without manufacturer branding.</p>
+  <div class="kit-shell">
+    <div class="kit-title"><span>PRESSURE MEASUREMENT TRAINER</span><span>INSTRUMENTATION LAB · MODEL VIEW</span></div>
+    <div class="diagram">
+      <div class="visual-box">
+        <svg viewBox="0 0 560 390" role="img" aria-label="Pressure tank, pressure gauge, valve and foot pump">
+          <defs>
+            <linearGradient id="tankmetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fafb"/><stop offset=".35" stop-color="#aebbc1"/><stop offset=".58" stop-color="#e5e9eb"/><stop offset="1" stop-color="#87979e"/></linearGradient>
+            <linearGradient id="pumpmetal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7d8d94"/><stop offset=".45" stop-color="#f4f6f6"/><stop offset="1" stop-color="#88979c"/></linearGradient>
+            <linearGradient id="gaugeface" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#edf2f4"/></linearGradient>
+            <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#4b5e66" flood-opacity=".27"/></filter>
+          </defs>
+          <rect x="7" y="7" width="546" height="376" rx="10" fill="#f3f5f2" stroke="#bdc8ca"/>
+          <text x="24" y="31" class="system-label">PRESSURE GENERATION ASSEMBLY</text>
+          <!-- pressure gauge -->
+          <g filter="url(#shadow)">
+            <circle cx="142" cy="106" r="59" fill="#7c8e95" stroke="#526872" stroke-width="2"/>
+            <circle cx="142" cy="106" r="51" fill="url(#gaugeface)" stroke="#d5dfe2" stroke-width="3"/>
+            <path d="M105 129 A43 43 0 0 1 179 129" fill="none" stroke="#c5d2d7" stroke-width="2"/>
+            <g id="gaugeTicks"></g>
+            <line id="gaugeNeedle" x1="142" y1="106" x2="142" y2="69" stroke="#c64237" stroke-width="3.8" stroke-linecap="round"/>
+            <circle cx="142" cy="106" r="5" fill="#344e59"/>
+            <text x="142" y="132" text-anchor="middle" font-size="10" fill="#304b58" font-weight="700"><tspan id="gaugeNum">0</tspan> psi</text>
+          </g>
+          <text x="142" y="178" text-anchor="middle" class="system-label">BOURDON GAUGE</text>
+          <!-- tank -->
+          <g filter="url(#shadow)">
+            <rect x="50" y="226" width="292" height="78" rx="38" fill="url(#tankmetal)" stroke="#65777e" stroke-width="2"/>
+            <ellipse cx="66" cy="265" rx="16" ry="36" fill="#bec9cd" stroke="#71838a" stroke-width="1.5"/>
+            <ellipse cx="327" cy="265" rx="14" ry="35" fill="#9baab0" stroke="#71838a" stroke-width="1.5"/>
+            <path d="M80 238 Q190 223 308 238" fill="none" stroke="#fff" stroke-width="4" opacity=".7"/>
+            <rect x="106" y="301" width="22" height="22" rx="3" fill="#819198" stroke="#66777d"/>
+            <rect x="264" y="301" width="22" height="22" rx="3" fill="#819198" stroke="#66777d"/>
+            <rect x="92" y="319" width="52" height="8" rx="3" fill="#6f8087"/>
+            <rect x="250" y="319" width="52" height="8" rx="3" fill="#6f8087"/>
+          </g>
+          <text x="196" y="267" text-anchor="middle" font-size="14" fill="#344e59" font-weight="800">PRESSURE TANK</text>
+          <text x="196" y="285" text-anchor="middle" font-size="11" fill="#4f646e">0–100 psi</text>
+          <!-- main pipe from tank to gauge -->
+          <path d="M142 224 V199 Q142 189 152 189 H207" fill="none" stroke="#71868f" stroke-width="9" stroke-linejoin="round"/>
+          <path d="M142 224 V199 Q142 189 152 189 H207" fill="none" stroke="#e2e8ea" stroke-width="4" stroke-linejoin="round"/>
+          <!-- valve branch -->
+          <path d="M341 266 H391 V224 H420" fill="none" stroke="#637981" stroke-width="9" stroke-linejoin="round"/>
+          <path d="M341 266 H391 V224 H420" fill="none" stroke="#e4e9eb" stroke-width="4" stroke-linejoin="round"/>
+          <g id="valveGraphic" transform="translate(391 224)">
+            <circle r="12" fill="#d9534a" stroke="#8e352f" stroke-width="2"/>
+            <path d="M-7 -7 L7 7 M-7 7 L7 -7" stroke="#fff" stroke-width="3"/>
+            <line x1="0" y1="-12" x2="0" y2="-27" stroke="#637981" stroke-width="4" stroke-linecap="round"/>
+            <line x1="-16" y1="-27" x2="16" y2="-27" stroke="#637981" stroke-width="5" stroke-linecap="round"/>
+          </g>
+          <text x="391" y="186" text-anchor="middle" class="system-label">RELEASE VALVE</text>
+          <!-- foot pump -->
+          <g transform="translate(439 237)" filter="url(#shadow)">
+            <rect x="7" y="24" width="52" height="72" rx="12" fill="url(#pumpmetal)" stroke="#65777e" stroke-width="2"/>
+            <rect x="21" y="4" width="24" height="38" rx="5" fill="#d9e0e2" stroke="#71838a" stroke-width="2"/>
+            <rect x="2" y="-4" width="62" height="12" rx="5" fill="#465a64" stroke="#2e414a" stroke-width="2"/>
+            <rect x="14" y="92" width="41" height="12" rx="3" fill="#53666e"/>
+            <path d="M33 104 V116" stroke="#6b7d84" stroke-width="5"/>
+            <path d="M8 116 H58" stroke="#53666e" stroke-width="7" stroke-linecap="round"/>
+          </g>
+          <path d="M420 224 H452 V242" fill="none" stroke="#637981" stroke-width="6"/>
+          <path d="M420 224 H452 V242" fill="none" stroke="#e3e8ea" stroke-width="2"/>
+          <text x="468" y="366" text-anchor="middle" class="system-label">FOOT PUMP</text>
+          <text x="196" y="352" text-anchor="middle" font-size="11" fill="#657983">SIMULATED PRESSURE SYSTEM</text>
+          <path d="M34 338 H520" stroke="#d5dddf" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="visual-box">
+        <svg viewBox="0 0 420 390" role="img" aria-label="Signal conditioner and digital pressure indicator">
+          <defs>
+            <linearGradient id="panelmetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafbf8"/><stop offset="1" stop-color="#dfe5e3"/></linearGradient>
+            <linearGradient id="lcd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10271e"/><stop offset="1" stop-color="#194231"/></linearGradient>
+          </defs>
+          <rect x="8" y="8" width="404" height="374" rx="9" fill="url(#panelmetal)" stroke="#aeb9bc" stroke-width="2"/>
+          <text x="210" y="31" text-anchor="middle" class="system-label">SIGNAL CONDITIONER &amp; INDICATOR</text>
+          <rect x="28" y="48" width="364" height="112" rx="6" fill="#c9d1d1" stroke="#98a6a9"/>
+          <text x="44" y="68" class="system-label">DIGITAL PRESSURE DISPLAY</text>
+          <rect x="44" y="77" width="332" height="66" rx="5" fill="url(#lcd)" stroke="#53665d" stroke-width="4"/>
+          <text id="digitalSvg" x="210" y="119" text-anchor="middle" class="digital">00.00</text>
+          <text x="352" y="136" text-anchor="end" font-size="9" fill="#80dba3">PSI</text>
+          <text x="210" y="179" text-anchor="middle" font-size="10" fill="#657983">3½-DIGIT STYLE INDICATOR</text>
+          <!-- offset knob -->
+          <text x="102" y="205" text-anchor="middle" class="system-label">OFFSET</text>
+          <circle cx="102" cy="244" r="30" fill="#64747b" stroke="#40545e" stroke-width="2"/>
+          <circle cx="102" cy="241" r="25" fill="#c8d0d1" stroke="#7b8a8f"/>
+          <path d="M102 241 L102 221" stroke="#3f5058" stroke-width="5" stroke-linecap="round"/>
+          <text x="102" y="291" text-anchor="middle" font-size="11" fill="#536873">ZERO ADJUST</text>
+          <!-- span knob -->
+          <text x="318" y="205" text-anchor="middle" class="system-label">SPAN</text>
+          <circle cx="318" cy="244" r="30" fill="#64747b" stroke="#40545e" stroke-width="2"/>
+          <circle cx="318" cy="241" r="25" fill="#c8d0d1" stroke="#7b8a8f"/>
+          <path d="M318 241 L331 225" stroke="#3f5058" stroke-width="5" stroke-linecap="round"/>
+          <text x="318" y="291" text-anchor="middle" font-size="11" fill="#536873">GAIN ADJUST</text>
+          <!-- terminals -->
+          <text x="28" y="319" class="system-label">OUTPUT / SUPPLY TERMINALS</text>
+          <g>
+            <circle cx="54" cy="346" r="13" fill="#c94e45" stroke="#85352f" stroke-width="2"/><circle cx="54" cy="343" r="5" fill="#f5c9c6"/>
+            <circle cx="103" cy="346" r="13" fill="#273d47" stroke="#101f25" stroke-width="2"/><circle cx="103" cy="343" r="5" fill="#a6b5bb"/>
+            <circle cx="152" cy="346" r="13" fill="#3887bd" stroke="#20577e" stroke-width="2"/><circle cx="152" cy="343" r="5" fill="#b8e1fa"/>
+            <circle cx="201" cy="346" r="13" fill="#4e9468" stroke="#2b5f3d" stroke-width="2"/><circle cx="201" cy="343" r="5" fill="#c3e9cd"/>
+          </g>
+          <g font-size="9" text-anchor="middle" fill="#516873"><text x="54" y="370">OUT+</text><text x="103" y="370">COM</text><text x="152" y="370">VCC</text><text x="201" y="370">GND</text></g>
+          <rect x="246" y="321" width="142" height="46" rx="5" fill="#e4eaeb" stroke="#c1cbce"/>
+          <text x="317" y="339" text-anchor="middle" font-size="10" fill="#4a626e" font-weight="700">TRANSDUCER OUTPUT</text>
+          <text id="voltSvg" x="317" y="357" text-anchor="middle" font-size="15" fill="#176fa7" font-weight="800">0.000 V</text>
+        </svg>
+      </div>
+    </div>
+    <div class="kit-bottom">
+      <div class="mini-panel"><strong>PRESSURE SENSOR</strong>Strain-gauge type transducer<br><span class="small">Range: 0–100 psi</span></div>
+      <div class="mini-panel"><strong>SIGNAL CONDITIONER</strong>Output: 0–5 V DC<br><span class="small">Offset and span adjustments</span></div>
+      <div class="mini-panel"><strong>PRESSURE RELEASE</strong>Manual release valve<br><span class="small">Virtual operation only</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Operate the virtual trainer</h2>
+  <p class="sub">The analog gauge indicates tank pressure. The digital reading follows the conditioned voltage, so offset/span errors can create a difference between the two.</p>
+  <div class="control-grid">
+    <div class="control">
+      <label for="pressure">Tank pressure</label>
+      <div class="big"><span id="pText">0.0</span> psi</div>
+      <input id="pressure" type="range" min="0" max="100" step="0.5" value="0">
+      <label for="pNumber" style="font-size:13px">Enter pressure directly (psi)</label>
+      <input id="pNumber" type="number" min="0" max="100" step="0.5" value="0">
+      <div class="actions"><button class="green" id="pump">Operate foot pump (+5 psi)</button><button class="light" id="release">Open release valve</button><button class="light" id="reset">Reset</button></div>
+      <p><span id="pressureStatus" class="status">Pressure stable</span></p>
+    </div>
+    <div class="control">
+      <label for="offset">Offset adjustment: <span id="offsetText">0.00</span> V</label>
+      <input id="offset" type="range" min="-0.5" max="0.5" step="0.01" value="0">
+      <label for="span">Span adjustment: <span id="spanText">100</span>%</label>
+      <input id="span" type="range" min="80" max="120" step="1" value="100">
+      <div class="actions"><button class="light" id="calReset">Reset calibration</button><span id="calStatus" class="status">Nominal calibration</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Live readings</h2>
+  <div class="metrics">
+    <div class="metric"><small>Tank pressure / gauge</small><strong><span id="mPressure">0.0</span> <span class="unit">psi</span></strong></div>
+    <div class="metric"><small>Conditioner output</small><strong><span id="mVoltage">0.000</span> <span class="unit">V</span></strong></div>
+    <div class="metric"><small>Digital indicator</small><strong><span id="mDisplay">0.00</span> <span class="unit">psi</span></strong></div>
+    <div class="metric"><small>Ideal sensitivity</small><strong>0.050 <span class="unit">V/psi</span></strong></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Pressure versus output voltage</h2>
+  <p class="sub">X-axis: pressure (psi). Y-axis: signal-conditioner output (V). The dot marks the current operating point.</p>
+  <canvas id="chart" width="1000" height="360" aria-label="Pressure versus output voltage line graph"></canvas>
+</section>
+
+<section class="card">
+  <h2>Observation table</h2>
+  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Gauge pressure (psi)</th><th>Output voltage (V)</th><th>Digital indicator (psi)</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+  <div class="actions"><button id="record">Record current reading</button><button class="light" id="standard">Add standard readings (0–100 psi)</button><button class="light" id="clear">Clear table</button><button class="light" id="csv">Download CSV</button></div>
+</section>
+
+<section class="card">
+  <h2>Working principle</h2>
+  <div class="formula-grid">
+    <div class="formula"><b>1. Pressure generation</b><br>The foot pump increases pressure in the tank. The analog gauge shows the simulated tank pressure.</div>
+    <div class="formula"><b>2. Conversion</b><br>The strain-gauge transducer and signal conditioner produce a voltage proportional to pressure.</div>
+    <div class="formula"><b>3. Indication</b><br>The digital indicator converts the conditioned voltage into a pressure reading.</div>
+  </div>
+  <p><b>Ideal relationship:</b> 0 psi → 0 V; 100 psi → 5 V; sensitivity = 5/100 = 0.05 V/psi.</p>
+  <p class="note"><b>Safety and accuracy:</b> This is a generic educational virtual kit, not a verified reproduction of any manufacturer's circuit. Actual equipment calibration, wiring and display scaling may differ. Never exceed the real trainer's pressure rating, and follow your laboratory manual when operating physical equipment.</p>
+</section>
+</main>
+<div class="footer">Pressure Measurement Virtual Lab · Generic unbranded trainer illustration</div>
+<script>
+const $=id=>document.getElementById(id);
+let recent=[];
+function pressure(){return Math.max(0,Math.min(100,Number($('pressure').value)||0))}
+function voltage(p){return Math.max(0,Math.min(5,(p/100)*5*(Number($('span').value)/100)+Number($('offset').value)))}
+function displayPressure(p){return voltage(p)/5*100}
+function drawGaugeTicks(){const g=$('gaugeTicks');for(let i=0;i<=10;i++){const a=(-135+i*27)*Math.PI/180;const x1=142+42*Math.sin(a),y1=106-42*Math.cos(a),x2=142+48*Math.sin(a),y2=106-48*Math.cos(a);const l=document.createElementNS('http://www.w3.org/2000/svg','line');[['x1',x1],['y1',y1],['x2',x2],['y2',y2]].forEach(([k,v])=>l.setAttribute(k,v));l.setAttribute('stroke','#415a66');l.setAttribute('stroke-width',i%2?1:2);g.appendChild(l);if(i%2===0){const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('x',142+53*Math.sin(a));t.setAttribute('y',106-53*Math.cos(a)+3);t.setAttribute('font-size','8');t.setAttribute('fill','#425b66');t.setAttribute('text-anchor','middle');t.textContent=i*10;g.appendChild(t)}}}
+function drawGraph(p){const c=$('chart'),ctx=c.getContext('2d'),w=c.width,h=c.height,P={l:65,r:25,t:24,b:48},pw=w-P.l-P.r,ph=h-P.t-P.b;ctx.clearRect(0,0,w,h);ctx.font='13px Arial';ctx.strokeStyle='#e0e8ed';ctx.fillStyle='#5a7080';ctx.lineWidth=1;for(let i=0;i<=5;i++){const xx=P.l+pw*i/5,yy=P.t+ph-ph*i/5;ctx.beginPath();ctx.moveTo(xx,P.t);ctx.lineTo(xx,P.t+ph);ctx.stroke();ctx.fillText(String(i*20),xx-9,P.t+ph+22);ctx.beginPath();ctx.moveTo(P.l,yy);ctx.lineTo(P.l+pw,yy);ctx.stroke();ctx.fillText(i.toFixed(1),23,yy+4)}ctx.strokeStyle='#1874ad';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=100;i++){const xx=P.l+pw*i/100,yy=P.t+ph-ph*voltage(i)/5;if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke();const xx=P.l+pw*p/100,yy=P.t+ph-ph*voltage(p)/5;ctx.fillStyle='#c84d43';ctx.beginPath();ctx.arc(xx,yy,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#274657';ctx.font='bold 13px Arial';ctx.fillText('Output voltage (V)',P.l,15);ctx.fillText('Tank pressure (psi)',w/2-54,h-7)}
+function render(){const p=pressure(),v=voltage(p),ind=displayPressure(p),a=(-135+p/100*270)*Math.PI/180;
+$('pText').textContent=p.toFixed(1);$('pNumber').value=p.toFixed(1);$('mPressure').textContent=p.toFixed(1);$('mVoltage').textContent=v.toFixed(3);$('mDisplay').textContent=ind.toFixed(2);
+$('gaugeNeedle').setAttribute('x2',142+36*Math.sin(a));$('gaugeNeedle').setAttribute('y2',106-36*Math.cos(a));$('gaugeNum').textContent=p.toFixed(0);
+$('digitalSvg').textContent=ind.toFixed(2).padStart(5,'0');$('voltSvg').textContent=v.toFixed(3)+' V';
+$('offsetText').textContent=Number($('offset').value).toFixed(2);$('spanText').textContent=$('span').value;
+const nominal=Number($('offset').value)===0&&Number($('span').value)===100;$('calStatus').textContent=nominal?'Nominal calibration':'Calibration adjusted';$('calStatus').className=nominal?'status':'status warn';
+$('pressureStatus').textContent=p>=100?'Maximum simulated pressure':p===0?'Pressure at zero':'Pressure stable';$('pressureStatus').className=p>=100?'status warn':'status';
+var arc=$('arc');if(arc)arc.setAttribute('stroke',p>=85?'#d28a21':'#1874ad');drawGraph(p)}
+function record(p=pressure()){recent.push({pressure:p,voltage:voltage(p),display:displayPressure(p)});const r=recent[recent.length-1],tr=document.createElement('tr');tr.innerHTML='<td>'+recent.length+'</td><td>'+r.pressure.toFixed(1)+'</td><td>'+r.voltage.toFixed(3)+'</td><td>'+r.display.toFixed(2)+'</td>';$('tableBody').appendChild(tr)}
+function renderTable(){ $('tableBody').innerHTML='';recent.forEach((r,i)=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+(i+1)+'</td><td>'+r.pressure.toFixed(1)+'</td><td>'+r.voltage.toFixed(3)+'</td><td>'+r.display.toFixed(2)+'</td>';$('tableBody').appendChild(tr)})}
+drawGaugeTicks();
+$('pressure').addEventListener('input',render);
+$('pNumber').addEventListener('change',()=>{$('pressure').value=Math.max(0,Math.min(100,Number($('pNumber').value)||0));render()});
+$('pump').addEventListener('click',()=>{$('pressure').value=Math.min(100,pressure()+5);render()});
+$('release').addEventListener('click',()=>{$('pressure').value=0;render()});
+$('reset').addEventListener('click',()=>{$('pressure').value=0;$('offset').value=0;$('span').value=100;render()});
+$('offset').addEventListener('input',render);$('span').addEventListener('input',render);
+$('calReset').addEventListener('click',()=>{$('offset').value=0;$('span').value=100;render()});
+$('record').addEventListener('click',()=>record());
+$('standard').addEventListener('click',()=>{for(let p=0;p<=100;p+=10)recent.push({pressure:p,voltage:voltage(p),display:displayPressure(p)});renderTable()});
+$('clear').addEventListener('click',()=>{recent=[];renderTable()});
+$('csv').addEventListener('click',()=>{const rows=[['No.','Gauge pressure (psi)','Output voltage (V)','Digital indicator (psi)'],...recent.map((r,i)=>[i+1,r.pressure.toFixed(1),r.voltage.toFixed(3),r.display.toFixed(2)])];const csv=rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\\r\\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pressure_measurement_observations.csv';a.click();URL.revokeObjectURL(url)});
+render();
+</script>
+</body></html>

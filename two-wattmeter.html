@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Two-Wattmeter Method | Virtual Lab</title><style>
+:root{--bg:#F4EAD5;--card:#FFEAF2;--ink:#382F32;--mute:#665B5E;--line:#BCBDAC;--teal:#382F32;--red:#8F3A45;--acc:#8FB69A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 system-ui,"Segoe UI",Arial,sans-serif}
+.w{max-width:900px;margin:0 auto;padding:8px}h1{font-size:20px;margin:0 0 2px;line-height:1.2}h2{font-size:15.5px;margin:0 0 5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}.sub{color:var(--mute);margin:0 0 8px;font-size:14px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:8px}.ctl label{display:flex;align-items:center;gap:6px}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:5px 11px;cursor:pointer}button:hover{border-color:var(--teal)}
+button.p{background:var(--teal);color:#FFEAF2;border-color:var(--teal)}button.r{background:var(--red);color:#FFEAF2;border-color:var(--red)}
+select,input[type=number]{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 7px}input[type=range]{accent-color:var(--teal)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}th,td{border:1px solid var(--line);padding:5px;text-align:center}th{background:#BCBDAC;font-size:13px}.sc{overflow-x:auto}
+.msg{min-height:20px;margin-top:6px;font-size:14px;color:var(--mute)}.msg.ok{color:#2F6B45}.msg.bad{color:var(--red)}
+.fm{background:var(--bg);border-radius:6px;padding:8px 12px;line-height:1.8;font-size:14.5px}
+svg{display:block;width:100%;height:auto}svg text{font-family:system-ui,Arial,sans-serif;fill:var(--ink)}
+.big{font:700 19px ui-monospace,Consolas,monospace;background:#242629;color:#BCE3C5;border-radius:5px;padding:4px 10px;display:inline-block;min-width:92px;text-align:center}
+.rd{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:8px}.rd small{color:var(--mute);display:block;font-size:12px}
+</style></head><body>
+<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
+<div class="w"><div style="margin:0 0 6px"><a href="index.html" style="color:var(--teal);font-weight:600;text-decoration:none">← Back to Virtual Laboratory</a></div><h1>Two-Wattmeter Method: Power Measurement in a 3-Phase Circuit</h1>
+<p class="sub">A balanced three-phase load is connected to a three-phase supply. Change the load current and power factor and watch W1 and W2.</p>
+<div class="card"><svg viewBox="0 0 560 190" id="dv"></svg>
+<div class="rd" style="justify-content:space-around"><div><small>W1 (W)</small><span class="big" id="w1">0</span></div><div><small>W2 (W)</small><span class="big" id="w2">0</span></div><div><small>W1 + W2 (W)</small><span class="big" id="wt">0</span></div><div><small>Power factor</small><span class="big" id="pf">0</span></div></div>
+<div class="msg" id="nt"></div>
+<div class="ctl"><label>Line voltage <select id="vl"><option>400</option><option selected>415</option></select> V</label><label>Line current <input id="il" type="range" min="1" max="10" step="0.5" value="5"> <b id="vi" style="min-width:4em">5.0 A</b></label></div>
+<div class="ctl"><label>Load phase angle φ <input id="ph" type="range" min="-90" max="90" step="1" value="30" style="width:240px"> <b id="vp" style="min-width:5em">30° lag</b></label></div>
+<div class="ctl"><button data-p="0">pf 1.0</button><button data-p="30">pf 0.866 lag</button><button data-p="60">pf 0.5 lag</button><button data-p="75">pf 0.26 lag</button><button data-p="-60">pf 0.5 lead</button></div>
+<div class="ctl"><button class="p" id="ad">Add reading</button><button class="r" id="rs">Reset table</button></div></div>
+<div class="card"><h2>Observation table</h2><div class="sc"><table id="tb"><thead><tr><th>S.No.</th><th>V<sub>L</sub> (V)</th><th>I<sub>L</sub> (A)</th><th>φ (°)</th><th>W1 (W)</th><th>W2 (W)</th><th>W1 + W2 (W)</th><th>√3·V<sub>L</sub>·I<sub>L</sub>·cosφ (W)</th><th>pf from W1, W2</th></tr></thead><tbody></tbody></table></div></div>
+<div class="card"><h2>Theory</h2><div class="fm">For a balanced load with lagging angle φ: <b>W1 = V<sub>L</sub> I<sub>L</sub> cos(30° − φ)</b>, <b>W2 = V<sub>L</sub> I<sub>L</sub> cos(30° + φ)</b><br>Total power <b>P = W1 + W2 = √3 V<sub>L</sub> I<sub>L</sub> cos φ</b><br>Power factor <b>tan φ = √3 (W1 − W2) / (W1 + W2)</b>, and cos φ = cos(tan⁻¹ of that)<br>At pf = 0.5 (φ = 60°) W2 = 0. Beyond that W2 reads negative, so its pressure coil connections are reversed and its reading is taken as negative. For a leading load, W1 and W2 swap roles.</div></div></div><script>var $=function(i){return document.getElementById(i)},R=4500,rows=[];
+(function(){var s="";[[140,"W1"],[420,"W2"]].forEach(function(d){var cx=d[0];s+='<rect x="'+(cx-125)+'" y="8" width="250" height="150" rx="5" fill="#fff" stroke="#222" stroke-width="2"/><rect x="'+(cx-125)+'" y="158" width="250" height="26" fill="#1c1f22"/><text x="'+cx+'" y="177" text-anchor="middle" font-size="14" font-weight="700" letter-spacing="1" style="fill:#fff">WATTMETER '+d[1]+'</text>';
+for(var i=0;i<=40;i++){var a=(-55+110*i/40)*Math.PI/180,r=i%5?72:66;s+='<line x1="'+(cx+r*Math.sin(a))+'" y1="'+(140-r*Math.cos(a))+'" x2="'+(cx+78*Math.sin(a))+'" y2="'+(140-78*Math.cos(a))+'" stroke="#222" stroke-width="'+(i%5?1:1.6)+'"/>'}
+[-4000,-2000,0,2000,4000].forEach(function(v,i){var a=(-55+110*i/4)*Math.PI/180;s+='<text x="'+(cx+54*Math.sin(a))+'" y="'+(140-54*Math.cos(a)+4)+'" text-anchor="middle" font-size="11" style="fill:#222">'+v+'</text>'});
+s+='<text x="'+cx+'" y="100" text-anchor="middle" font-size="22" font-weight="700" style="fill:#222">W</text><g id="n'+d[1]+'"><line x1="'+cx+'" y1="140" x2="'+cx+'" y2="68" stroke="#d00" stroke-width="3"/></g><circle cx="'+cx+'" cy="140" r="7" fill="#111"/>'});$("dv").innerHTML=s})();
+function vals(){var VL=+$("vl").value,IL=+$("il").value,p=+$("ph").value*Math.PI/180,k=VL*IL;return{VL:VL,IL:IL,p:p,w1:k*Math.cos(Math.PI/6-p),w2:k*Math.cos(Math.PI/6+p)}}
+function pfv(w1,w2){var t=Math.sqrt(3)*(w1-w2)/(w1+w2);return isFinite(t)?Math.cos(Math.atan(t)):0}
+function upd(){var v=vals(),t=v.w1+v.w2,deg=+$("ph").value;$("vi").textContent=v.IL.toFixed(1)+" A";$("vp").textContent=Math.abs(deg)+"°"+(deg>0?" lag":deg<0?" lead":"");
+$("w1").textContent=v.w1.toFixed(0);$("w2").textContent=v.w2.toFixed(0);$("wt").textContent=t.toFixed(0);$("pf").textContent=pfv(v.w1,v.w2).toFixed(3);
+[["W1",v.w1,140],["W2",v.w2,420]].forEach(function(d){$("n"+d[0]).setAttribute("transform","rotate("+(-55+110*(Math.max(-R,Math.min(R,d[1]))+R)/(2*R))+" "+d[2]+" 140)")});
+var a=Math.abs(deg);$("nt").textContent=a>60?(deg>0?"W2":"W1")+" reads negative. Reverse its pressure coil connections and take the reading as negative.":a===60?(deg>0?"W2":"W1")+" reads zero at pf 0.5.":"Both wattmeters read positive."}
+["vl","il","ph"].forEach(function(i){$(i).oninput=upd});
+Array.prototype.forEach.call(document.querySelectorAll("button[data-p]"),function(b){b.onclick=function(){$("ph").value=b.dataset.p;upd()}});
+$("ad").onclick=function(){var v=vals();rows.push([rows.length+1,v.VL,v.IL.toFixed(1),(v.p*180/Math.PI).toFixed(0),v.w1.toFixed(0),v.w2.toFixed(0),(v.w1+v.w2).toFixed(0),(Math.sqrt(3)*v.VL*v.IL*Math.cos(v.p)).toFixed(0),pfv(v.w1,v.w2).toFixed(3)]);
+$("tb").querySelector("tbody").innerHTML=rows.map(function(r){return"<tr>"+r.map(function(x){return"<td>"+x+"</td>"}).join("")+"</tr>"}).join("")};
+$("rs").onclick=function(){rows=[];$("tb").querySelector("tbody").innerHTML=""};upd();</script></body></html>

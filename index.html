@@ -27,6 +27,23 @@ body{background:#F4EAD5;color:#382F32}header{background:#382F32!important;border
 .card{background:#FFEAF2;border-color:#BCBDAC;box-shadow:0 4px 14px #382F3210}.tag{background:#BCE3C5;color:#382F32}
 .btn{background:#382F32;color:#FFEAF2}.btn.disabled{background:#BCBDAC;color:#665b5e}.note{background:#F4EAD5;border-color:#BCBDAC;color:#382F32}
 input,select,textarea{background:#FFF9F8;border-color:#BCBDAC;color:#382F32}footer{color:#665b5e}
+  .visitor-counter {
+    text-align: center;
+    margin: 25px auto;
+    padding: 15px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    max-width: 250px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #1e293b;
+}
+
+.visitor-counter img {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+}
 </style>
 </head>
 <body>
@@ -70,10 +87,12 @@ input,select,textarea{background:#FFF9F8;border-color:#BCBDAC;color:#382F32}foot
 <span class="tag">Digital Electronics</span><h3>ADC Interface</h3><p>Convert an analogue input into a digital value and explore resolution.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
 <article class="card" data-category="Digital Electronics" data-search="DAC digital to analog converter interface">
 <span class="tag">Digital Electronics</span><h3>DAC Interface</h3><p>Convert digital input codes to analogue output voltage.</p><a class="btn" href="dac-trainer.html">Open Simulation</a></article>
-</div>
-<div class="note"><strong>Faculty note:</strong> This is a starter portal. The Maxwell’s Bridge page is an interactive teaching prototype; other experiment cards can be connected to their own HTML modules as they are developed.</div>
+<div class="visitor-counter">
+  <span>👥 Total Visitors:</span>
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=kgr.virtual.laboratory"
+       alt="Visitor Count"> </div>
 </main>
-<footer>KGR Virtual Laboratory · Electrical & Electronics Engineering</footer>
+<footer>Virtual Laboratory · Electrical & Electronics Engineering</footer>
 <script>
 const search=document.getElementById('search'), category=document.getElementById('category');
 function filterCards(){const q=search.value.toLowerCase().trim(), c=category.value;document.querySelectorAll('.card').forEach(card=>{const matchesText=(card.innerText+' '+card.dataset.search).toLowerCase().includes(q);const matchesCategory=c==='all'||card.dataset.category===c;card.style.display=matchesText&&matchesCategory?'flex':'none';});}

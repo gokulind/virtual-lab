@@ -20,9 +20,18 @@ input{flex:1;min-width:220px}.section-title{margin:28px 0 12px;font-size:1.25rem
 .btn{display:inline-block;background:var(--blue);color:white;text-decoration:none;padding:11px 14px;border-radius:9px;font-weight:bold;text-align:center}
 .btn.disabled{background:#e7edf3;color:#687789;cursor:default}.note{background:#fff8e7;border:1px solid #f1dfad;padding:14px 16px;border-radius:12px;line-height:1.5;color:#5c4a1e;margin:22px 0}
 footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem}
+
+/* palette: #FFEAF2 #382F32 #BCBDAC #F4EAD5 #BCE3C5 */
+:root{--navy:#382F32;--blue:#382F32;--teal:#8FB69A;--bg:#F4EAD5;--ink:#382F32;--muted:#665b5e;--line:#BCBDAC}
+body{background:#F4EAD5;color:#382F32}header{background:#382F32!important;border-bottom:4px solid #BCBDAC}header p{color:#FFEAF2}
+.card{background:#FFEAF2;border-color:#BCBDAC;box-shadow:0 4px 14px #382F3210}.tag{background:#BCE3C5;color:#382F32}
+.btn{background:#382F32;color:#FFEAF2}.btn.disabled{background:#BCBDAC;color:#665b5e}.note{background:#F4EAD5;border-color:#BCBDAC;color:#382F32}
+input,select,textarea{background:#FFF9F8;border-color:#BCBDAC;color:#382F32}footer{color:#665b5e}
 </style>
 </head>
 <body>
+<div style="background:#382F32;color:#FFEAF2;border-bottom:4px solid #BCBDAC;padding:9px 16px;display:flex;flex-wrap:wrap;gap:4px 20px;justify-content:space-between;align-items:center;font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.35"><div><div style="font-weight:700;font-size:15px">E.G.S. Pillay Engineering College (Autonomous)</div><div style="font-size:12px;color:#BCBDAC">Nagapattinam, Tamil Nadu · Department of Electrical and Electronics Engineering</div></div><div style="font-size:12px;color:#BCBDAC;text-align:right">Developed by <b style="color:#BCE3C5;font-size:13px;letter-spacing:.5px">GOKULRAJ</b><br>Assistant Professor, Department of EEE</div></div>
+
 <header><div class="wrap">
 <div class="eyebrow">KGR · Electrical & Electronics Engineering</div>
 <h1>Virtual Laboratory</h1>
@@ -35,24 +44,32 @@ footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem}
 </div>
 <h2 class="section-title">Experiments</h2>
 <div class="grid" id="cards">
+<article class="card" data-category="DC Bridges" data-search="wheatstone bridge unknown resistance galvanometer balance">
+<span class="tag">DC Bridges</span><h3>Wheatstone Bridge</h3><p>Balance the bridge and find an unknown resistance from the ratio arms.</p><a class="btn" href="wheatstone-bridge.html">Open Simulation</a></article>
+<article class="card" data-category="Electrical Measurements" data-search="two wattmeter method three phase power factor">
+<span class="tag">Electrical Measurements</span><h3>Two-Wattmeter Method</h3><p>Measure three-phase power and power factor with two wattmeters.</p><a class="btn" href="two-wattmeter.html">Open Simulation</a></article>
 <article class="card" data-category="DC Bridges" data-search="kelvin double bridge low resistance">
-<span class="tag">DC Bridges</span><h3>Kelvin’s Double Bridge</h3><p>Study the measurement of low resistance and the role of ratio arms and lead resistance.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
+<span class="tag">DC Bridges</span><h3>Kelvin’s Double Bridge</h3><p>Study the measurement of low resistance and the role of ratio arms and lead resistance.</p><a class="btn" href="kelvin-double-bridge.html">Open Simulation</a></article>
 <article class="card" data-category="DC Bridges" data-search="maxwell bridge inductance capacitance ac bridge">
 <span class="tag">DC/AC Bridges</span><h3>Maxwell’s Bridge</h3><p>Explore bridge balance, unknown inductance, resistance and standard capacitance.</p><a class="btn" href="maxwells-bridge.html">Open Simulation</a></article>
 <article class="card" data-category="DC Bridges" data-search="schering bridge capacitance dielectric loss">
 <span class="tag">AC Bridges</span><h3>Schering Bridge</h3><p>Learn capacitance and dielectric-loss measurement in an AC bridge.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
 <article class="card" data-category="Electrical Measurements" data-search="single phase energy meter calibration watt hour">
-<span class="tag">Electrical Measurements</span><h3>Single-Phase Energy Meter Calibration</h3><p>Compare meter readings with reference energy and calculate percentage error.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
+<span class="tag">Electrical Measurements</span><h3>Single-Phase Energy Meter Calibration</h3><p>Compare meter readings with reference energy and calculate percentage error.</p><a class="btn" href="energy-meter.html">Open Simulation</a></article>
 <article class="card" data-category="Electrical Measurements" data-search="dynamometer wattmeter power measurement">
 <span class="tag">Electrical Measurements</span><h3>Dynamometer Wattmeter</h3><p>Understand current and pressure coils and power measurement.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
 <article class="card" data-category="Sensors & Transducers" data-search="LVDT displacement transducer">
 <span class="tag">Sensors & Transducers</span><h3>LVDT</h3><p>Investigate displacement, differential output and transducer sensitivity.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
+<article class="card" data-category="Sensors & Transducers" data-search="pressure measurement trainer transducer gauge voltage output">
+<span class="tag">Sensors & Transducers</span><h3>Pressure Measurement Trainer</h3><p>Apply pressure, read the gauge and transducer output, and plot pressure against output voltage.</p><a class="btn" href="pressure-measurement-trainer.html">Open Simulation</a></article>
+<article class="card" data-category="Sensors & Transducers" data-search="flow sensor turbine hall effect pulse frequency flow rate calibration">
+<span class="tag">Sensors & Transducers</span><h3>Flow Sensor Trainer</h3><p>Count turbine sensor pulses, find the flow rate and calibrate against a collection tank.</p><a class="btn" href="flow-sensor-trainer.html">Open Simulation</a></article>
 <article class="card" data-category="Sensors & Transducers" data-search="temperature pressure flow sensor transducer">
 <span class="tag">Sensors & Transducers</span><h3>Temperature, Pressure & Flow Transducers</h3><p>Review sensor response, calibration and output characteristics.</p><a class="btn disabled" aria-disabled="true">Learning page coming soon</a></article>
 <article class="card" data-category="Digital Electronics" data-search="ADC analog to digital converter interface">
 <span class="tag">Digital Electronics</span><h3>ADC Interface</h3><p>Convert an analogue input into a digital value and explore resolution.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
 <article class="card" data-category="Digital Electronics" data-search="DAC digital to analog converter interface">
-<span class="tag">Digital Electronics</span><h3>DAC Interface</h3><p>Convert digital input codes to analogue output voltage.</p><a class="btn disabled" aria-disabled="true">Simulation coming soon</a></article>
+<span class="tag">Digital Electronics</span><h3>DAC Interface</h3><p>Convert digital input codes to analogue output voltage.</p><a class="btn" href="dac-trainer.html">Open Simulation</a></article>
 </div>
 <div class="note"><strong>Faculty note:</strong> This is a starter portal. The Maxwell’s Bridge page is an interactive teaching prototype; other experiment cards can be connected to their own HTML modules as they are developed.</div>
 </main>

@@ -1,825 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>EEE Virtual Laboratory</title>
-
-    <meta name="description"
-          content="EEE Virtual Laboratory of E.G.S. Pillay Engineering College, Nagapattinam. Explore interactive electrical and electronics engineering experiments.">
-
-    <style>
-        :root {
-            --cream: #F4EAD5;
-            --pink: #FFEAF2;
-            --brown: #382F32;
-            --sage: #BCBDAC;
-            --green: #BCE3C5;
-            --white: #FFFFFF;
-            --muted: #75696D;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: var(--cream);
-            color: var(--brown);
-            line-height: 1.6;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        /* COLLEGE HEADER */
-
-        header {
-            background: var(--pink);
-            padding: 25px 20px;
-            border-bottom: 2px solid var(--sage);
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            text-align: center;
-        }
-
-        .college-logo {
-            width: 85px;
-            height: 85px;
-            object-fit: contain;
-            flex-shrink: 0;
-        }
-
-        .college-info h1 {
-            font-size: clamp(20px, 3vw, 30px);
-            line-height: 1.3;
-            margin-bottom: 5px;
-        }
-
-        .college-info h2 {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .college-info p {
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        .lab-title {
-            margin-top: 12px;
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--brown);
-        }
-
-        /* NAVIGATION */
-
-        nav {
-            background: var(--brown);
-            color: var(--white);
-            padding: 12px 20px;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 28px;
-            flex-wrap: wrap;
-        }
-
-        nav a {
-            font-size: 14px;
-            transition: color 0.2s ease;
-        }
-
-        nav a:hover {
-            color: var(--green);
-        }
-
-        /* MAIN CONTENT */
-
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 35px 20px;
-        }
-
-        .welcome-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .welcome-section h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .welcome-section p {
-            max-width: 750px;
-            margin: 0 auto;
-            color: var(--muted);
-            font-size: 15px;
-        }
-
-        /* SEARCH */
-
-        .search-container {
-            max-width: 650px;
-            margin: 25px auto;
-        }
-
-        #searchInput {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1px solid var(--sage);
-            border-radius: 30px;
-            outline: none;
-            background: var(--white);
-            color: var(--brown);
-            font-size: 15px;
-            box-shadow: 0 3px 10px rgba(56, 47, 50, 0.06);
-        }
-
-        #searchInput:focus {
-            border-color: var(--brown);
-            box-shadow: 0 0 0 3px rgba(188, 189, 172, 0.3);
-        }
-
-        /* CATEGORY FILTERS */
-
-        .filter-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0 35px;
-        }
-
-        .filter-btn {
-            border: 1px solid var(--sage);
-            border-radius: 25px;
-            background: var(--pink);
-            color: var(--brown);
-            padding: 9px 18px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: var(--brown);
-            color: var(--white);
-            border-color: var(--brown);
-        }
-
-        /* EXPERIMENT GRID */
-
-        .experiment-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 22px;
-        }
-
-        .experiment-card {
-            background: var(--white);
-            border: 1px solid rgba(188, 189, 172, 0.8);
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 14px rgba(56, 47, 50, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .experiment-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 9px 22px rgba(56, 47, 50, 0.12);
-        }
-
-        .card-icon {
-            width: 55px;
-            height: 55px;
-            border-radius: 14px;
-            background: var(--pink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin-bottom: 16px;
-        }
-
-        .category-tag {
-            display: inline-block;
-            width: fit-content;
-            background: var(--green);
-            color: var(--brown);
-            border-radius: 20px;
-            padding: 4px 10px;
-            margin-bottom: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .experiment-card h3 {
-            font-size: 18px;
-            line-height: 1.4;
-            margin-bottom: 10px;
-        }
-
-        .experiment-card p {
-            color: var(--muted);
-            font-size: 13px;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
-
-        .card-button {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 11px 14px;
-            border-radius: 9px;
-            background: var(--brown);
-            color: var(--white);
-            border: none;
-            font-size: 13px;
-            font-weight: bold;
-            transition: background 0.2s ease;
-        }
-
-        .card-button:hover {
-            background: #55474C;
-        }
-
-        .card-button.disabled {
-            background: var(--sage);
-            color: var(--brown);
-            cursor: not-allowed;
-            opacity: 0.8;
-        }
-
-        .no-results {
-            display: none;
-            text-align: center;
-            padding: 35px 15px;
-            color: var(--muted);
-        }
-
-        /* VISITOR COUNTER */
-
-        .visitor-counter {
-            width: 100%;
-            max-width: 360px;
-            margin: 45px auto 20px;
-            padding: 25px 20px;
-            text-align: center;
-            background: var(--pink);
-            border: 1px solid var(--sage);
-            border-radius: 16px;
-            box-shadow: 0 4px 14px rgba(56, 47, 50, 0.06);
-            color: var(--brown);
-        }
-
-        .visitor-icon {
-            font-size: 34px;
-            margin-bottom: 8px;
-        }
-
-        .visitor-counter h3 {
-            font-size: 19px;
-            margin: 5px 0 8px;
-        }
-
-        .visitor-counter p {
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .visitor-label {
-            margin: 12px 0 10px;
-            font-size: 13px;
-            font-weight: bold;
-            color: var(--muted);
-        }
-
-        .visitor-counter img {
-            display: inline-block;
-            max-width: 100%;
-            min-height: 20px;
-        }
-
-        /* FOOTER */
-
-        footer {
-            margin-top: 20px;
-            background: var(--brown);
-            color: var(--white);
-            padding: 25px 20px;
-            text-align: center;
-        }
-
-        footer p {
-            font-size: 13px;
-            margin: 4px 0;
-        }
-
-        .developer-name {
-            color: var(--green);
-            font-weight: bold;
-        }
-
-        /* RESPONSIVE DESIGN */
-
-        @media (max-width: 900px) {
-            .experiment-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 600px) {
-            header {
-                padding: 20px 12px;
-            }
-
-            .header-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .college-logo {
-                width: 70px;
-                height: 70px;
-            }
-
-            .college-info h2 {
-                font-size: 15px;
-            }
-
-            .lab-title {
-                font-size: 19px;
-            }
-
-            .nav-container {
-                gap: 15px;
-            }
-
-            main {
-                padding: 25px 15px;
-            }
-
-            .welcome-section h2 {
-                font-size: 23px;
-            }
-
-            .experiment-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .experiment-card {
-                padding: 20px;
-            }
-
-            .visitor-counter {
-                margin-top: 35px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EEE Virtual Laboratory</title>
+<meta name="description" content="EEE Virtual Laboratory of E.G.S. Pillay Engineering College, Nagapattinam. Interactive electrical and electronics engineering experiments.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F6F8;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;--line:#E2E8F0;--accent:#1D4ED8;--accent-ink:#FFFFFF;--soft:#EEF3FF;--side:#0F172A;--side-ink:#CBD5E1;--ok:#16A34A;--c-bridges:#2563EB;--c-measurements:#0D9488;--c-sensors:#D97706;--c-electronics:#7C3AED;--shadow:0 1px 2px rgba(15,23,42,.05),0 4px 14px rgba(15,23,42,.05)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0B0F17;--surface:#111826;--ink:#E5E7EB;--muted:#94A3B8;--line:#1E293B;--accent:#60A5FA;--accent-ink:#0B0F17;--soft:#14213D;--side:#080B12;--shadow:0 1px 2px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0B0F17;--surface:#111826;--ink:#E5E7EB;--muted:#94A3B8;--line:#1E293B;--accent:#60A5FA;--accent-ink:#0B0F17;--soft:#14213D;--side:#080B12;--shadow:0 1px 2px rgba(0,0,0,.3)}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:256px 1fr;min-height:100vh}
+/* sidebar */
+.side{background:var(--side);color:var(--side-ink);padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:22px;overflow:auto}
+.brand{display:flex;gap:12px;align-items:center;padding:0 6px}
+.logo,.logo-fb{width:42px;height:42px;border-radius:10px;flex-shrink:0;object-fit:contain;background:#fff}
+.logo-fb{display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700}
+.brand b{display:block;color:#fff;font-size:13px;line-height:1.3;font-weight:600}
+.brand span{font-size:11px;color:#94A3B8}
+.nav-h{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748B;padding:0 10px;margin-bottom:6px}
+.nav button{display:flex;width:100%;align-items:center;gap:10px;border:none;background:none;color:inherit;text-align:left;padding:9px 10px;border-radius:8px;font-size:13px;font-weight:500;transition:background .15s}
+.nav button:hover{background:rgba(255,255,255,.06)}
+.nav button.on{background:rgba(255,255,255,.1);color:#fff}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--c,#94A3B8);flex-shrink:0}
+.nav em{margin-left:auto;font-style:normal;font-size:11px;color:#64748B}
+.side-foot{margin-top:auto;padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;font-size:12px}
+.side-foot b{color:#fff;display:block;margin-bottom:8px;font-weight:600}
+.bar{height:6px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;width:0;background:#60A5FA;border-radius:6px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+/* main */
+.main{padding:28px 36px 20px;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:4px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.sub{color:var(--muted);margin-top:4px;max-width:560px}
+.hbtns{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 16px;border-radius:9px;font-weight:600;font-size:13px;transition:filter .15s,transform .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn.off{background:var(--bg);color:var(--muted);border-color:var(--line);pointer-events:none}
+.sq{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-size:16px}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.kpi span{font-size:12px;color:var(--muted);font-weight:500}
+.kpi b{display:block;font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.kpi small{font-size:12px;color:var(--muted)}
+/* resume banner */
+.resume{display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--soft);border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line));border-radius:12px;padding:14px 18px;margin-bottom:24px}
+.resume small{color:var(--muted);display:block;font-size:12px}
+.resume b{font-weight:600}
+/* toolbar */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.search{flex:1 1 260px;position:relative}
+.search input{width:100%;padding:10px 44px 10px 38px;border:1px solid var(--line);background:var(--surface);border-radius:9px;outline:none;transition:border-color .15s,box-shadow .15s}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.search .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:11px monospace;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--muted)}
+select{padding:9px 10px;border:1px solid var(--line);background:var(--surface);border-radius:9px}
+.seg{display:flex;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:2px}
+.seg button{border:none;background:none;padding:6px 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button.on{background:var(--soft);color:var(--accent)}
+.count{font-size:12px;color:var(--muted);margin-bottom:12px}
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid.list{grid-template-columns:1fr;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);transition:border-color .2s,transform .2s,box-shadow .2s;animation:in .35s both;position:relative}
+.card::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
+.card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 55%,var(--line));box-shadow:0 10px 28px rgba(15,23,42,.1)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.top{display:flex;justify-content:space-between;align-items:center}
+.idx{font:600 12px ui-monospace,Menlo,monospace;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
+.pill.live{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,var(--line));background:color-mix(in srgb,var(--ok) 8%,transparent)}
+.pill.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.cat{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c);display:flex;align-items:center;gap:6px}
+.card h3{font-size:16px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
+.card p{color:var(--muted);font-size:13px;flex:1}
+.acts{display:flex;gap:8px}
+.acts .btn{flex:1}
+.mini{width:38px;height:38px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:15px;color:var(--muted);transition:all .15s}
+.mini:hover{border-color:var(--accent);color:var(--accent)}
+.mini.on{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+.list .card{flex-direction:row;align-items:center;gap:20px;padding:14px 20px 14px 24px}
+.list .card>div.info{flex:1}
+.list .card p{display:none}
+.list .top,.list .acts{flex-shrink:0}
+.empty{display:none;text-align:center;padding:50px 10px;color:var(--muted)}
+.empty h3{color:var(--ink);margin-bottom:4px}
+/* footer */
+.visit{margin-top:36px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px}
+.visit b{font-weight:600}.visit small{color:var(--muted);display:block}
+.visit img{min-height:20px;max-width:100%}
+footer{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+footer b{color:var(--ink);font-weight:600}
+.toast{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:9px;font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);pointer-events:none;transition:all .25s;z-index:50}
+.toast.show{opacity:1;transform:none}
+@media (max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:860px){.app{grid-template-columns:1fr}.side{position:static;height:auto;padding:14px 16px;flex-direction:row;align-items:center;gap:12px}.side .nav,.side-foot{display:none}.main{padding:20px 16px}}
+@media (max-width:600px){.grid{grid-template-columns:1fr}.list .card{flex-direction:column;align-items:stretch}.kpis{gap:10px}h1{font-size:22px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
-
 <body>
-
-    <!-- COLLEGE HEADER -->
-
-    <header id="home">
-        <div class="header-container">
-
-            <!-- Replace with your actual college logo filename -->
-            <img
-                src="college-logo.png"
-                alt="College Logo"
-                class="college-logo"
-                onerror="this.style.display='none';"
-            >
-
-            <div class="college-info">
-                <h1>E.G.S. Pillay Engineering College</h1>
-                <h2>(Autonomous)</h2>
-                <p>Nagapattinam, Tamil Nadu</p>
-                <p>Department of Electrical and Electronics Engineering</p>
-
-                <div class="lab-title">
-                    EEE Virtual Laboratory
-                </div>
-            </div>
-
-        </div>
-    </header>
-
-    <!-- NAVIGATION -->
-
-    <nav>
-        <div class="nav-container">
-            <a href="#home">Home</a>
-            <a href="#experiments">Experiments</a>
-            <a href="#visitor-counter">Visitor Count</a>
-        </div>
-    </nav>
-
-    <!-- MAIN CONTENT -->
-
-    <main>
-
-        <!-- WELCOME SECTION -->
-
-        <section class="welcome-section">
-            <h2>Welcome to the Virtual Laboratory</h2>
-
-            <p>
-                Explore interactive electrical and electronics engineering
-                experiments. Select an experiment to learn the operating
-                principles, circuit connections, and measurement techniques.
-            </p>
-        </section>
-
-        <!-- SEARCH BOX -->
-
-        <div class="search-container">
-            <input
-                type="search"
-                id="searchInput"
-                placeholder="Search experiments..."
-                aria-label="Search experiments"
-            >
-        </div>
-
-        <!-- CATEGORY FILTERS -->
-
-        <div class="filter-container" aria-label="Filter experiments">
-
-            <button class="filter-btn active"
-                    type="button"
-                    data-filter="all">
-                All Experiments
-            </button>
-
-            <button class="filter-btn"
-                    type="button"
-                    data-filter="bridges">
-                Bridges
-            </button>
-
-            <button class="filter-btn"
-                    type="button"
-                    data-filter="measurements">
-                Measurements
-            </button>
-
-            <button class="filter-btn"
-                    type="button"
-                    data-filter="sensors">
-                Sensors
-            </button>
-
-            <button class="filter-btn"
-                    type="button"
-                    data-filter="electronics">
-                Electronics
-            </button>
-
-        </div>
-
-        <!-- EXPERIMENT CARDS -->
-
-        <section id="experiments"
-                 class="experiment-grid"
-                 aria-label="Available experiments">
-
-            <!-- WHEATSTONE BRIDGE -->
-
-            <article class="experiment-card" data-category="bridges">
-                <div class="card-icon">⚡</div>
-                <span class="category-tag">BRIDGES</span>
-
-                <h3>Wheatstone Bridge</h3>
-
-                <p>
-                    Understand the principle of the Wheatstone bridge
-                    and determine an unknown resistance using the
-                    bridge balance condition.
-                </p>
-
-                <a class="card-button" href="wheatstone-bridge.html">
-                    Start Experiment →
-                </a>
-            </article>
-
-            <!-- TWO-WATTMETER METHOD -->
-
-            <article class="experiment-card" data-category="measurements">
-                <div class="card-icon">📊</div>
-                <span class="category-tag">MEASUREMENTS</span>
-
-                <h3>Two-Wattmeter Method</h3>
-
-                <p>
-                    Study three-phase power measurement using two
-                    wattmeters and understand the calculation of
-                    total power and power factor.
-                </p>
-
-                <a class="card-button" href="two-wattmeter.html">
-                    Start Experiment →
-                </a>
-            </article>
-
-            <!-- KELVIN'S DOUBLE BRIDGE -->
-
-            <article class="experiment-card" data-category="bridges">
-                <div class="card-icon">🔌</div>
-                <span class="category-tag">BRIDGES</span>
-
-                <h3>Kelvin's Double Bridge</h3>
-
-                <p>
-                    Learn how low resistance is measured accurately
-                    using Kelvin's double bridge method.
-                </p>
-
-                <a class="card-button" href="kelvin-double-bridge.html">
-                    Start Experiment →
-                </a>
-            </article>
-
-            <!-- MAXWELL'S BRIDGE -->
-
-            <article class="experiment-card" data-category="bridges">
-                <div class="card-icon">〰️</div>
-                <span class="category-tag">BRIDGES</span>
-
-                <h3>Maxwell's Bridge</h3>
-
-                <p>
-                    Explore AC bridge balance conditions and determine
-                    unknown inductance using Maxwell's bridge.
-                </p>
-
-                <a class="card-button" href="maxwells-bridge.html">
-                    Start Experiment →
-                </a>
-            </article>
-
-            <!-- SCHERING BRIDGE -->
-
-            <article class="experiment-card" data-category="bridges">
-                <div class="card-icon">🧪</div>
-                <span class="category-tag">BRIDGES</span>
-
-                <h3>Schering Bridge</h3>
-
-                <p>
-                    Learn the basic principle of Schering bridge
-                    measurement for capacitance and dielectric properties.
-                </p>
-
-                <span class="card-button disabled" aria-disabled="true">
-                    Coming Soon
-                </span>
-            </article>
-
-            <!-- SINGLE-PHASE ENERGY METER -->
-
-            <article class="experiment-card" data-category="measurements">
-                <div class="card-icon">💡</div>
-                <span class="category-tag">MEASUREMENTS</span>
-
-                <h3>Single-Phase Energy Meter</h3>
-
-                <p>
-                    Study the operating principle of a single-phase
-                    energy meter and understand electrical energy
-                    measurement.
-                </p>
-
-                <a class="card-button" href="energy-meter.html">
-                    Start Experiment →
-                </a>
-            </article>
-
-            <!-- DYNAMOMETER WATTMETER -->
-
-            <article class="experiment-card" data-category="measurements">
-                <div class="card-icon">📈</div>
-                <span class="category-tag">MEASUREMENTS</span>
-
-                <h3>Dynamometer Wattmeter</h3>
-
-                <p>
-                    Understand the construction, operating principle,
-                    and use of a dynamometer-type wattmeter.
-                </p>
-
-                <span class="card-button disabled" aria-disabled="true">
-                    Coming Soon
-                </span>
-            </article>
-
-            <!-- LVDT -->
-
-            <article class="experiment-card" data-category="sensors">
-                <div class="card-icon">📐</div>
-                <span class="category-tag">SENSORS</span>
-
-                <h3>LVDT</h3>
-
-                <p>
-                    Learn how a Linear Variable Differential Transformer
-                    converts linear displacement into an electrical signal.
-                </p>
-
-                <span class="card-button disabled" aria-disabled="true">
-                    Coming Soon
-                </span>
-            </article>
-
-            <!-- ANALOG-TO-DIGITAL CONVERTER -->
-
-            <article class="experiment-card" data-category="electronics">
-                <div class="card-icon">🔢</div>
-                <span class="category-tag">ELECTRONICS</span>
-
-                <h3>Analog-to-Digital Converter (ADC)</h3>
-
-                <p>
-                    Explore the conversion of analog signals into digital
-                    values and understand the basic ADC operation.
-                </p>
-
-                <span class="card-button disabled" aria-disabled="true">
-                    Coming Soon
-                </span>
-            </article>
-
-            <!-- DIGITAL-TO-ANALOG CONVERTER -->
-
-            <article class="experiment-card" data-category="electronics">
-                <div class="card-icon">🔄</div>
-                <span class="category-tag">ELECTRONICS</span>
-
-                <h3>Digital-to-Analog Converter (DAC)</h3>
-
-                <p>
-                    Understand how digital input values are converted
-                    into corresponding analog output signals.
-                </p>
-
-                <a class="card-button" href="dac-trainer.html">
-                    Start Experiment →
-                </a>
-            </article>
-
-        </section>
-
-        <!-- NO RESULTS MESSAGE -->
-
-        <div class="no-results" id="noResults">
-            <h3>No experiments found</h3>
-            <p>Try another search term or select a different category.</p>
-        </div>
-
-        <!-- VISITOR COUNTER AT THE CENTRE BOTTOM -->
-
-        <section id="visitor-counter"
-                 class="visitor-counter"
-                 aria-label="Website visitor counter">
-
-            <div class="visitor-icon" aria-hidden="true">👥</div>
-
-            <h3>EEE Virtual Laboratory</h3>
-
-            <p>
-                Thank you for visiting our Virtual Laboratory!
-                Explore our experiments and continue learning.
-            </p>
-
-            <div class="visitor-label">
-                TOTAL VISITORS
-            </div>
-
-            <img
-                src="https://visitor-badge.laobi.icu/badge?page_id=eee-virtual-laboratory"
-                alt="Total website visitor count"
-                loading="lazy"
-            >
-
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-
-    <footer>
-        <p>
-            © <span id="currentYear"></span>
-            EEE Virtual Laboratory
-        </p>
-
-        <p>
-            Department of Electrical and Electronics Engineering
-        </p>
-
-        <p>
-            Developed by
-            <span class="developer-name">GOKULRAJ</span>
-        </p>
-
-        <p>
-            E.G.S. Pillay Engineering College (Autonomous), Nagapattinam
-        </p>
-    </footer>
-
-    <!-- JAVASCRIPT -->
-
-    <script>
-        // Automatically update the copyright year
-        document.getElementById("currentYear").textContent =
-            new Date().getFullYear();
-
-        // Search and category filtering
-        const searchInput = document.getElementById("searchInput");
-        const filterButtons = document.querySelectorAll(".filter-btn");
-        const experimentCards = document.querySelectorAll(".experiment-card");
-        const noResults = document.getElementById("noResults");
-
-        let activeCategory = "all";
-
-        function filterExperiments() {
-            const searchText = searchInput.value.trim().toLowerCase();
-            let visibleCount = 0;
-
-            experimentCards.forEach(function(card) {
-                const cardText = card.textContent.toLowerCase();
-                const cardCategory = card.dataset.category;
-
-                const matchesSearch = cardText.includes(searchText);
-
-                const matchesCategory =
-                    activeCategory === "all" ||
-                    cardCategory === activeCategory;
-
-                const shouldShow = matchesSearch && matchesCategory;
-
-                card.style.display = shouldShow ? "flex" : "none";
-
-                if (shouldShow) {
-                    visibleCount++;
-                }
-            });
-
-            noResults.style.display =
-                visibleCount === 0 ? "block" : "none";
-        }
-
-        searchInput.addEventListener("input", filterExperiments);
-
-        filterButtons.forEach(function(button) {
-            button.addEventListener("click", function() {
-                filterButtons.forEach(function(btn) {
-                    btn.classList.remove("active");
-                });
-
-                button.classList.add("active");
-                activeCategory = button.dataset.filter;
-
-                filterExperiments();
-            });
-        });
-    </script>
-
+<div class="app">
+<aside class="side">
+  <div class="brand">
+    <img class="logo" src="college-logo.png" alt="College logo" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-fb',textContent:'EEE'}))">
+    <div><b>E.G.S. Pillay Engineering College</b><span>Autonomous · Nagapattinam</span></div>
+  </div>
+  <nav class="nav" aria-label="Categories"><div class="nav-h">Categories</div><div id="nav"></div></nav>
+  <div class="side-foot"><b>Your progress</b><div class="bar"><i id="bar"></i></div><span id="progTxt">0 of 0 completed</span></div>
+</aside>
+
+<main class="main">
+  <header class="head">
+    <div>
+      <div class="crumb">Department of Electrical &amp; Electronics Engineering</div>
+      <h1>EEE Virtual Laboratory</h1>
+      <p class="sub">Interactive experiments covering bridges, measurements, sensors and electronics. Learn the principles, connections and measurement techniques.</p>
+    </div>
+    <div class="hbtns"><button class="sq" id="theme" aria-label="Toggle theme">◐</button></div>
+  </header>
+
+  <section class="kpis" aria-label="Summary">
+    <div class="kpi"><span>Total experiments</span><b id="kT">0</b><small>across 4 categories</small></div>
+    <div class="kpi"><span>Available</span><b id="kL">0</b><small>ready to start</small></div>
+    <div class="kpi"><span>Completed</span><b id="kD">0</b><small id="kP">0% of available</small></div>
+    <div class="kpi"><span>Favourites</span><b id="kF">0</b><small>saved by you</small></div>
+  </section>
+
+  <section class="resume" id="resume"><div><small>Continue where you left off</small><b id="rName"></b></div><a class="btn" id="rLink" href="#">Resume experiment →</a></section>
+
+  <div class="tools" id="experiments">
+    <label class="search"><span class="si">⌕</span><input id="q" type="search" placeholder="Search experiments" aria-label="Search experiments"><kbd>/</kbd></label>
+    <select id="sort" aria-label="Sort"><option value="default">Default order</option><option value="az">Name A–Z</option><option value="live">Available first</option><option value="fav">Favourites first</option></select>
+    <div class="seg" role="group" aria-label="View"><button class="on" data-v="grid">Grid</button><button data-v="list">List</button></div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty"><h3>No experiments found</h3><p>Try a different search term or category.</p></div>
+
+  <section class="visit" aria-label="Visitor counter">
+    <div><b>Total visitors</b><small>Thank you for visiting the Virtual Laboratory.</small></div>
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=eee-virtual-laboratory" alt="Total website visitor count" loading="lazy" onerror="this.style.display='none'">
+  </section>
+  <footer><span>© <span id="yr"></span> EEE Virtual Laboratory · Developed by <b>GOKULRAJ</b></span><span>E.G.S. Pillay Engineering College (Autonomous), Nagapattinam</span></footer>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const EXP=[
+{id:'wheatstone',t:'Wheatstone Bridge',c:'bridges',u:'wheatstone-bridge.html',d:'Understand the Wheatstone bridge principle and determine an unknown resistance using the balance condition.'},
+{id:'twowatt',t:'Two-Wattmeter Method',c:'measurements',u:'two-wattmeter.html',d:'Measure three-phase power using two wattmeters and calculate total power and power factor.'},
+{id:'kelvin',t:'Kelvin’s Double Bridge',c:'bridges',u:'kelvin-double-bridge.html',d:'Learn how low resistance is measured accurately using Kelvin’s double bridge method.'},
+{id:'maxwell',t:'Maxwell’s Bridge',c:'bridges',u:'maxwells-bridge.html',d:'Explore AC bridge balance conditions and determine unknown inductance.'},
+{id:'schering',t:'Schering Bridge',c:'bridges',u:null,d:'Learn Schering bridge measurement of capacitance and dielectric properties.'},
+{id:'energy',t:'Single-Phase Energy Meter',c:'measurements',u:'energy-meter.html',d:'Study the operating principle of a single-phase energy meter and electrical energy measurement.'},
+{id:'dynamo',t:'Dynamometer Wattmeter',c:'measurements',u:null,d:'Understand the construction, operating principle and use of a dynamometer-type wattmeter.'},
+{id:'lvdt',t:'LVDT',c:'sensors',u:null,d:'See how a Linear Variable Differential Transformer converts linear displacement into an electrical signal.'},
+{id:'adc',t:'Analog-to-Digital Converter (ADC)',c:'electronics',u:null,d:'Explore the conversion of analog signals into digital values and basic ADC operation.'},
+{id:'dac',t:'Digital-to-Analog Converter (DAC)',c:'electronics',u:'dac-trainer.html',d:'Understand how digital input values are converted into analog output signals.'}
+];
+EXP.forEach((e,i)=>e.n=String(i+1).padStart(2,'0'));
+const CATS=['all','bridges','measurements','sensors','electronics'];
+const NAME={all:'All experiments',bridges:'Bridges',measurements:'Measurements',sensors:'Sensors',electronics:'Electronics'};
+let S={fav:[],done:[],last:null,theme:null,view:'grid'};
+try{Object.assign(S,JSON.parse(localStorage.getItem('eeelab')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('eeelab',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+let cat='all',q='',sort='default';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1600)}
+function flip(a,id){const i=S[a].indexOf(id);i>-1?S[a].splice(i,1):S[a].push(id);save()}
+function nav(){$('#nav').innerHTML=CATS.map(c=>{const n=c==='all'?EXP.length:EXP.filter(e=>e.c===c).length;
+  return `<button class="${c===cat?'on':''}" data-c="${c}" style="--c:var(--c-${c})"><span class="dot"${c==='all'?' style="background:#94A3B8"':''}></span>${NAME[c]}<em>${n}</em></button>`}).join('')}
+function stats(){
+  const live=EXP.filter(e=>e.u),d=live.filter(e=>S.done.includes(e.id)).length,p=live.length?Math.round(d/live.length*100):0;
+  $('#kT').textContent=EXP.length;$('#kL').textContent=live.length;$('#kD').textContent=d;$('#kF').textContent=S.fav.length;
+  $('#kP').textContent=p+'% of available';$('#bar').style.width=p+'%';$('#progTxt').textContent=`${d} of ${live.length} completed`;
+  const l=EXP.find(e=>e.id===S.last);
+  if(l&&l.u){$('#resume').style.display='flex';$('#rName').textContent=l.t;$('#rLink').href=l.u}
+}
+function render(){
+  let list=EXP.filter(e=>(cat==='all'||e.c===cat)&&(e.t+' '+e.d+' '+e.c).toLowerCase().includes(q));
+  if(sort==='az')list.sort((a,b)=>a.t.localeCompare(b.t));
+  if(sort==='live')list.sort((a,b)=>!!b.u-!!a.u);
+  if(sort==='fav')list.sort((a,b)=>S.fav.includes(b.id)-S.fav.includes(a.id));
+  $('#grid').className='grid'+(S.view==='list'?' list':'');
+  $('#grid').innerHTML=list.map((e,i)=>{
+    const f=S.fav.includes(e.id),dn=S.done.includes(e.id);
+    return `<article class="card" style="--c:var(--c-${e.c});animation-delay:${i*40}ms">
+      <div class="top"><span class="idx">EXP ${e.n}</span><span class="pill ${e.u?'live':''}">${dn?'Completed':e.u?'Available':'Coming soon'}</span></div>
+      <div class="info"><div class="cat">${NAME[e.c]}</div><h3>${e.t}</h3></div>
+      <p>${e.d}</p>
+      <div class="acts">${e.u?`<a class="btn" href="${e.u}" data-go="${e.id}">Start experiment</a>`:`<span class="btn off">Coming soon</span>`}
+      <button class="mini ${f?'on':''}" data-fav="${e.id}" aria-label="Favourite" title="Favourite">${f?'★':'☆'}</button>
+      ${e.u?`<button class="mini ${dn?'on':''}" data-done="${e.id}" aria-label="Mark completed" title="Mark completed">✓</button>`:''}</div>
+    </article>`}).join('');
+  $('#empty').style.display=list.length?'none':'block';
+  $('#count').textContent=`Showing ${list.length} of ${EXP.length} experiments`;
+  nav();stats();
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-c]'),f=e.target.closest('[data-fav]'),d=e.target.closest('[data-done]'),g=e.target.closest('[data-go]'),v=e.target.closest('[data-v]');
+  if(c){cat=c.dataset.c;render()}
+  if(f){flip('fav',f.dataset.fav);toast(S.fav.includes(f.dataset.fav)?'Added to favourites':'Removed from favourites');render()}
+  if(d){flip('done',d.dataset.done);toast(S.done.includes(d.dataset.done)?'Marked as completed':'Marked as incomplete');render()}
+  if(g){S.last=g.dataset.go;save()}
+  if(v){S.view=v.dataset.v;save();document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b===v));render()}
+});
+$('#q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render()});
+$('#sort').addEventListener('change',e=>{sort=e.target.value;render()});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==$('#q')){e.preventDefault();$('#q').focus()}});
+const isDark=()=>{const t=document.documentElement.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme:dark)').matches};
+if(S.theme)document.documentElement.setAttribute('data-theme',S.theme);
+$('#theme').addEventListener('click',()=>{S.theme=isDark()?'light':'dark';document.documentElement.setAttribute('data-theme',S.theme);save()});
+$('#yr').textContent=new Date().getFullYear();
+document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+render();
+</script>
 </body>
 </html>
-```

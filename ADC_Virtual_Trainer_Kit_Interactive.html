@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADC Virtual Trainer Kit</title>
+<style>
+:root{
+  --pink:#FFEAF2; --ink:#382F32; --sage:#BCBDAC; --cream:#F4EAD5; --mint:#BCE3C5;
+  --board:#e7e8df; --panel:#f9f7f0; --red:#d84b4b; --green:#48a96a; --blue:#2e6f91;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#f7f3ec,#e8f0e8);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{padding:18px 22px;background:var(--ink);color:white;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:clamp(1.25rem,3vw,1.9rem);margin:0 0 5px}
+header p{margin:0;color:#f4ead5;font-size:.94rem}
+.badge{background:var(--mint);color:var(--ink);padding:8px 12px;border-radius:20px;font-weight:bold;font-size:.8rem}
+main{max-width:1250px;margin:22px auto;padding:0 14px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:18px}
+.card{background:#fffdf8;border:1px solid #d8d4c8;border-radius:16px;box-shadow:0 6px 18px #382f3210;overflow:hidden}
+.cardhead{background:var(--cream);padding:12px 16px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cardbody{padding:16px}
+.trainer{background:linear-gradient(145deg,#f0f0e9,#d9ddd3);border:3px solid #a9ada1;border-radius:15px;padding:18px;box-shadow:inset 0 0 0 2px #ffffffb0}
+.brandrow{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:2px solid #b7baaf;padding-bottom:12px;margin-bottom:15px}
+.brandrow strong{font-size:1.15rem;letter-spacing:.06em}
+.model{font-size:.78rem;background:#d1d4ca;border:1px solid #b2b6ab;padding:6px 8px;border-radius:5px}
+.trainergrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.module{background:#f8f7f1;border:1px solid #c5c8bd;border-radius:10px;padding:12px;min-width:0}
+.module h3{margin:0 0 10px;font-size:.92rem;text-transform:uppercase;letter-spacing:.04em}
+.label{font-size:.76rem;color:#5b5556;margin-bottom:6px;display:block}
+.knobrow{display:flex;align-items:center;gap:12px}
+.knob{width:70px;height:70px;flex:0 0 70px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#6f7777,#333b3d 65%,#202526);border:5px solid #adb1a8;box-shadow:0 3px 4px #0003;position:relative}
+.knob:after{content:"";position:absolute;width:4px;height:24px;background:#f4ead5;left:calc(50% - 2px);top:6px;border-radius:3px;transform-origin:50% 29px;transform:rotate(var(--angle,0deg))}
+.readout{font-size:1.2rem;font-weight:bold;font-variant-numeric:tabular-nums}
+.range{width:100%;accent-color:#477d61}
+.small{font-size:.76rem;color:#655d5e;line-height:1.4}
+.scale{display:flex;justify-content:space-between;font-size:.7rem;color:#625b5c}
+.switches{display:flex;gap:8px;flex-wrap:wrap}
+.switchbox{border:1px solid #d0cec4;border-radius:7px;padding:8px;background:#fff;flex:1;min-width:70px;text-align:center}
+.toggle{width:38px;height:22px;border:0;border-radius:14px;background:#999;position:relative;cursor:pointer;display:block;margin:7px auto 0}
+.toggle:after{content:"";width:16px;height:16px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:.15s}
+.toggle.on{background:#3f9860}.toggle.on:after{left:19px}
+.ledrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}
+.led{text-align:center;font-size:.72rem}
+.bulb{width:24px;height:24px;border-radius:50%;background:#777;border:3px solid #a9aaa3;margin:0 auto 5px;box-shadow:inset 0 0 5px #0008}
+.bulb.on{background:#57e27b;box-shadow:0 0 12px #4edb70,inset 0 0 4px white}
+.outputline{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{background:#e7eee7;border:1px solid #c8d4c7;padding:8px 10px;border-radius:8px;font-size:.86rem}
+.chip b{display:block;font-size:1rem;margin-top:3px;font-variant-numeric:tabular-nums}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button.action{border:0;border-radius:8px;padding:10px 13px;background:var(--ink);color:white;font-weight:bold;cursor:pointer}
+button.action.secondary{background:#d9ded5;color:var(--ink)}
+button.action:disabled{opacity:.45;cursor:not-allowed}
+.status{padding:9px 11px;border-radius:8px;background:#fff3d9;font-size:.84rem;margin-top:10px;line-height:1.45}
+canvas{width:100%;height:230px;border:1px solid #ddd7c9;border-radius:8px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:.82rem}
+th,td{padding:8px 7px;border-bottom:1px solid #e5e0d5;text-align:center}
+th{background:#f2ede2}
+.tablewrap{overflow-x:auto;max-height:245px}
+.note{font-size:.78rem;line-height:1.5;color:#635c5d}
+footer{text-align:center;padding:10px 14px 22px;color:#655d5e;font-size:.78rem}
+@media(max-width:850px){main{grid-template-columns:1fr}.trainergrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.trainergrid{grid-template-columns:1fr}.ledrow{gap:2px}.bulb{width:19px;height:19px}.led{font-size:.65rem}.cardbody{padding:11px}.trainer{padding:10px}}
+</style>
+</head>
+<body>
+<header>
+ <div><h1>ADC Virtual Trainer Kit</h1><p>Interactive laboratory simulation • Analog-to-Digital Conversion</p></div>
+ <span class="badge">VIRTUAL LAB · 8-BIT ADC</span>
+</header>
+<main>
+ <section class="card">
+  <div class="cardhead"><span>01 · Trainer hardware panel</span><span>POWER: <b id="powerText">ON</b></span></div>
+  <div class="cardbody">
+   <div class="trainer">
+    <div class="brandrow"><strong>ADC TRAINER MODULE</strong><span class="model">SIMULATION · REV 1.0</span></div>
+    <div class="trainergrid">
+     <div class="module">
+      <h3>Analog input</h3>
+      <span class="label">Input voltage · VIN</span>
+      <div class="knobrow"><div class="knob" id="vinKnob"></div><div><div class="readout"><span id="vinText">2.50</span> V</div><div class="small">Adjust input control</div></div></div>
+      <input class="range" id="vin" type="range" min="0" max="5" step="0.01" value="2.5" aria-label="Input voltage">
+      <div class="scale"><span>0 V</span><span>2.5 V</span><span>5 V</span></div>
+     </div>
+     <div class="module">
+      <h3>Reference setting</h3>
+      <span class="label">Reference voltage · VREF</span>
+      <div class="knobrow"><div class="knob" id="vrefKnob"></div><div><div class="readout"><span id="vrefText">5.00</span> V</div><div class="small">Full-scale reference</div></div></div>
+      <input class="range" id="vref" type="range" min="1" max="5" step="0.1" value="5" aria-label="Reference voltage">
+      <div class="scale"><span>1 V</span><span>3 V</span><span>5 V</span></div>
+     </div>
+     <div class="module">
+      <h3>Control switches</h3>
+      <div class="switches">
+       <div class="switchbox"><span class="label">POWER</span><button class="toggle on" id="power" aria-label="Power toggle"></button></div>
+       <div class="switchbox"><span class="label">SOC</span><button class="toggle" id="soc" aria-label="Start conversion switch"></button></div>
+       <div class="switchbox"><span class="label">AUTO</span><button class="toggle on" id="auto" aria-label="Auto update toggle"></button></div>
+      </div>
+      <p class="small">POWER enables the virtual module. SOC starts one conversion. AUTO updates output as you adjust VIN.</p>
+     </div>
+     <div class="module">
+      <h3>Conversion status</h3>
+      <div class="outputline" style="margin-top:0">
+       <div class="chip">SOC <b id="socStatus">LOW</b></div>
+       <div class="chip">EOC <b id="eocStatus">READY</b></div>
+      </div>
+      <div class="status" id="status">Module powered. Adjust VIN and press SOC to convert, or leave AUTO enabled.</div>
+     </div>
+    </div>
+    <div class="module" style="margin-top:14px">
+     <h3>Digital output indicators · D7 (MSB) to D0 (LSB)</h3>
+     <div class="ledrow" id="ledrow"></div>
+     <div class="outputline">
+      <div class="chip">Binary output <b id="binary">10000000</b></div>
+      <div class="chip">Decimal output <b id="decimal">128</b></div>
+      <div class="chip">Resolution <b id="resolution">19.53 mV/step</b></div>
+     </div>
+    </div>
+   </div>
+   <div class="actions"><button class="action" id="convert">▶ Start conversion (SOC)</button><button class="action secondary" id="reset">↺ Reset trainer</button><button class="action secondary" id="sample">＋ Add reading</button></div>
+   <p class="note">Educational model: ideal 8-bit unipolar ADC. It is a trainer-style simulation, not a verified replica of the exact VSTM-003 circuit. Confirm the physical module's manual and input limits before connecting real equipment.</p>
+  </div>
+ </section>
+ <section class="card">
+  <div class="cardhead"><span>02 · Graph and live readings</span><span>VIN → DIGITAL</span></div>
+  <div class="cardbody">
+   <h3 style="margin:0 0 8px;font-size:1rem">Input voltage vs. digital output</h3>
+   <canvas id="graph" width="700" height="300" aria-label="ADC output graph"></canvas>
+   <div class="outputline">
+    <div class="chip">Quantized voltage <b id="quantized">2.500 V</b></div>
+    <div class="chip">Full-scale code <b>0–255</b></div>
+   </div>
+   <div class="actions"><button class="action secondary" id="clear">Clear readings</button><button class="action secondary" id="download">Download CSV</button></div>
+   <h3 style="font-size:1rem;margin:20px 0 8px">Observation table</h3>
+   <div class="tablewrap"><table><thead><tr><th>#</th><th>VIN (V)</th><th>VREF (V)</th><th>Binary</th><th>Decimal</th><th>VQ (V)</th></tr></thead><tbody id="rows"><tr><td colspan="6">No readings yet. Click “Add reading”.</td></tr></tbody></table></div>
+   <p class="note">Formula: Code = floor(VIN / VREF × 256), limited to 0–255. Quantized voltage = Code × (VREF / 256). Values are illustrative and may differ from a real ADC IC or trainer module.</p>
+  </div>
+ </section>
+</main>
+<footer>Virtual instrumentation learning resource · No physical hardware is controlled by this page.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const ledrow=$('ledrow');
+for(let bit=7;bit>=0;bit--){const item=document.createElement('div');item.className='led';item.innerHTML=`<div class="bulb" id="led${bit}"></div><div>D${bit}</div><small>${bit===7?'MSB':bit===0?'LSB':bit}</small>`;ledrow.appendChild(item)}
+let powered=true,auto=true,readings=[],lastCode=128,conversionTimer=null;
+function current(){
+ const vin=Number($('vin').value),vref=Number($('vref').value);
+ const code=Math.max(0,Math.min(255,Math.floor((vin/vref)*256)));
+ return {vin,vref,code,q:code*vref/256,step:vref/256};
+}
+function updateKnob(id,value,max){$(id).style.setProperty('--angle',`${-135+(value/max)*270}deg`)}
+function render(){
+ const x=current();$('vinText').textContent=x.vin.toFixed(2);$('vrefText').textContent=x.vref.toFixed(2);
+ updateKnob('vinKnob',x.vin,5);updateKnob('vrefKnob',x.vref,5);
+ $('resolution').textContent=(x.step*1000).toFixed(2)+' mV/step';
+ $('quantized').textContent=x.q.toFixed(3)+' V';
+ $('binary').textContent=x.code.toString(2).padStart(8,'0');$('decimal').textContent=x.code;
+ for(let bit=0;bit<8;bit++)$('led'+bit).classList.toggle('on',powered&&!!(x.code&(1<<bit)));
+ drawGraph();
+}
+function drawGraph(){
+ const c=$('graph'),ctx=c.getContext('2d'),w=c.width,h=c.height,p={l:48,r:18,t:18,b:40};
+ ctx.clearRect(0,0,w,h);ctx.font='12px Arial';ctx.strokeStyle='#e5e0d5';ctx.fillStyle='#5f5859';ctx.lineWidth=1;
+ for(let i=0;i<=5;i++){let y=p.t+(h-p.t-p.b)*(1-i/5);ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(w-p.r,y);ctx.stroke();ctx.fillText(String(Math.round(i*255/5)),8,y+4)}
+ for(let i=0;i<=5;i++){let x=p.l+(w-p.l-p.r)*i/5;ctx.beginPath();ctx.moveTo(x,p.t);ctx.lineTo(x,h-p.b);ctx.stroke();ctx.fillText((i*5/5).toFixed(0),x-3,h-17)}
+ ctx.strokeStyle='#477d61';ctx.lineWidth=2.5;ctx.beginPath();
+ for(let i=0;i<=255;i++){const xx=p.l+(w-p.l-p.r)*(i/5),yy=h-p.b-(h-p.t-p.b)*(i/255);if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke();
+ const x=current(),xx=p.l+(w-p.l-p.r)*(x.vin/5),yy=h-p.b-(h-p.t-p.b)*(x.code/255);
+ ctx.fillStyle='#d84b4b';ctx.beginPath();ctx.arc(xx,yy,6,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#382F32';ctx.fillText(`Current code: ${x.code}`,Math.min(w-130,Math.max(p.l,xx+9)),Math.max(p.t+12,yy-9));
+ ctx.fillText('Input voltage VIN (V)',w/2-55,h-2);
+ ctx.save();ctx.translate(13,h/2+35);ctx.rotate(-Math.PI/2);ctx.fillText('Digital output code',0,0);ctx.restore();
+}
+function setStatus(msg){$('status').textContent=msg}
+function convert(){
+ if(!powered){setStatus('Power is OFF. Turn POWER on before conversion.');return}
+ $('soc').classList.add('on');$('socStatus').textContent='HIGH';$('eocStatus').textContent='BUSY';
+ setStatus('Conversion started… sampling analog input.');
+ clearTimeout(conversionTimer);
+ conversionTimer=setTimeout(()=>{$('soc').classList.remove('on');$('socStatus').textContent='LOW';$('eocStatus').textContent='DONE';render();setStatus(`Conversion complete: VIN ${current().vin.toFixed(2)} V → code ${current().code} (${current().code.toString(2).padStart(8,'0')}).`);},450);
+}
+function addReading(){
+ const x=current();readings.push({n:readings.length+1,vin:x.vin,vref:x.vref,binary:x.code.toString(2).padStart(8,'0'),decimal:x.code,q:x.q});
+ $('rows').innerHTML=readings.map(r=>`<tr><td>${r.n}</td><td>${r.vin.toFixed(2)}</td><td>${r.vref.toFixed(2)}</td><td style="font-family:monospace">${r.binary}</td><td>${r.decimal}</td><td>${r.q.toFixed(3)}</td></tr>`).join('');
+}
+$('vin').addEventListener('input',()=>{render();if(auto&&powered){$('eocStatus').textContent='LIVE';setStatus('AUTO mode: output is updating with the input voltage.')}})
+$('vref').addEventListener('input',()=>{render();if(auto&&powered){$('eocStatus').textContent='LIVE';setStatus('Reference changed. AUTO output refreshed.')}})
+$('power').addEventListener('click',()=>{powered=!powered;$('power').classList.toggle('on',powered);$('powerText').textContent=powered?'ON':'OFF';$('eocStatus').textContent=powered?'READY':'OFF';if(!powered){for(let b=0;b<8;b++)$('led'+b).classList.remove('on');setStatus('Power is OFF. Digital LEDs are disabled.')}else{setStatus('Power ON. Module ready.');render()}})
+$('auto').addEventListener('click',()=>{auto=!auto;$('auto').classList.toggle('on',auto);setStatus(auto?'AUTO mode enabled. Output follows VIN.':'AUTO mode disabled. Press Start conversion to update the output.')})
+$('soc').addEventListener('click',convert);$('convert').addEventListener('click',convert);
+$('reset').addEventListener('click',()=>{$('vin').value=2.5;$('vref').value=5;powered=true;auto=true;$('power').classList.add('on');$('auto').classList.add('on');$('powerText').textContent='ON';$('soc').classList.remove('on');$('socStatus').textContent='LOW';$('eocStatus').textContent='READY';readings=[];$('rows').innerHTML='<tr><td colspan="6">No readings yet. Click “Add reading”.</td></tr>';render();setStatus('Trainer reset to default settings.')})
+$('sample').addEventListener('click',addReading);$('clear').addEventListener('click',()=>{readings=[];$('rows').innerHTML='<tr><td colspan="6">No readings yet. Click “Add reading”.</td></tr>'})
+$('download').addEventListener('click',()=>{if(!readings.length){setStatus('Add at least one reading before downloading CSV.');return}const head='No,VIN (V),VREF (V),Binary,Decimal,VQ (V)';const body=readings.map(r=>[r.n,r.vin.toFixed(2),r.vref.toFixed(2),r.binary,r.decimal,r.q.toFixed(3)].join(','));const blob=new Blob([[head,...body].join('\\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ADC_observation_table.csv';a.click();URL.revokeObjectURL(a.href)})
+render();
+</script>
+</body>
+</html>
